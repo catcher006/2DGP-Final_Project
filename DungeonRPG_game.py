@@ -26,7 +26,7 @@ class Player:
         self.dead_image = load_image('player_none_none_dead.png')
 
         self.x = 512
-        self.y = 288
+        self.y = 144
 
         self.frame = 0
         self.idle_frame_counter = 0  # idle 애니메이션용 카운터
@@ -35,6 +35,13 @@ class Player:
         self.dx = 0
         self.dy = 0
         self.direction = 'down'
+
+        # 마을의 4개 통로 영역
+        self.village_paths = [
+            {'min_x': 20, 'max_x': 1004, 'min_y': 120, 'max_y': 200},  # 중앙 메인 통로
+            {'min_x': 370, 'max_x': 520, 'min_y': 60, 'max_y': 120},  # 하단 중앙 통로
+            {'min_x': 370, 'max_x': 520, 'min_y': 200, 'max_y': 230},  # 하단 중앙 통로
+        ]
 
         self.is_attacking = False  # 공격 상태
         self.attack_start_time = 0  # 공격 시작 시간
@@ -79,8 +86,21 @@ class Player:
         else:
             self.frame = (self.frame + 1) % 9
 
-        self.x += self.dx
-        self.y += self.dy
+            # 새로운 위치 계산
+            new_x = self.x + self.dx
+            new_y = self.y + self.dy
+
+            # 4개 통로 영역 중 하나라도 포함되면 이동 허용
+            can_move = False
+            for path in self.village_paths:
+                if (path['min_x'] <= new_x <= path['max_x'] and
+                        path['min_y'] <= new_y <= path['max_y']):
+                    can_move = True
+                    break
+
+            if can_move:
+                self.x = new_x
+                self.y = new_y
 
     def set_direction(self, dx, dy, direction):
         # 이동에서 정지로 바뀔 때 idle 프레임 즉시 시작
@@ -92,6 +112,7 @@ class Player:
         self.dx = dx
         self.dy = dy
         self.direction = direction
+        print(f"x={self.x}, y={self.y}")
 
     def attack(self):
         if not self.is_attacking:  # 이미 공격 중이 아니면
