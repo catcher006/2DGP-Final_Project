@@ -29,19 +29,24 @@ class Goblin_Mob:
         }
         row = direction_map[self.direction]
         offset_x = 0  # 중심 보정용 변수
+        offset_y = 0  # 중심 보정용 변수
 
         if self.mob_is_attacking:
             if self.direction == 'left':
-                offset_x = -10
+                offset_x = 7
+                offset_y = 8
             elif self.direction == 'right':
-                offset_x = +10
+                offset_x = -5
+                offset_y = 8
             elif self.direction == 'up':
-                offset_x = +10
+                offset_x = -10
+                offset_y = 8
             elif self.direction == 'down':
-                offset_x = +10
+                offset_x = -7
+                offset_y = 7
 
             self.attack_image.clip_draw(self.frame * 64, 64 * row, 64, 64,
-                                        self.x + offset_x, self.y)
+                                        self.x + offset_x, self.y + offset_y)
         else:
             self.walk_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
 
