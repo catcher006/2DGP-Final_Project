@@ -1,35 +1,50 @@
 from pico2d import *
-import random
+import random, time
 
 class Boy:
     def __init__(self):
         self.image = load_image('skeleton_none_walk_all.png')
+        self.attack_image = load_image('skeleton_mace_attack_all.png')  # 공격 이미지 추가
         self.x = random.randint(0, 700)
         self.y = 90
         self.frame = random.randint(0, 7)
         self.dx = 0
         self.dy = 0
         self.direction = 'down'
+        self.is_attacking = False  # 공격 상태
+        self.attack_start_time = 0  # 공격 시작 시간
 
     def draw(self):
         direction_map = {
             'up': 3,  # 위쪽 방향에 해당하는 이미지 행
-            'down': 1,  # 아래쪽 방향에 해당하는 이미지 행
             'left': 2,  # 왼쪽 방향에 해당하는 이미지 행
+            'down': 1,  # 아래쪽 방향에 해당하는 이미지 행
             'right': 0  # 오른쪽 방향에 해당하는 이미지 행
         }
         row = direction_map[self.direction]
-        self.image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
+        if self.is_attacking:
+            self.attack_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
+        else:
+            self.image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
 
     def update(self):
         self.frame = (self.frame + 1) % 8
         self.x += self.dx
         self.y += self.dy
+        if self.is_attacking:
+            # 공격 상태 해제 (0.5초 후)
+            if time.time() - self.attack_start_time > 0.5:
+                self.is_attacking = False
 
     def set_direction(self, dx, dy, direction):
         self.dx = dx
         self.dy = dy
         self.direction = direction
+
+    def attack(self):
+        if not self.is_attacking:  # 이미 공격 중이 아니면
+            self.is_attacking = True
+            self.attack_start_time = time.time()  # 공격 시작 시간 기록
 
 def handle_events():
     global running
@@ -49,6 +64,8 @@ def handle_events():
                 boy.set_direction(-5, 0, 'left')
             elif event.key == SDLK_d:
                 boy.set_direction(5, 0, 'right')
+            elif event.key == SDLK_SPACE:  # 공격 키 처리
+                boy.attack()
         elif event.type == SDL_KEYUP:
             if event.key in (SDLK_w, SDLK_s, SDLK_a, SDLK_d):
                 boy.set_direction(0, 0, boy.direction)
