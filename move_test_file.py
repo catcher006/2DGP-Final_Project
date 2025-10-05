@@ -5,9 +5,9 @@ class Boy:
     def __init__(self):
         self.image = load_image('skeleton_mace_walk_all.png')
         self.attack_image = load_image('skeleton_mace_attack_all.png')  # 공격 이미지 추가
-        self.x = random.randint(0, 700)
+        self.x = 400
         self.y = 90
-        self.frame = random.randint(0, 7)
+        self.frame = 0
         self.dx = 0
         self.dy = 0
         self.direction = 'down'
@@ -23,7 +23,10 @@ class Boy:
         }
         row = direction_map[self.direction]
         if self.is_attacking:
-            self.attack_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
+            if self.direction == 'down':
+                self.attack_image.clip_draw(self.frame * 75, 64 * row, 75, 64, self.x, self.y)
+            else:
+                self.attack_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
         else:
             self.image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
 
