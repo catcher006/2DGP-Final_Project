@@ -27,7 +27,11 @@ class Player:
 
         self.x = 512
         self.y = 288
+
         self.frame = 0
+        self.idle_frame_counter = 0  # idle 애니메이션용 카운터
+        self.idle_frame_delay = 10  # 10프레임마다 idle 프레임 변경
+
         self.dx = 0
         self.dy = 0
         self.direction = 'down'
@@ -64,11 +68,17 @@ class Player:
 
     def update(self):
         if self.dx == 0 and self.dy == 0 and self.is_attacking == False:  # 멈춰있는 상태
-            self.frame = (self.frame + 1) % 2
+            self.idle_frame_counter += 1
+            if self.idle_frame_counter >= self.idle_frame_delay:
+                self.frame = (self.frame + 1) % 2
+                self.idle_frame_counter = 0
+
         elif self.is_attacking:
             pass
+
         else:
             self.frame = (self.frame + 1) % 9
+
         self.x += self.dx
         self.y += self.dy
 
