@@ -5,14 +5,18 @@ class Skeleton_Mob:
     def __init__(self):
         self.walk_image = load_image('skeleton_mace_walk_all.png')
         self.attack_image = load_image('skeleton_mace_attack_all.png')  # 공격 이미지 추가
+        self.dead_image = load_image('skeleton_mace_dead.png')  # 사망 이미지 추가
+
         self.x = 400
         self.y = 90
         self.frame = 0
         self.dx = 0
         self.dy = 0
         self.direction = 'down'
+
         self.mob_is_attacking = False  # 공격 상태
         self.attack_start_time = 0  # 공격 시작 시간
+
         self.hp = 100  # 체력 추가
         self.is_alive = True  # 생존 상태 추가
 
