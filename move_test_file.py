@@ -16,17 +16,28 @@ class Skeleton_Mob:
 
     def draw(self):
         direction_map = {
-            'up': 3,  # 위쪽 방향에 해당하는 이미지 행
-            'left': 2,  # 왼쪽 방향에 해당하는 이미지 행
-            'down': 1,  # 아래쪽 방향에 해당하는 이미지 행
-            'right': 0  # 오른쪽 방향에 해당하는 이미지 행
+            'up': 3,
+            'left': 2,
+            'down': 1,
+            'right': 0
         }
         row = direction_map[self.direction]
+        offset_x = 0  # 중심 보정용 변수
+
         if self.mob_is_attacking:
-            if self.direction == 'down':
-                self.attack_image.clip_draw(self.frame * 75, 64 * row, 75, 64, self.x, self.y)
-            else:
-                self.attack_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
+            # 공격 프레임은 프레임당 폭이 약간 넓으므로 중심 보정
+            frame_width = 75 if self.direction == 'down' else 64
+            if self.direction == 'left':
+                offset_x = -10
+            elif self.direction == 'right':
+                offset_x = +10
+            elif self.direction == 'up':
+                offset_x = +10
+            elif self.direction == 'down':
+                offset_x = +10
+
+            self.attack_image.clip_draw(self.frame * frame_width, 64 * row, frame_width, 64,
+                                        self.x + offset_x, self.y)
         else:
             self.walk_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
 
