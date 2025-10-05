@@ -31,8 +31,6 @@ class Goblin_Mob:
         offset_x = 0  # 중심 보정용 변수
 
         if self.mob_is_attacking:
-            # 공격 프레임은 프레임당 폭이 약간 넓으므로 중심 보정
-            frame_width = 75 if self.direction == 'down' else 64
             if self.direction == 'left':
                 offset_x = -10
             elif self.direction == 'right':
@@ -42,7 +40,7 @@ class Goblin_Mob:
             elif self.direction == 'down':
                 offset_x = +10
 
-            self.attack_image.clip_draw(self.frame * frame_width, 64 * row, frame_width, 64,
+            self.attack_image.clip_draw(self.frame * 64, 64 * row, 64, 64,
                                         self.x + offset_x, self.y)
         else:
             self.walk_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
