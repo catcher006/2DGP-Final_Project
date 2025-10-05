@@ -3,7 +3,7 @@ import random, time
 
 class Boy:
     def __init__(self):
-        self.image = load_image('skeleton_none_walk_all.png')
+        self.image = load_image('skeleton_mace_walk_all.png')
         self.attack_image = load_image('skeleton_mace_attack_all.png')  # 공격 이미지 추가
         self.x = random.randint(0, 700)
         self.y = 90
