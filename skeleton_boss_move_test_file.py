@@ -129,30 +129,6 @@ class Skeleton_Boss:
     def damage(self):
         pass
 
-def handle_events():
-    global running
-    global skeleton_boss  # 제어할 스켈레톤 객체
-    events = get_events()
-    for event in events:
-        if event.type == SDL_QUIT:
-            running = False
-        elif event.type == SDL_KEYDOWN:
-            if event.key == SDLK_ESCAPE:
-                running = False
-            elif event.key == SDLK_w:
-                skeleton_boss.set_direction(0, 10, 'up')
-            elif event.key == SDLK_s:
-                skeleton_boss.set_direction(0, -10, 'down')
-            elif event.key == SDLK_a:
-                skeleton_boss.set_direction(-10, 0, 'left')
-            elif event.key == SDLK_d:
-                skeleton_boss.set_direction(10, 0, 'right')
-            elif event.key == SDLK_SPACE:  # 공격 키 처리
-                skeleton_boss.attack()
-        elif event.type == SDL_KEYUP:
-            if event.key in (SDLK_w, SDLK_s, SDLK_a, SDLK_d):
-                skeleton_boss.set_direction(0, 0, skeleton_boss.direction)
-
 open_canvas(1200,800)
 
 def reset_world():
@@ -182,7 +158,6 @@ def render_world():
 reset_world()
 
 while running:
-    handle_events()
     update_world()
     render_world()
     delay(0.07)
