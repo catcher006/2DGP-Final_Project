@@ -32,6 +32,7 @@ class Skeleton_Boss:
         offset_y = 0  # 중심 보정용 변수
 
         if self.mob_is_attacking:
+
             if self.direction == 'left':
                 if self.frame == 0:
                     offset_x = 0
@@ -44,12 +45,59 @@ class Skeleton_Boss:
                 elif self.frame in (4, 5):
                     offset_x = -40
                 offset_y = -27
+
             elif self.direction == 'right':
-                offset_x = +10
+                if self.frame == 0:
+                    offset_x = 0
+                elif self.frame == 1:
+                    offset_x = +5
+                elif self.frame == 2:
+                    offset_x = -5
+                elif self.frame == 3:
+                    offset_x = +28
+                elif self.frame in (4, 5):
+                    offset_x = +40
+                offset_y = -27
+
             elif self.direction == 'up':
-                offset_x = +10
+                if self.frame == 0:
+                    offset_x = 10
+                    offset_y = -27
+                elif self.frame == 1:
+                    offset_x = -3
+                    offset_y = -27
+                elif self.frame == 2:
+                    offset_x = -15
+                    offset_y = -27
+                elif self.frame == 3:
+                    offset_x = 0
+                    offset_y = -27
+                elif self.frame == 4:
+                    offset_x = 0
+                    offset_y = -17
+                elif self.frame == 5:
+                    offset_x = 40
+                    offset_y = -17
+
             elif self.direction == 'down':
-                offset_x = +10
+                if self.frame == 0:
+                    offset_x = 22
+                    offset_y = -27
+                elif self.frame == 1:
+                    offset_x = -5
+                    offset_y = -27
+                elif self.frame == 2:
+                    offset_x = -20
+                    offset_y = -27
+                elif self.frame == 3:
+                    offset_x = -10
+                    offset_y = -27
+                elif self.frame == 4:
+                    offset_x = 25
+                    offset_y = -37
+                elif self.frame == 5:
+                    offset_x = 40
+                    offset_y = -32
 
             self.attack_image.clip_draw(self.frame * 66, 66 * row, 64, 64,
                                         self.x + offset_x, self.y + offset_y, 200, 200)
@@ -92,13 +140,13 @@ def handle_events():
             if event.key == SDLK_ESCAPE:
                 running = False
             elif event.key == SDLK_w:
-                skeleton_boss.set_direction(0, 5, 'up')
+                skeleton_boss.set_direction(0, 10, 'up')
             elif event.key == SDLK_s:
-                skeleton_boss.set_direction(0, -5, 'down')
+                skeleton_boss.set_direction(0, -10, 'down')
             elif event.key == SDLK_a:
-                skeleton_boss.set_direction(-5, 0, 'left')
+                skeleton_boss.set_direction(-10, 0, 'left')
             elif event.key == SDLK_d:
-                skeleton_boss.set_direction(5, 0, 'right')
+                skeleton_boss.set_direction(10, 0, 'right')
             elif event.key == SDLK_SPACE:  # 공격 키 처리
                 skeleton_boss.attack()
         elif event.type == SDL_KEYUP:
