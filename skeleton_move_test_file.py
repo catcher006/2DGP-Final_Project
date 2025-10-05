@@ -13,6 +13,8 @@ class Skeleton_Mob:
         self.direction = 'down'
         self.mob_is_attacking = False  # 공격 상태
         self.attack_start_time = 0  # 공격 시작 시간
+        self.hp = 100  # 체력 추가
+        self.is_alive = True  # 생존 상태 추가
 
     def draw(self):
         direction_map = {
