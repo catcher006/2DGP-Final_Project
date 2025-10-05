@@ -7,14 +7,14 @@ class Skeleton_Boss:
         self.attack_image = load_image('skeleton_boss_attack_all.png')
         self.dead_image = load_image('skeleton_boss_dead.png')
 
-        self.x = 400
-        self.y = 300
+        self.x = 200
+        self.y = 200
         self.frame = 0
         self.dx = 0
         self.dy = 0
         self.direction = 'down'
 
-        self.mob_is_attacking = False  # 공격 상태
+        self.mob_is_moving = False  # 공격 상태
         self.attack_start_time = 0  # 공격 시작 시간
 
         self.hp = 300  # 체력 추가
@@ -31,7 +31,7 @@ class Skeleton_Boss:
         offset_x = 0  # 중심 보정용 변수
         offset_y = 0  # 중심 보정용 변수
 
-        if self.mob_is_attacking:
+        if self.mob_is_moving:
 
             if self.direction == 'left':
                 if self.frame == 0:
@@ -105,12 +105,12 @@ class Skeleton_Boss:
             self.walk_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y, 200, 200)
 
     def update(self):
-        if self.dx == 0 and self.dy == 0 and self.mob_is_attacking == False:  # 멈춰있는 상태
+        if self.dx == 0 and self.dy == 0 and self.mob_is_moving == False:  # 멈춰있는 상태
             self.frame = 0  # 0열 고정
-        elif self.mob_is_attacking:
+        elif self.mob_is_moving:
             self.frame = (self.frame + 1) % 6  # 공격은 6프레임
             if time.time() - self.attack_start_time > 0.5:  # 공격 상태 해제 (0.5초 후)
-                self.mob_is_attacking = False
+                self.mob_is_moving = False
         else:
             self.frame = (self.frame + 1) % 9  # 걷기는 9프레임
         self.x += self.dx
@@ -122,8 +122,8 @@ class Skeleton_Boss:
         self.direction = direction
 
     def attack(self):
-        if not self.mob_is_attacking:  # 이미 공격 중이 아니면
-            self.mob_is_attacking = True
+        if not self.mob_is_moving:  # 이미 공격 중이 아니면
+            self.mob_is_moving = True
             self.attack_start_time = time.time()  # 공격 시작 시간 기록
 
     def damage(self):
