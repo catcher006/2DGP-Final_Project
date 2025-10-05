@@ -28,7 +28,7 @@ class Item:
 class UI:
     pass
 
-open_canvas(1024,1024)
+open_canvas(1024,576)
 
 def handle_events():
     pass
