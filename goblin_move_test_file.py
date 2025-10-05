@@ -7,8 +7,8 @@ class Goblin_Mob:
         self.attack_image = load_image('goblin_bow_shoot.png')
         self.dead_image = load_image('goblin_bow_dead.png')
 
-        self.x = 400
-        self.y = 90
+        self.x = 512
+        self.y = 512
         self.frame = 0
         self.dx = 0
         self.dy = 0
@@ -48,7 +48,19 @@ class Goblin_Mob:
             self.attack_image.clip_draw(self.frame * 64, 64 * row, 64, 64,
                                         self.x + offset_x, self.y + offset_y)
         else:
-            self.walk_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
+            if self.direction == 'left':
+                offset_x = -17
+                offset_y = 0
+            elif self.direction == 'right':
+                offset_x = -3
+                offset_y = 0
+            elif self.direction == 'up':
+                offset_x = 0
+                offset_y = 0
+            elif self.direction == 'down':
+                offset_x = -7
+                offset_y = 0
+            self.walk_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x + offset_x, self.y + offset_y)
 
     def update(self):
         if self.dx == 0 and self.dy == 0 and self.mob_is_attacking == False:  # 멈춰있는 상태
@@ -99,7 +111,7 @@ def handle_events():
             if event.key in (SDLK_w, SDLK_s, SDLK_a, SDLK_d):
                 goblin_mob.set_direction(0, 0, goblin_mob.direction)
 
-open_canvas(1200,800)
+open_canvas(1024,1024)
 
 def reset_world():
     global running
