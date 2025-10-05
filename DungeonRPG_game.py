@@ -83,6 +83,12 @@ class Player:
         self.y += self.dy
 
     def set_direction(self, dx, dy, direction):
+        # 이동에서 정지로 바뀔 때 idle 프레임 즉시 시작
+        if self.dx != 0 or self.dy != 0:  # 이전에 이동 중이었다면
+            if dx == 0 and dy == 0:  # 지금 정지 상태가 되면
+                self.frame = 0  # idle 첫 번째 프레임으로 설정
+                self.idle_frame_counter = 0  # 카운터 리셋
+
         self.dx = dx
         self.dy = dy
         self.direction = direction
