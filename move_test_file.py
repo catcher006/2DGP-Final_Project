@@ -42,14 +42,16 @@ def handle_events():
             if event.key == SDLK_ESCAPE:
                 running = False
             elif event.key == SDLK_w:
-                boy.set_direction(0, 10, 'up')
+                boy.set_direction(0, 5, 'up')
             elif event.key == SDLK_s:
-                boy.set_direction(0, -10, 'down')
+                boy.set_direction(0, -5, 'down')
             elif event.key == SDLK_a:
-                boy.set_direction(-10, 0, 'left')
+                boy.set_direction(-5, 0, 'left')
             elif event.key == SDLK_d:
-                boy.set_direction(10, 0, 'right')
-
+                boy.set_direction(5, 0, 'right')
+        elif event.type == SDL_KEYUP:
+            if event.key in (SDLK_w, SDLK_s, SDLK_a, SDLK_d):
+                boy.set_direction(0, 0, boy.direction)
 
 open_canvas(1200,800)
 
@@ -83,6 +85,6 @@ while running:
     handle_events()
     update_world()
     render_world()
-    delay(0.1)
+    delay(0.07)
 
 close_canvas()
