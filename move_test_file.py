@@ -7,6 +7,8 @@ class Boy:
         self.x = random.randint(0, 700)
         self.y = 90
         self.frame = random.randint(0, 7)
+        self.dx = 0
+        self.dy = 0
         self.direction = 'down'
 
     def draw(self):
@@ -21,10 +23,12 @@ class Boy:
 
     def update(self):
         self.frame = (self.frame + 1) % 8
+        self.x += self.dx
+        self.y += self.dy
 
-    def move(self, dx, dy, direction):
-        self.x += dx
-        self.y += dy
+    def set_direction(self, dx, dy, direction):
+        self.dx = dx
+        self.dy = dy
         self.direction = direction
 
 def handle_events():
@@ -38,13 +42,14 @@ def handle_events():
             if event.key == SDLK_ESCAPE:
                 running = False
             elif event.key == SDLK_w:
-                boy.move(0, 10, 'up')
+                boy.set_direction(0, 10, 'up')
             elif event.key == SDLK_s:
-                boy.move(0, -10, 'down')
+                boy.set_direction(0, -10, 'down')
             elif event.key == SDLK_a:
-                boy.move(-10, 0, 'left')
+                boy.set_direction(-10, 0, 'left')
             elif event.key == SDLK_d:
-                boy.move(10, 0, 'right')
+                boy.set_direction(10, 0, 'right')
+
 
 open_canvas(1200,800)
 
