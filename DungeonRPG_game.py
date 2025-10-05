@@ -59,15 +59,6 @@ class Player:
             self.idle_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
 
         else:
-            if self.direction == 'left':
-                offset_x = -10
-            elif self.direction == 'right':
-                offset_x = +10
-            elif self.direction == 'up':
-                offset_x = +10
-            elif self.direction == 'down':
-                offset_x = +10
-
             self.walk_image.clip_draw(self.frame * 64, 64 * row, 64, 64,
                                         self.x + offset_x, self.y)
 
@@ -154,8 +145,8 @@ def reset_world():
     world = []
     running = True
 
-    background = Background_Resource()
-    world.append(background)
+    #background = Background_Resource()
+    #world.append(background)
 
     player = Player()
     world.append(player)
