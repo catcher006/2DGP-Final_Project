@@ -7,7 +7,7 @@ class Skeleton_Boss:
         self.attack_image = load_image('skeleton_boss_attack_all.png')
         self.dead_image = load_image('skeleton_boss_dead.png')
 
-        self.x = 350
+        self.x = 200
         self.y = 200
         self.frame = 0
         self.dx = 0
@@ -19,67 +19,6 @@ class Skeleton_Boss:
 
         self.hp = 300  # 체력 추가
         self.is_alive = True  # 생존 상태 추가
-
-        self.is_pattern_moving = False
-        self.target_distance = 0
-        self.moved_distance = 0
-
-        self.is_pattern_active = False
-        self.current_pattern_index = 0
-        self.pattern_delay_timer = 0
-
-        self.movement_patterns = []
-        self.pattern_state = 'moving'  # 패턴 상태
-
-    # 방향과 거리를 받아서 5씩 이동하는 함수
-    def move_function(self, direction, distance):
-        direction_map = {
-            'up': (0, 5),
-            'down': (0, -5),
-            'left': (-5, 0),
-            'right': (5, 0)
-        }
-
-        if direction in direction_map:
-            dx, dy = direction_map[direction]
-            self.target_distance = distance
-            self.moved_distance = 0
-            self.set_direction(dx, dy, direction)
-            self.is_pattern_moving = True
-
-    # 여러 이동 패턴을 순차적으로 실행하는 함수
-    def execute_movement_patterns(self):
-        self.movement_patterns = [
-            ('up', 250),
-            ('up', 250),
-            ('down', 250),
-            ('right', 250),
-            ('up', 170),
-            ('down', 170),
-            ('down', 170),
-            ('up', 170),
-            ('right', 250),
-            ('up', 250),
-            ('down', 250),
-            ('down', 250),
-            ('up', 250),
-            ('left', 250),
-            ('down', 170),
-            ('up', 170),
-            ('up', 170),
-            ('down', 170),
-            ('left', 250),
-            ('down', 250),
-        ]
-        self.current_pattern_index = 0
-        self.pattern_delay_timer = 0
-        self.is_pattern_active = True
-        self.pattern_state = 'moving'
-
-        # 첫 번째 패턴 시작
-        if self.movement_patterns:
-            direction, distance = self.movement_patterns[0]
-            self.move_function(direction, distance)
 
     def draw(self):
         direction_map = {
@@ -166,40 +105,14 @@ class Skeleton_Boss:
             self.walk_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y, 200, 200)
 
     def update(self):
-        # 패턴 이동 처리
-        if self.is_pattern_moving and self.is_alive:
-            self.moved_distance += 5
-            if self.moved_distance >= self.target_distance:
-                self.set_direction(0, 0, self.direction)
-                self.is_pattern_moving = False
-                self.pattern_state = 'attacking'
-                self.attack()  # 이동 완료 후 공격 시작
-
-        # 패턴 상태에 따른 처리
-        if self.is_pattern_active and self.is_alive:
-            if self.pattern_state == 'attacking' and not self.mob_is_moving:
-                # 공격이 끝나면 대기 상태로 전환
-                self.pattern_state = 'waiting'
-                self.pattern_delay_timer = time.time()
-
-            elif self.pattern_state == 'waiting':
-                if time.time() - self.pattern_delay_timer > 0.5:  # 0.5초 대기
-                    # 다음 패턴으로 이동
-                    self.current_pattern_index = (self.current_pattern_index + 1) % len(self.movement_patterns)
-                    direction, distance = self.movement_patterns[self.current_pattern_index]
-                    self.move_function(direction, distance)
-                    self.pattern_state = 'moving'
-
-        # 기존 update 로직
-        if self.dx == 0 and self.dy == 0 and self.mob_is_moving == False:
-            self.frame = 0
+        if self.dx == 0 and self.dy == 0 and self.mob_is_moving == False:  # 멈춰있는 상태
+            self.frame = 0  # 0열 고정
         elif self.mob_is_moving:
-            self.frame = (self.frame + 1) % 6
-            if time.time() - self.attack_start_time > 0.5:
+            self.frame = (self.frame + 1) % 6  # 공격은 6프레임
+            if time.time() - self.attack_start_time > 0.5:  # 공격 상태 해제 (0.5초 후)
                 self.mob_is_moving = False
         else:
-            self.frame = (self.frame + 1) % 9
-
+            self.frame = (self.frame + 1) % 9  # 걷기는 9프레임
         self.x += self.dx
         self.y += self.dy
 
@@ -243,8 +156,6 @@ def render_world():
     update_canvas()
 
 reset_world()
-# 이동 패턴 시작
-skeleton_boss.execute_movement_patterns()
 
 while running:
     update_world()
