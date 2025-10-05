@@ -28,7 +28,7 @@ class Boy:
             self.image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
 
     def update(self):
-        if self.dx == 0 and self.dy == 0:  # 멈춰있는 상태
+        if self.dx == 0 and self.dy == 0 and self.is_attacking == False:  # 멈춰있는 상태
             self.frame = 0  # 0열 고정
         elif self.is_attacking:
             self.frame = (self.frame + 1) % 6  # 공격은 6프레임
