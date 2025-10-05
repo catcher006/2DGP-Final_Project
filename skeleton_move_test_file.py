@@ -69,6 +69,9 @@ class Skeleton_Mob:
             self.mob_is_attacking = True
             self.attack_start_time = time.time()  # 공격 시작 시간 기록
 
+    def damage(self):
+        pass
+
 def handle_events():
     global running
     global skeleton_mob  # 제어할 스켈레톤 객체
