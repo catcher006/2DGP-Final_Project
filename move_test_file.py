@@ -28,13 +28,14 @@ class Boy:
             self.image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
 
     def update(self):
-        self.frame = (self.frame + 1) % 8
+        if self.is_attacking:
+            self.frame = (self.frame + 1) % 6  # 공격은 6프레임
+            if time.time() - self.attack_start_time > 0.5:  # 공격 상태 해제 (0.5초 후)
+                self.is_attacking = False
+        else:
+            self.frame = (self.frame + 1) % 8  # 걷기는 8프레임
         self.x += self.dx
         self.y += self.dy
-        if self.is_attacking:
-            # 공격 상태 해제 (0.5초 후)
-            if time.time() - self.attack_start_time > 0.5:
-                self.is_attacking = False
 
     def set_direction(self, dx, dy, direction):
         self.dx = dx
