@@ -161,8 +161,8 @@ def reset_world():
     world = []
     running = True
 
-    #background = Background_Resource()
-    #world.append(background)
+    background = Background_Resource()
+    world.append(background)
 
     player = Player()
     world.append(player)
