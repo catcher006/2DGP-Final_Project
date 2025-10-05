@@ -1,9 +1,9 @@
 from pico2d import *
 import random, time
 
-class Boy:
+class Skeleton_Mob:
     def __init__(self):
-        self.image = load_image('skeleton_mace_walk_all.png')
+        self.walk_image = load_image('skeleton_mace_walk_all.png')
         self.attack_image = load_image('skeleton_mace_attack_all.png')  # 공격 이미지 추가
         self.x = 400
         self.y = 90
@@ -11,7 +11,7 @@ class Boy:
         self.dx = 0
         self.dy = 0
         self.direction = 'down'
-        self.is_attacking = False  # 공격 상태
+        self.mob_is_attacking = False  # 공격 상태
         self.attack_start_time = 0  # 공격 시작 시간
 
     def draw(self):
@@ -22,21 +22,21 @@ class Boy:
             'right': 0  # 오른쪽 방향에 해당하는 이미지 행
         }
         row = direction_map[self.direction]
-        if self.is_attacking:
+        if self.mob_is_attacking:
             if self.direction == 'down':
                 self.attack_image.clip_draw(self.frame * 75, 64 * row, 75, 64, self.x, self.y)
             else:
                 self.attack_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
         else:
-            self.image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
+            self.walk_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
 
     def update(self):
-        if self.dx == 0 and self.dy == 0 and self.is_attacking == False:  # 멈춰있는 상태
+        if self.dx == 0 and self.dy == 0 and self.mob_is_attacking == False:  # 멈춰있는 상태
             self.frame = 0  # 0열 고정
-        elif self.is_attacking:
+        elif self.mob_is_attacking:
             self.frame = (self.frame + 1) % 6  # 공격은 6프레임
             if time.time() - self.attack_start_time > 0.5:  # 공격 상태 해제 (0.5초 후)
-                self.is_attacking = False
+                self.mob_is_attacking = False
         else:
             self.frame = (self.frame + 1) % 8  # 걷기는 8프레임
         self.x += self.dx
@@ -48,13 +48,13 @@ class Boy:
         self.direction = direction
 
     def attack(self):
-        if not self.is_attacking:  # 이미 공격 중이 아니면
-            self.is_attacking = True
+        if not self.mob_is_attacking:  # 이미 공격 중이 아니면
+            self.mob_is_attacking = True
             self.attack_start_time = time.time()  # 공격 시작 시간 기록
 
 def handle_events():
     global running
-    global boy  # 제어할 소년 객체
+    global skeleton_mob  # 제어할 스켈레톤 객체
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -63,31 +63,31 @@ def handle_events():
             if event.key == SDLK_ESCAPE:
                 running = False
             elif event.key == SDLK_w:
-                boy.set_direction(0, 5, 'up')
+                skeleton_mob.set_direction(0, 5, 'up')
             elif event.key == SDLK_s:
-                boy.set_direction(0, -5, 'down')
+                skeleton_mob.set_direction(0, -5, 'down')
             elif event.key == SDLK_a:
-                boy.set_direction(-5, 0, 'left')
+                skeleton_mob.set_direction(-5, 0, 'left')
             elif event.key == SDLK_d:
-                boy.set_direction(5, 0, 'right')
+                skeleton_mob.set_direction(5, 0, 'right')
             elif event.key == SDLK_SPACE:  # 공격 키 처리
-                boy.attack()
+                skeleton_mob.attack()
         elif event.type == SDL_KEYUP:
             if event.key in (SDLK_w, SDLK_s, SDLK_a, SDLK_d):
-                boy.set_direction(0, 0, boy.direction)
+                skeleton_mob.set_direction(0, 0, skeleton_mob.direction)
 
 open_canvas(1200,800)
 
 def reset_world():
     global running
     global world # World List - 모든 객체를 갖고 있는 리스트
-    global boy
+    global skeleton_mob
 
     world = [] # 하나도 객체가 없는 월드
     running = True
 
-    boy = Boy()  # Boy 객체 생성
-    world.append(boy)  # 월드에 추가
+    skeleton_mob = Skeleton_Mob()  # skeleton_mob 객체 생성
+    world.append(skeleton_mob)  # 월드에 추가
 
 # 게임 로직
 def update_world():
