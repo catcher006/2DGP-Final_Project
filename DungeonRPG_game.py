@@ -56,7 +56,7 @@ class Player:
 
         elif self.dx == 0 and self.dy == 0:
             # 정지 상태 - idle 이미지 사용
-            self.idle_image.clip_draw(0, 64 * row, 64, 64, self.x, self.y)
+            self.idle_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
 
         else:
             if self.direction == 'left':
@@ -73,7 +73,7 @@ class Player:
 
     def update(self):
         if self.dx == 0 and self.dy == 0 and self.is_attacking == False:  # 멈춰있는 상태
-            self.frame = 0  # 0열 고정
+            self.frame = (self.frame + 1) % 2
         elif self.is_attacking:
             pass
         else:
