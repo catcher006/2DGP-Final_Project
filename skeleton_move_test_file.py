@@ -1,6 +1,12 @@
 from pico2d import *
 import random, time
 
+# 추후 추가해야할 기능들
+# 1. 몹 랜덤 생성 (방별로 0 ~ 3명 생성)
+# 2. 몹 이동 (특정 범위에 들어오면 접근및 공격 시스템 생성, 방 내에서만 이동 가능)
+# 3. 공격 성공시 피격 판정 및 데미지
+# 4. 몹 사망 및 아이템 드랍
+
 class Skeleton_Mob:
     def __init__(self):
         self.walk_image = load_image('skeleton_mace_walk_all.png')
