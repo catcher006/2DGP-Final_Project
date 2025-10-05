@@ -7,16 +7,25 @@ class Boy:
         self.x = random.randint(0, 700)
         self.y = 90
         self.frame = random.randint(0, 7)
+        self.direction = 'down'
 
     def draw(self):
-        self.image.clip_draw(self.frame * 64, 64*0, 64, 64, self.x, self.y)
+        direction_map = {
+            'up': 3,  # 위쪽 방향에 해당하는 이미지 행
+            'down': 1,  # 아래쪽 방향에 해당하는 이미지 행
+            'left': 2,  # 왼쪽 방향에 해당하는 이미지 행
+            'right': 0  # 오른쪽 방향에 해당하는 이미지 행
+        }
+        row = direction_map[self.direction]
+        self.image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
 
     def update(self):
         self.frame = (self.frame + 1) % 8
 
-    def move(self, dx, dy):
+    def move(self, dx, dy, direction):
         self.x += dx
         self.y += dy
+        self.direction = direction
 
 def handle_events():
     global running
@@ -29,13 +38,13 @@ def handle_events():
             if event.key == SDLK_ESCAPE:
                 running = False
             elif event.key == SDLK_w:
-                boy.move(0, 10)
+                boy.move(0, 10, 'up')
             elif event.key == SDLK_s:
-                boy.move(0, -10)
+                boy.move(0, -10, 'down')
             elif event.key == SDLK_a:
-                boy.move(-10, 0)
+                boy.move(-10, 0, 'left')
             elif event.key == SDLK_d:
-                boy.move(10, 0)
+                boy.move(10, 0, 'right')
 
 open_canvas(1200,800)
 
