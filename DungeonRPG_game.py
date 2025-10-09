@@ -129,11 +129,6 @@ class Background_Resource:
             'village': load_image('village.png'),
         }
 
-        # 전경 오브젝트 (표지판 등)
-        self.foreground_objects = {
-            'village': load_image('village_objects.png')  # 표지판 이미지
-        }
-
         # 현재 장소
         self.current_location = 'village'
 
@@ -146,7 +141,21 @@ class Background_Resource:
         if self.current_location in self.backgrounds:
             self.backgrounds[self.current_location].draw_to_origin(0, 0, 1024, 576)
 
-    def draw_foreground(self):
+class Object:
+    def __init__(self):
+        self.foreground_objects = {
+            # 'village': load_image('village_objects.png')  # 표지판 이미지
+        }
+
+        # 현재 장소
+        self.current_location = 'village'
+
+
+    def update(self):
+        # 배경 업데이트 로직 (현재는 빈 메서드)
+        pass
+
+    def draw(self):
         if self.current_location in self.foreground_objects:
             self.foreground_objects[self.current_location].draw_to_origin(0, 0, 1024, 576)
 
@@ -188,6 +197,7 @@ def reset_world():
     global world
     global background
     global player
+    global object
 
     world = []
     running = True
@@ -197,6 +207,9 @@ def reset_world():
 
     player = Player()
     world.append(player)
+
+    object = Object()
+    world.append(object)
 
 def update_world():
     for game_object in world:
