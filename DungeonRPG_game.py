@@ -141,7 +141,7 @@ class Background:
         if self.current_location in self.backgrounds:
             self.backgrounds[self.current_location].draw_to_origin(0, 0, 1024, 576)
 
-class Object:
+class Front_Object:
     def __init__(self):
         self.foreground_objects = {
             'village': load_image('village_objects.png')  # 표지판 이미지
@@ -197,7 +197,7 @@ def reset_world():
     global world
     global background
     global player
-    global object
+    global front_object
 
     world = []
     running = True
@@ -208,8 +208,8 @@ def reset_world():
     player = Player()
     world.append(player)
 
-    object = Object()
-    world.append(object)
+    front_object = Front_Object()
+    world.append(front_object)
 
 def update_world():
     for game_object in world:
