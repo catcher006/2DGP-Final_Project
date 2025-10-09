@@ -41,7 +41,7 @@ class Player:
             {'min_x': 10, 'max_x': 1014, 'min_y': 120, 'max_y': 200},  # 중앙 메인 통로
             {'min_x': 370, 'max_x': 520, 'min_y': 60, 'max_y': 120},  # 하단 중앙 통로
             {'min_x': 150, 'max_x': 200, 'min_y': 200, 'max_y': 250},  # 상단 죄측 통로
-            {'min_x': 710, 'max_x': 735, 'min_y': 200, 'max_y': 250},  # 상단 죄측 통로
+            {'min_x': 710, 'max_x': 735, 'min_y': 200, 'max_y': 250},  # 상단 우측 통로
         ]
 
         self.is_attacking = False  # 공격 상태
@@ -132,7 +132,6 @@ class Background:
         # 현재 장소
         self.current_location = 'village'
 
-
     def update(self):
         # 배경 업데이트 로직 (현재는 빈 메서드)
         pass
@@ -143,7 +142,7 @@ class Background:
 
 class Front_Object:
     def __init__(self):
-        self.foreground_objects = {
+        self.front_objects = {
             'village': load_image('village_objects.png')  # 표지판 이미지
         }
 
@@ -156,9 +155,25 @@ class Front_Object:
         pass
 
     def draw(self):
-        if self.current_location in self.foreground_objects:
-            self.foreground_objects[self.current_location].draw_to_origin(0, 0, 1024, 576)
+        if self.current_location in self.front_objects:
+            self.front_objects[self.current_location].draw_to_origin(0, 0, 1024, 576)
 
+class Back_Object:
+    def __init__(self):
+        self.back_objects = {
+            'village': load_image('village_home_door.png')  # 집 문 오브젝트 이미지
+        }
+        # 현재 장소
+        self.current_location = 'village'
+
+
+    def update(self):
+        # 배경 업데이트 로직 (현재는 빈 메서드)
+        pass
+
+    def draw(self):
+        if self.current_location in self.back_objects:
+            self.back_objects[self.current_location].clip_draw(0 * 1024, 1024 * 0, 1024, 1024, 182, 262, 100, 80)
 
 class Item:
     pass
@@ -197,6 +212,7 @@ def reset_world():
     global world
     global background
     global player
+    global back_object
     global front_object
 
     world = []
@@ -204,6 +220,9 @@ def reset_world():
 
     background = Background()
     world.append(background)
+
+    back_object = Back_Object()
+    world.append(back_object)
 
     player = Player()
     world.append(player)
