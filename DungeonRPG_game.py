@@ -38,7 +38,7 @@ class Player:
 
         # 마을의 4개 통로 영역
         self.village_paths = [
-            {'min_x': 20, 'max_x': 1004, 'min_y': 120, 'max_y': 200},  # 중앙 메인 통로
+            {'min_x': 10, 'max_x': 1014, 'min_y': 120, 'max_y': 200},  # 중앙 메인 통로
             {'min_x': 370, 'max_x': 520, 'min_y': 60, 'max_y': 120},  # 하단 중앙 통로
             {'min_x': 150, 'max_x': 200, 'min_y': 200, 'max_y': 250},  # 상단 죄측 통로
             {'min_x': 710, 'max_x': 735, 'min_y': 200, 'max_y': 250},  # 상단 죄측 통로
@@ -123,7 +123,7 @@ class Player:
     def damage(self):
         pass
 
-class Background_Resource:
+class Background:
     def __init__(self):
         self.backgrounds = {
             'village': load_image('village.png'),
@@ -202,7 +202,7 @@ def reset_world():
     world = []
     running = True
 
-    background = Background_Resource()
+    background = Background()
     world.append(background)
 
     player = Player()
