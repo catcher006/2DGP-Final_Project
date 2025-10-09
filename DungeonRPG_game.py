@@ -144,7 +144,7 @@ class Background_Resource:
 class Object:
     def __init__(self):
         self.foreground_objects = {
-            # 'village': load_image('village_objects.png')  # 표지판 이미지
+            'village': load_image('village_objects.png')  # 표지판 이미지
         }
 
         # 현재 장소
