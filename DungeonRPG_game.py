@@ -26,7 +26,7 @@ class Player:
         self.dead_image = load_image('player_none_none_dead.png')
 
         self.x = 510
-        self.y = 145
+        self.y = 160
 
         self.frame = 0
         self.idle_frame_counter = 0  # idle 애니메이션용 카운터
