@@ -61,18 +61,18 @@ class Player:
 
         if not self.is_alive:
             # 죽은 상태 - dead 이미지 사용
-            self.dead_image.clip_draw(0, 0, 64, 64, self.x, self.y)
+            self.dead_image.clip_draw(0, 0, 64, 64, self.x, self.y, 100, 100)
 
         elif self.is_attacking:
             pass
 
         elif self.dx == 0 and self.dy == 0:
             # 정지 상태 - idle 이미지 사용
-            self.idle_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y)
+            self.idle_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y, 100, 100)
 
         else:
             self.walk_image.clip_draw(self.frame * 64, 64 * row, 64, 64,
-                                        self.x + offset_x, self.y)
+                                        self.x + offset_x, self.y, 100, 100)
 
     def update(self):
         if self.dx == 0 and self.dy == 0 and self.is_attacking == False:  # 멈춰있는 상태
