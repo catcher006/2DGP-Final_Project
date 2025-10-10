@@ -25,8 +25,8 @@ class Player:
         self.idle_image = load_image('player_none_none_idle.png')
         self.dead_image = load_image('player_none_none_dead.png')
 
-        self.x = 512
-        self.y = 144
+        self.x = 510
+        self.y = 145
 
         self.frame = 0
         self.idle_frame_counter = 0  # idle 애니메이션용 카운터
@@ -38,7 +38,7 @@ class Player:
 
         # 마을의 4개 통로 영역
         self.village_paths = [
-            {'min_x': 10, 'max_x': 1014, 'min_y': 120, 'max_y': 200},  # 중앙 메인 통로
+            {'min_x': 10, 'max_x': 1014, 'min_y': 140, 'max_y': 200},  # 중앙 메인 통로
             {'min_x': 370, 'max_x': 520, 'min_y': 60, 'max_y': 120},  # 하단 중앙 통로
             {'min_x': 150, 'max_x': 200, 'min_y': 200, 'max_y': 250},  # 상단 죄측 통로
             {'min_x': 710, 'max_x': 735, 'min_y': 200, 'max_y': 250},  # 상단 우측 통로
