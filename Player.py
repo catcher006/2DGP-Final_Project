@@ -3,6 +3,109 @@ import time
 from pico2d import load_image
 
 
+class Idle:
+    def __init__(self, player):
+        self.player = player
+
+    def enter(self, e):
+        self.player.dx = 0
+        self.player.dy = 0
+        self.player.frame = 0
+        self.player.idle_frame_counter = 0
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        self.player.idle_frame_counter += 1
+        if self.player.idle_frame_counter >= self.player.idle_frame_delay:
+            self.player.frame = (self.player.frame + 1) % 2
+            self.player.idle_frame_counter = 0
+
+    def draw(self):
+        direction_map = {'up': 3, 'left': 2, 'down': 1, 'right': 0}
+        row = direction_map[self.player.direction]
+        self.player.idle_image.clip_draw(
+            self.player.frame * 64, 64 * row, 64, 64,
+            self.player.x, self.player.y, 100, 100
+        )
+
+
+class Walk:
+    def __init__(self, player):
+        self.player = player
+
+    def enter(self, e):
+        pass
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        self.player.frame = (self.player.frame + 1) % 9
+
+        new_x = self.player.x + self.player.dx
+        new_y = self.player.y + self.player.dy
+
+        can_move = False
+        for path in self.player.village_paths:
+            if (path['min_x'] <= new_x <= path['max_x'] and path['min_y'] <= new_y <= path['max_y']):
+                can_move = True
+                break
+
+        if can_move:
+            self.player.x = new_x
+            self.player.y = new_y
+
+    def draw(self):
+        direction_map = {'up': 3, 'left': 2, 'down': 1, 'right': 0}
+        row = direction_map[self.player.direction]
+        self.player.walk_image.clip_draw(self.player.frame * 64, 64 * row, 64, 64,self.player.x, self.player.y, 100, 100)
+
+
+class Attack:
+    def __init__(self, player):
+        self.player = player
+
+    def enter(self, e):
+        self.player.is_attacking = True
+        self.player.attack_start_time = get_time()
+        self.player.dx = 0
+        self.player.dy = 0
+
+    def exit(self, e):
+        self.player.is_attacking = False
+
+    def do(self):
+        # 공격 지속 시간 체크 (예: 0.5초)
+        if get_time() - self.player.attack_start_time > 0.5:
+            self.player.state_machine.handle_state_event(('ATTACK_END', None))
+
+    def draw(self):
+        # 공격 애니메이션 구현 (임시로 idle 이미지 사용)
+        direction_map = {'up': 3, 'left': 2, 'down': 1, 'right': 0}
+        row = direction_map[self.player.direction]
+        self.player.idle_image.clip_draw(0, 64 * row, 64, 64, self.player.x, self.player.y, 100, 100)
+
+
+class Dead:
+    def __init__(self, player):
+        self.player = player
+
+    def enter(self, e):
+        self.player.dx = 0
+        self.player.dy = 0
+        self.player.is_alive = False
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        pass
+
+    def draw(self):
+        self.player.dead_image.clip_draw(0, 0, 64, 64, self.player.x, self.player.y, 100, 100)
+
 class Player:
     def __init__(self):
         self.walk_image = load_image('player_none_none_walk.png')
