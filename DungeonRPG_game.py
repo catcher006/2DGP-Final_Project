@@ -79,20 +79,20 @@ class Item:
 class UI:
     pass
 
+################################
+
 open_canvas(1024,576)
 
 def handle_events():
     global running
     global player
-    events = get_events()
-    for event in events:
+    event_list = get_events()
+    for event in event_list:
         if event.type == SDL_QUIT:
             running = False
-        elif event.type == SDL_KEYDOWN:
-            if event.key == SDLK_ESCAPE:
-                running = False
-
-            # Player의 상태 머신에 이벤트 전달
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
+            running = False
+        else:
             player.handle_event(event)
 
 def reset_world():
