@@ -1,27 +1,31 @@
 import time
 from state_machine import StateMachine
 from pico2d import load_image, get_time
-from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE
+from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s
 
-def move_key_down(e):
-    return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and
-            e[1].key in [SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT])
+def a_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
 
-def move_key_up(e):
-    return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
-            e[1].key in [SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT])
+def a_up(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_a
 
-def space_down(e):
-    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
+def d_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_d
 
-def attack_end(e):
-    return e[0] == 'ATTACK_END'
+def d_up(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_d
 
-def player_die(e):
-    return e[0] == 'PLAYER_DIE'
+def w_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_w
 
-def no_move_keys_pressed(e):
-    return e[0] == 'NO_MOVE_KEYS'
+def w_up(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_w
+
+def s_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_s
+
+def s_up(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_s
 
 class Idle:
     def __init__(self, player):
@@ -37,18 +41,12 @@ class Idle:
         pass
 
     def do(self):
-        self.player.idle_frame_counter += 1
-        if self.player.idle_frame_counter >= self.player.idle_frame_delay:
-            self.player.frame = (self.player.frame + 1) % 2
-            self.player.idle_frame_counter = 0
+        self.player.frame = (self.player.frame + 1) % 2
 
     def draw(self):
         direction_map = {'up': 3, 'left': 2, 'down': 1, 'right': 0}
         row = direction_map[self.player.direction]
-        self.player.idle_image.clip_draw(
-            self.player.frame * 64, 64 * row, 64, 64,
-            self.player.x, self.player.y, 100, 100
-        )
+        self.player.idle_image.clip_draw(self.player.frame * 64, 64 * row, 64, 64,self.player.x, self.player.y, 100, 100)
 
 
 class Walk:
@@ -56,7 +54,14 @@ class Walk:
         self.player = player
 
     def enter(self, e):
-        pass
+        if a_down(e) or a_up(e):
+            self.player.direction = 'left'
+        elif d_down(e) or d_up(e):
+            self.player.direction = 'right'
+        elif w_down(e) or w_up(e):
+            self.player.direction = 'up'
+        elif s_down(e) or s_up(e):
+            self.player.direction = 'down'
 
     def exit(self, e):
         pass
@@ -82,51 +87,6 @@ class Walk:
         row = direction_map[self.player.direction]
         self.player.walk_image.clip_draw(self.player.frame * 64, 64 * row, 64, 64,self.player.x, self.player.y, 100, 100)
 
-
-class Attack:
-    def __init__(self, player):
-        self.player = player
-
-    def enter(self, e):
-        self.player.is_attacking = True
-        self.player.attack_start_time = get_time()
-        self.player.dx = 0
-        self.player.dy = 0
-
-    def exit(self, e):
-        self.player.is_attacking = False
-
-    def do(self):
-        # 공격 지속 시간 체크 (예: 0.5초)
-        if get_time() - self.player.attack_start_time > 0.5:
-            self.player.state_machine.handle_state_event(('ATTACK_END', None))
-
-    def draw(self):
-        # 공격 애니메이션 구현 (임시로 idle 이미지 사용)
-        direction_map = {'up': 3, 'left': 2, 'down': 1, 'right': 0}
-        row = direction_map[self.player.direction]
-        self.player.idle_image.clip_draw(0, 64 * row, 64, 64, self.player.x, self.player.y, 100, 100)
-
-
-class Dead:
-    def __init__(self, player):
-        self.player = player
-
-    def enter(self, e):
-        self.player.dx = 0
-        self.player.dy = 0
-        self.player.is_alive = False
-
-    def exit(self, e):
-        pass
-
-    def do(self):
-        pass
-
-    def draw(self):
-        self.player.dead_image.clip_draw(0, 0, 64, 64, self.player.x, self.player.y, 100, 100)
-
-
 class Player:
     def __init__(self):
         self.walk_image = load_image('player_none_none_walk.png')
@@ -137,15 +97,10 @@ class Player:
         self.y = 160
 
         self.frame = 0
-        self.idle_frame_counter = 0  # idle 애니메이션용 카운터
-        self.idle_frame_delay = 10  # 10프레임마다 idle 프레임 변경
 
         self.dx = 0
         self.dy = 0
         self.direction = 'down'
-
-        # 현재 눌린 키들을 추적
-        self.pressed_keys = set()
 
         # 마을의 4개 통로 영역
         self.village_paths = [
@@ -166,29 +121,15 @@ class Player:
         # 상태들 생성
         self.IDLE = Idle(self)
         self.WALK = Walk(self)
-        self.ATTACK = Attack(self)
-        self.DEAD = Dead(self)
 
         # 상태 머신 생성
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE: {
-                    move_key_down: self.WALK,
-                    space_down: self.ATTACK,
-                    player_die: self.DEAD
-                },
-                self.WALK: {
-                    no_move_keys_pressed: self.IDLE,
-                    space_down: self.ATTACK,
-                    player_die: self.DEAD
-                },
-                self.ATTACK: {
-                    attack_end: self.IDLE,
-                    player_die: self.DEAD
-                },
-                self.DEAD: {}
+                self.IDLE: {a_down: self.WALK, d_down: self.WALK, w_down: self.WALK, s_down: self.WALK},
+                self.WALK: {a_up: self.IDLE, d_up: self.IDLE, w_up: self.IDLE, s_up: self.IDLE}
             }
+
         )
 
     def draw(self):
@@ -197,46 +138,5 @@ class Player:
     def update(self):
         self.state_machine.update()
 
-        # 움직임 키가 모두 떼어졌는지 체크
-        if not self.pressed_keys and (self.dx != 0 or self.dy != 0):
-            self.state_machine.handle_state_event(('NO_MOVE_KEYS', None))
-
     def handle_event(self, event):
-        # 키 추적 업데이트
-        if event.type == SDL_KEYDOWN:
-            self.pressed_keys.add(event.key)
-            self._update_movement()
-        elif event.type == SDL_KEYUP:
-            self.pressed_keys.discard(event.key)
-            self._update_movement()
-
         self.state_machine.handle_state_event(('INPUT', event))
-
-    def _update_movement(self):
-        """현재 눌린 키들을 바탕으로 이동 방향 업데이트"""
-        from sdl2 import SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT
-
-        dx, dy = 0, 0
-
-        if SDLK_UP in self.pressed_keys:
-            dy = 2
-            self.direction = 'up'
-        elif SDLK_DOWN in self.pressed_keys:
-            dy = -2
-            self.direction = 'down'
-
-        if SDLK_LEFT in self.pressed_keys:
-            dx = -2
-            self.direction = 'left'
-        elif SDLK_RIGHT in self.pressed_keys:
-            dx = 2
-            self.direction = 'right'
-
-        self.dx = dx
-        self.dy = dy
-
-    def take_damage(self, damage):
-        """체력 감소 및 죽음 처리"""
-        self.hp -= damage
-        if self.hp <= 0:
-            self.state_machine.handle_state_event(('PLAYER_DIE', None))

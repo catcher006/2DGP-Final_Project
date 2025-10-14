@@ -80,12 +80,9 @@ class UI:
     pass
 
 ################################
-
-open_canvas(1024,576)
-
 def handle_events():
     global running
-    global player
+
     event_list = get_events()
     for event in event_list:
         if event.type == SDL_QUIT:
@@ -96,7 +93,6 @@ def handle_events():
             player.handle_event(event)
 
 def reset_world():
-    global running
     global world
     global background
     global player
@@ -104,7 +100,6 @@ def reset_world():
     global front_object
 
     world = []
-    running = True
 
     background = Background()
     world.append(background)
@@ -130,6 +125,9 @@ def render_world():
 
     update_canvas()
 
+running = True
+
+open_canvas(1024,576)
 reset_world()
 
 while running:
