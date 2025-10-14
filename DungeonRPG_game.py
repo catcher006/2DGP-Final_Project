@@ -1,5 +1,4 @@
 from pico2d import *
-
 from Player import Player
 
 
@@ -92,19 +91,9 @@ def handle_events():
         elif event.type == SDL_KEYDOWN:
             if event.key == SDLK_ESCAPE:
                 running = False
-            elif event.key == SDLK_w:
-                player.set_direction(0, 5, 'up')
-            elif event.key == SDLK_s:
-                player.set_direction(0, -5, 'down')
-            elif event.key == SDLK_a:
-                player.set_direction(-5, 0, 'left')
-            elif event.key == SDLK_d:
-                player.set_direction(5, 0, 'right')
-            elif event.key == SDLK_SPACE:  # 공격 키 처리
-                player.attack()
-        elif event.type == SDL_KEYUP:
-            if event.key in (SDLK_w, SDLK_s, SDLK_a, SDLK_d):
-                player.set_direction(0, 0, player.direction)
+
+            # Player의 상태 머신에 이벤트 전달
+            player.handle_event(event)
 
 def reset_world():
     global running
