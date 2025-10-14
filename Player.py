@@ -1,7 +1,27 @@
 import time
+from state_machine import StateMachine
+from pico2d import load_image, get_time
+from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE
 
-from pico2d import load_image
+def move_key_down(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and
+            e[1].key in [SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT])
 
+def move_key_up(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
+            e[1].key in [SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT])
+
+def space_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
+
+def attack_end(e):
+    return e[0] == 'ATTACK_END'
+
+def player_die(e):
+    return e[0] == 'PLAYER_DIE'
+
+def no_move_keys_pressed(e):
+    return e[0] == 'NO_MOVE_KEYS'
 
 class Idle:
     def __init__(self, player):
@@ -106,6 +126,7 @@ class Dead:
     def draw(self):
         self.player.dead_image.clip_draw(0, 0, 64, 64, self.player.x, self.player.y, 100, 100)
 
+
 class Player:
     def __init__(self):
         self.walk_image = load_image('player_none_none_walk.png')
@@ -123,6 +144,9 @@ class Player:
         self.dy = 0
         self.direction = 'down'
 
+        # 현재 눌린 키들을 추적
+        self.pressed_keys = set()
+
         # 마을의 4개 통로 영역
         self.village_paths = [
             {'min_x': 10, 'max_x': 1014, 'min_y': 150, 'max_y': 200},  # 중앙 메인 통로 - 1구역 - 전체 해당 부분
@@ -139,76 +163,80 @@ class Player:
         self.hp = 100  # 체력 추가
         self.is_alive = True  # 생존 상태 추가
 
+        # 상태들 생성
+        self.IDLE = Idle(self)
+        self.WALK = Walk(self)
+        self.ATTACK = Attack(self)
+        self.DEAD = Dead(self)
+
+        # 상태 머신 생성
+        self.state_machine = StateMachine(
+            self.IDLE,
+            {
+                self.IDLE: {
+                    move_key_down: self.WALK,
+                    space_down: self.ATTACK,
+                    player_die: self.DEAD
+                },
+                self.WALK: {
+                    no_move_keys_pressed: self.IDLE,
+                    space_down: self.ATTACK,
+                    player_die: self.DEAD
+                },
+                self.ATTACK: {
+                    attack_end: self.IDLE,
+                    player_die: self.DEAD
+                },
+                self.DEAD: {}
+            }
+        )
+
     def draw(self):
-        direction_map = {
-            'up': 3,
-            'left': 2,
-            'down': 1,
-            'right': 0
-        }
-        row = direction_map[self.direction]
-        offset_x = 0  # 중심 보정용 변수
-
-        if not self.is_alive:
-            # 죽은 상태 - dead 이미지 사용
-            self.dead_image.clip_draw(0, 0, 64, 64, self.x, self.y, 100, 100)
-
-        elif self.is_attacking:
-            pass
-
-        elif self.dx == 0 and self.dy == 0:
-            # 정지 상태 - idle 이미지 사용
-            self.idle_image.clip_draw(self.frame * 64, 64 * row, 64, 64, self.x, self.y, 100, 100)
-
-        else:
-            self.walk_image.clip_draw(self.frame * 64, 64 * row, 64, 64,
-                                        self.x + offset_x, self.y, 100, 100)
+        self.state_machine.draw()
 
     def update(self):
-        if self.dx == 0 and self.dy == 0 and self.is_attacking == False:  # 멈춰있는 상태
-            self.idle_frame_counter += 1
-            if self.idle_frame_counter >= self.idle_frame_delay:
-                self.frame = (self.frame + 1) % 2
-                self.idle_frame_counter = 0
+        self.state_machine.update()
 
-        elif self.is_attacking:
-            pass
+        # 움직임 키가 모두 떼어졌는지 체크
+        if not self.pressed_keys and (self.dx != 0 or self.dy != 0):
+            self.state_machine.handle_state_event(('NO_MOVE_KEYS', None))
 
-        else:
-            self.frame = (self.frame + 1) % 9
+    def handle_event(self, event):
+        # 키 추적 업데이트
+        if event.type == SDL_KEYDOWN:
+            self.pressed_keys.add(event.key)
+            self._update_movement()
+        elif event.type == SDL_KEYUP:
+            self.pressed_keys.discard(event.key)
+            self._update_movement()
 
-            # 새로운 위치 계산
-            new_x = self.x + self.dx
-            new_y = self.y + self.dy
+        self.state_machine.handle_state_event(('INPUT', event))
 
-            # 4개 통로 영역 중 하나라도 포함되면 이동 허용
-            can_move = False
-            for path in self.village_paths:
-                if (path['min_x'] <= new_x <= path['max_x'] and
-                        path['min_y'] <= new_y <= path['max_y']):
-                    can_move = True
-                    break
+    def _update_movement(self):
+        """현재 눌린 키들을 바탕으로 이동 방향 업데이트"""
+        from sdl2 import SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT
 
-            if can_move:
-                self.x = new_x
-                self.y = new_y
+        dx, dy = 0, 0
 
-    def set_direction(self, dx, dy, direction):
-        # 이동에서 정지로 바뀔 때 idle 프레임 즉시 시작
-        if self.dx != 0 or self.dy != 0:  # 이전에 이동 중이었다면
-            if dx == 0 and dy == 0:  # 지금 정지 상태가 되면
-                self.frame = 0  # idle 첫 번째 프레임으로 설정
-                self.idle_frame_counter = 0  # 카운터 리셋
+        if SDLK_UP in self.pressed_keys:
+            dy = 2
+            self.direction = 'up'
+        elif SDLK_DOWN in self.pressed_keys:
+            dy = -2
+            self.direction = 'down'
+
+        if SDLK_LEFT in self.pressed_keys:
+            dx = -2
+            self.direction = 'left'
+        elif SDLK_RIGHT in self.pressed_keys:
+            dx = 2
+            self.direction = 'right'
 
         self.dx = dx
         self.dy = dy
-        self.direction = direction
-        print(f"x={self.x}, y={self.y}")
 
-    def attack(self):
-        if not self.is_attacking:  # 이미 공격 중이 아니면
-            self.is_attacking = True
-            self.attack_start_time = time.time()  # 공격 시작 시간 기록
-
-    def damage(self):
-        pass
+    def take_damage(self, damage):
+        """체력 감소 및 죽음 처리"""
+        self.hp -= damage
+        if self.hp <= 0:
+            self.state_machine.handle_state_event(('PLAYER_DIE', None))
