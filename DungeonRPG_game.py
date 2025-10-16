@@ -6,32 +6,8 @@ from Front_object import Front_Object
 from Player import Player
 
 
-class Slime_Mob:
-    pass
-
-class Slime_Boss:
-    pass
-
-class Skeleton_Mob:
-    pass
-
-class Skeleton_Boss:
-    pass
-
-class Goblin_Mob:
-    pass
-
-class Goblin_Boss:
-    pass
 
 
-class Item:
-    pass
-
-class UI:
-    pass
-
-################################
 def handle_events():
     global running
 
