@@ -35,7 +35,6 @@ class Idle:
         self.player.dx = 0
         self.player.dy = 0
         self.player.frame = 0
-        self.player.idle_frame_counter = 0
 
     def exit(self, e):
         pass
@@ -54,14 +53,24 @@ class Walk:
         self.player = player
 
     def enter(self, e):
-        if a_down(e) or a_up(e):
+        speed = 10  # 이동 속도
+
+        if a_down(e) or d_up(e):
             self.player.direction = 'left'
-        elif d_down(e) or d_up(e):
+            self.player.dx = -speed
+            self.player.dy = 0
+        elif d_down(e) or a_up(e):
             self.player.direction = 'right'
-        elif w_down(e) or w_up(e):
+            self.player.dx = speed
+            self.player.dy = 0
+        elif w_down(e) or s_up(e):
             self.player.direction = 'up'
-        elif s_down(e) or s_up(e):
+            self.player.dx = 0
+            self.player.dy = speed
+        elif s_down(e) or w_up(e):
             self.player.direction = 'down'
+            self.player.dx = 0
+            self.player.dy = -speed
 
     def exit(self, e):
         pass
@@ -102,7 +111,7 @@ class Player:
         self.dy = 0
         self.direction = 'down'
 
-        # 마을의 4개 통로 영역
+        # 마을의 이동 가능 통로 영역
         self.village_paths = [
             {'min_x': 10, 'max_x': 1014, 'min_y': 150, 'max_y': 200},  # 중앙 메인 통로 - 1구역 - 전체 해당 부분
             {'min_x': 10, 'max_x': 155, 'min_y': 140, 'max_y': 200},  # 중앙 메인 통로 - 2구역 - 좌측 돌부리 부분
@@ -126,8 +135,8 @@ class Player:
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE: {a_down: self.WALK, d_down: self.WALK, w_down: self.WALK, s_down: self.WALK},
-                self.WALK: {a_up: self.IDLE, d_up: self.IDLE, w_up: self.IDLE, s_up: self.IDLE}
+                self.IDLE: {a_down: self.WALK, a_up: self.WALK, d_down: self.WALK, d_up: self.WALK, w_down: self.WALK, w_up: self.WALK, s_down: self.WALK, s_up: self.WALK},
+                self.WALK: {a_down: self.IDLE, a_up: self.IDLE, d_down: self.IDLE, d_up: self.IDLE, w_down: self.IDLE, w_up: self.IDLE, s_down: self.IDLE, s_up: self.IDLE}
             }
 
         )
