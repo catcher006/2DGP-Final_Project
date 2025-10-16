@@ -1,19 +1,34 @@
 from pico2d import load_image
+from state_machine import StateMachine
 
+class VillageBackObject:
+    def __init__(self, bo):
+        self.bo = bo
+        self.image = load_image('village_home_door.png')  # 집 문 오브젝트 이미지
+    def enter(self, e): pass
+    def exit(self, e): pass
+    def do(self): pass
+    def draw(self):
+        self.image.clip_draw(0, 0, 1024, 1024, 182, 262, 100, 80)
+
+def to_village(e): return e == 'village'
 
 class Back_Object:
     def __init__(self):
-        self.back_objects = {
-            'village': load_image('village_home_door.png')  # 집 문 오브젝트 이미지
-        }
-        # 현재 장소
-        self.current_location = 'village'
+        self.VILLAGE = VillageBackObject(self)
 
+        self.state_machine = StateMachine(
+            self.VILLAGE,
+            {
+                self.VILLAGE: {}
+            }
+        )
+
+    def set_location(self, location):
+        self.state_machine.handle_state_event(location)
 
     def update(self):
-        # 배경 업데이트 로직 (현재는 빈 메서드)
-        pass
+        self.state_machine.update()
 
     def draw(self):
-        if self.current_location in self.back_objects:
-            self.back_objects[self.current_location].clip_draw(0 * 1024, 1024 * 0, 1024, 1024, 182, 262, 100, 80)
+        self.state_machine.draw()
