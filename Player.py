@@ -3,6 +3,20 @@ from state_machine import StateMachine
 from pico2d import load_image, get_time
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s
 
+# 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
+def point_in_polygon(x, y, polygon):
+    n = len(polygon)
+    inside = False
+
+    j = n - 1
+    for i in range(n):
+        if ((polygon[i][1] > y) != (polygon[j][1] > y)) and \
+           (x < (polygon[j][0] - polygon[i][0]) * (y - polygon[i][1]) / (polygon[j][1] - polygon[i][1]) + polygon[i][0]):
+            inside = not inside
+        j = i
+
+    return inside
+
 def a_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
 
@@ -81,11 +95,21 @@ class Walk:
         new_x = self.player.x + self.player.dx
         new_y = self.player.y + self.player.dy
 
+        print(f"Trying to move to ({new_x}, {new_y})")
+
         can_move = False
         for path in self.player.village_paths:
-            if (path['min_x'] <= new_x <= path['max_x'] and path['min_y'] <= new_y <= path['max_y']):
-                can_move = True
-                break
+            if path['type'] == 'rect':
+                # 기존 직사각형 검사
+                if (path['min_x'] <= new_x <= path['max_x'] and
+                        path['min_y'] <= new_y <= path['max_y']):
+                    can_move = True
+                    break
+            elif path['type'] == 'polygon':
+                # 다각형 검사
+                if point_in_polygon(new_x, new_y, path['points']):
+                    can_move = True
+                    break
 
         if can_move:
             self.player.x = new_x
@@ -113,13 +137,20 @@ class Player:
 
         # 마을의 이동 가능 통로 영역
         self.village_paths = [
-            {'min_x': 10, 'max_x': 1014, 'min_y': 150, 'max_y': 200},  # 중앙 메인 통로 - 1구역 - 전체 해당 부분
-            {'min_x': 10, 'max_x': 155, 'min_y': 140, 'max_y': 200},  # 중앙 메인 통로 - 2구역 - 좌측 돌부리 부분
-            {'min_x': 645, 'max_x': 1014, 'min_y': 140, 'max_y': 200},  # 중앙 메인 통로 - 3구역 - 우측 표지판 이후 부분
-            {'min_x': 155, 'max_x': 225, 'min_y': 150, 'max_y': 200},  # 중앙 메인 통로 - 4구역 - 좌측 돌부리 옆 일부 풀밭 부분
-            {'min_x': 370, 'max_x': 520, 'min_y': 60, 'max_y': 120},  # 하단 중앙 통로
-            {'min_x': 150, 'max_x': 200, 'min_y': 200, 'max_y': 250},  # 상단 죄측 통로
-            {'min_x': 710, 'max_x': 735, 'min_y': 200, 'max_y': 250},  # 상단 우측 통로
+            {'type': 'rect', 'min_x': 10, 'max_x': 1014, 'min_y': 120, 'max_y': 190},  # 중앙 메인 통로 - 가로구역
+            {'type': 'rect', 'min_x': 480, 'max_x': 590, 'min_y': 40, 'max_y': 380},  # 중앙 메인 통로 - 세로구역
+            {'type': 'polygon', 'points': [
+                (190, 190),  # 하단 왼쪽
+                (270, 190),  # 하단 오른쪽
+                (260, 210),  # 상단 오른쪽
+                (210, 210)  # 상단 왼쪽
+            ]}, # 집 입구 통로
+            {'type': 'polygon', 'points': [
+                (730, 190),  # 하단 왼쪽
+                (800, 190),  # 하단 오른쪽
+                (810, 220),  # 상단 오른쪽
+                (770, 230)  # 상단 왼쪽
+            ]} # 상점 입구 통로
         ]
 
         self.is_attacking = False  # 공격 상태
