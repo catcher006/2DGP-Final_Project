@@ -4,7 +4,7 @@ from state_machine import StateMachine
 class Village:
     def __init__(self, bg):
         self.bg = bg
-        self.image = load_image('village.png')
+        self.image = load_image('village_2.png')
     def enter(self, e): pass
     def exit(self, e): pass
     def do(self): pass

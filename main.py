@@ -32,8 +32,8 @@ def reset_world():
     background = Background()
     world.append(background)
 
-    back_object = Back_Object()
-    world.append(back_object)
+    # back_object = Back_Object()
+    # world.append(back_object)
 
     player = Player()
     world.append(player)
