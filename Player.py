@@ -1,6 +1,7 @@
 import time
 from state_machine import StateMachine
 from pico2d import load_image, get_time
+from LocationManager import location_manager
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
@@ -97,16 +98,17 @@ class Walk:
 
         print(f"Trying to move to ({new_x}, {new_y})")
 
+        # 현재 위치에 따라 다른 경로 사용
+        current_paths = self.player.get_current_paths()
+
         can_move = False
-        for path in self.player.village_paths:
+        for path in current_paths:
             if path['type'] == 'rect':
-                # 기존 직사각형 검사
                 if (path['min_x'] <= new_x <= path['max_x'] and
                         path['min_y'] <= new_y <= path['max_y']):
                     can_move = True
                     break
             elif path['type'] == 'polygon':
-                # 다각형 검사
                 if point_in_polygon(new_x, new_y, path['points']):
                     can_move = True
                     break
@@ -153,6 +155,14 @@ class Player:
             ]} # 상점 입구 통로
         ]
 
+        self.house_paths = []
+
+        self.shop_paths = []
+
+        self.dungeon_main_paths = []
+
+        self.dungeon_inside_paths = []
+
         self.is_attacking = False  # 공격 상태
         self.attack_start_time = 0  # 공격 시작 시간
         self.hp = 100  # 체력 추가
@@ -171,6 +181,21 @@ class Player:
             }
 
         )
+
+    # 현재 위치에 따른 이동 경로 반환
+    def get_current_paths(self):
+        if location_manager.is_village():
+            return self.village_paths
+        elif location_manager.is_house():
+            return self.house_paths
+        elif location_manager.is_shop():
+            return self.shop_paths
+        elif location_manager.is_dungeon_main():
+            return self.dungeon_main_paths
+        elif location_manager.is_dungeon_inside():
+            return self.dungeon_inside_paths
+        else:
+            return self.village_paths  # 기본값
 
     def draw(self):
         self.state_machine.draw()
