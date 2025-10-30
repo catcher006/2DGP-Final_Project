@@ -1,8 +1,10 @@
 # game 내의 객체들의 생성과 소멸을 관리하는 모듈입니다.
 
-# world[0] : 0 layer
-# world[1] : 1 layer
-world = [[], []] # 게임 내 객체를 추가하는 함수
+# world[0] : 무조건 백그라운드 이미지
+# world[1] : 백 오브젝트 이미지
+# world[2] : 플레이어 오브젝트 이미지
+# world[3] : 앞 오브젝트 이미지
+world = [[], [], [], []] # 게임 내 객체를 추가하는 함수
 
 def add_object(o, depth = 0): # 게임 내 객체를 추가하는 함수
     world[depth].append(o)
