@@ -31,3 +31,7 @@ def remove_object(o): # 게임 내 객체를 제거하는 함수
             return
 
     raise ValueError("월드에 존재하지 않는 객체를 삭제하려고 합니다")
+
+def clear():
+    for layer in world:
+        layer.clear()
