@@ -1,11 +1,10 @@
 from pico2d import *
 
+import game_world
 from BackGround import Background
 from Back_Object import Back_Object
 from Front_object import Front_Object
 from Player import Player
-
-
 
 
 def handle_events():
@@ -30,27 +29,23 @@ def reset_world():
     world = []
 
     background = Background()
-    world.append(background)
+    game_world.add_object((background), 0)
 
     back_object = Back_Object()
-    world.append(back_object)
+    game_world.add_object((back_object), 1)
 
     player = Player()
-    world.append(player)
+    game_world.add_object((player), 2)
 
     front_object = Front_Object()
-    world.append(front_object)
+    game_world.add_object((front_object), 3)
 
 def update_world():
-    for game_object in world:
-        game_object.update()
+    game_world.update()
 
 def render_world():
     clear_canvas()
-
-    for game_object in world:
-        game_object.draw()
-
+    game_world.render()
     update_canvas()
 
 running = True
