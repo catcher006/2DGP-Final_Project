@@ -2,6 +2,7 @@ from pico2d import *
 
 import game_world
 import game_framework
+import title_mode
 from BackGround import Background
 from Back_Object import Back_Object
 from Front_object import Front_Object

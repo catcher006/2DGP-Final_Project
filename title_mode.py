@@ -1,12 +1,12 @@
 import game_framework
 from pico2d import *
-import play_mode
+import village_mode
 
 image = None
 
 def init():
     global image
-    image = load_image('title.png')
+    image = load_image('main_title.png')
 
 def finish():
     global image
@@ -17,7 +17,7 @@ def update():
 
 def draw():
     clear_canvas()
-    image.draw(400, 300)
+    image.draw_to_origin(0, 0, 1024, 576)
     update_canvas()
 
 def handle_events():
@@ -28,7 +28,7 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
-            game_framework.change_mode(play_mode)
+            game_framework.change_mode(village_mode)
 
 def pause():
     pass
