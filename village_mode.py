@@ -19,14 +19,12 @@ def handle_events():
         else:
             player.handle_event(event)
 
-def reset_world():
+def init():
     global world
     global background
     global player
     global back_object
     global front_object
-
-    world = []
 
     background = Background()
     game_world.add_object((background), 0)
@@ -40,13 +38,22 @@ def reset_world():
     front_object = Front_Object()
     game_world.add_object((front_object), 3)
 
-def update_world():
+def update():
     game_world.update()
 
-def render_world():
+def draw():
     clear_canvas()
     game_world.render()
     update_canvas()
+
+def finish():
+    game_world.clear()
+
+def pause():
+    pass
+
+def resume():
+    pass
 
 running = True
 
