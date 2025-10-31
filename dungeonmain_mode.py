@@ -36,7 +36,10 @@ def init():
 
     player = Player()
     # 던전 메인 모드에서는 던전 메인 경로만 허용
-    player.allowed_paths = player.village_paths
+    player.allowed_paths = player.dungeon_main_paths
+    player.x = 535
+    player.y = 60
+
     game_world.add_object((player), 2)
 
     # front_object = Front_Object()
