@@ -154,7 +154,9 @@ class Player:
 
         self.shop_paths = []
 
-        self.dungeon_main_paths = []
+        self.dungeon_main_paths = [
+            {'type': 'rect', 'min_x': 70, 'max_x': 1000, 'min_y': 60, 'max_y': 200},  # 기본 아래 구역 - 임시 설정
+        ]
 
         self.dungeon_inside_paths = []
 
