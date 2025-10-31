@@ -1,5 +1,6 @@
 from pico2d import *
 
+import dungeonmain_mode
 import game_world
 import game_framework
 import title_mode
@@ -18,6 +19,8 @@ def handle_events():
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.change_mode(title_mode)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
+            game_framework.change_mode(dungeonmain_mode)
         else:
             player.handle_event(event)
 
