@@ -1,7 +1,6 @@
 import time
 from state_machine import StateMachine
 from pico2d import load_image, get_time
-from LocationManager import location_manager
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
@@ -106,8 +105,8 @@ class Walk:
 
         print(f"Trying to move to ({new_x}, {new_y})")
 
-
-        can_move = True
+        # 실제 이동 가능 여부 검사
+        can_move = self.player.can_move_to(new_x, new_y)
 
         if can_move:
             self.player.x = new_x
@@ -186,3 +185,16 @@ class Player:
 
     def handle_event(self, event):
         self.state_machine.handle_state_event(('INPUT', event))
+
+    def can_move_to(self, x, y):
+        # self.allowed_paths가 설정되어 있으면 그것을 사용, 없으면 기본 village_paths를 사용
+        paths = getattr(self, 'allowed_paths', None) or self.village_paths
+
+        for p in paths:
+            if p.get('type') == 'rect':
+                if p['min_x'] <= x <= p['max_x'] and p['min_y'] <= y <= p['max_y']:
+                    return True
+            elif p.get('type') == 'polygon':
+                if point_in_polygon(x, y, p['points']):
+                    return True
+        return False

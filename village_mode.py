@@ -35,6 +35,8 @@ def init():
     game_world.add_object((back_object), 1)
 
     player = Player()
+    # 마을 모드에서는 마을 경로만 허용
+    player.allowed_paths = player.village_paths
     game_world.add_object((player), 2)
 
     front_object = Front_Object()
