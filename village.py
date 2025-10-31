@@ -1,5 +1,4 @@
 from pico2d import load_image
-from state_machine import StateMachine
 
 class Village:
     def __init__(self):
