@@ -3,7 +3,7 @@ from pico2d import *
 import game_world
 import game_framework
 import title_mode
-from BackGround import Background
+from village import Village
 from Back_Object import Back_Object
 from Front_object import Front_Object
 from Player import Player
@@ -23,13 +23,13 @@ def handle_events():
 
 def init():
     global world
-    global background
+    global village
     global player
     global back_object
     global front_object
 
-    background = Background()
-    game_world.add_object((background), 0)
+    village = Village()
+    game_world.add_object((village), 0)
 
     back_object = Back_Object()
     game_world.add_object((back_object), 1)
