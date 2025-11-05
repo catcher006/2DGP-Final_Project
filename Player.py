@@ -111,10 +111,6 @@ class Walk:
         pass
 
     def do(self):
-        self.player.frame = (self.player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 9
-        self.player.x += self.player.lr_dir * RUN_SPEED_PPS * game_framework.frame_time
-        self.player.y += self.player.ud_dir * RUN_SPEED_PPS * game_framework.frame_time
-
         dt = game_framework.frame_time
         # 이동 벡터를 먼저 계산 (px per second * dt)
         dx = self.player.lr_dir * RUN_SPEED_PPS * dt
@@ -131,6 +127,8 @@ class Walk:
 
         # 실제 이동 가능 여부 검사
         can_move = self.player.can_move_to(new_x, new_y)
+
+        self.player.frame = (self.player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 9
 
         if can_move:
             self.player.x = new_x
