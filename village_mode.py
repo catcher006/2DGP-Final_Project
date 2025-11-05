@@ -20,7 +20,8 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.change_mode(title_mode)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
-            game_framework.change_mode(dungeonmain_mode)
+            if player.x >= 480 and player.x <=  590 and player.y >= 370 and player.y <= 380: # 던전 입구 좌표 범위
+                game_framework.change_mode(dungeonmain_mode)
         else:
             player.handle_event(event)
 
