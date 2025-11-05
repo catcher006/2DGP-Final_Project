@@ -17,7 +17,12 @@ def handle_events():
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
-            game_framework.change_mode(village_mode)
+            if player.x >= 195 and player.x <= 290 and player.y >= 380 and player.y <= 400:  # 1번 스테이지 입구 좌표 범위
+                print("Stage 1 Entered") # 스테이지 1로 이동
+            elif player.x >= 505 and player.x <= 585 and player.y >= 380 and player.y <= 400:  # 2번 스테이지 입구 좌표 범위
+                print("Stage 2 Entered") # 스테이지 2로 이동
+            elif player.x >= 780 and player.x <= 880 and player.y >= 380 and player.y <= 400:  # 3번 스테이지 입구 좌표 범위
+                print("Stage 3 Entered") # 스테이지 3로 이동
         else:
             player.handle_event(event)
 
