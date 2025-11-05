@@ -66,10 +66,7 @@ class Idle:
         self.player = player
 
     def enter(self, e):
-        self.player.dx = 0
-        self.player.dy = 0
-        self.player.frame = 0
-
+        pass
     def exit(self, e):
         pass
 
@@ -78,8 +75,15 @@ class Idle:
 
 
     def draw(self):
-        direction_map = {'up': 3, 'left': 2, 'down': 1, 'right': 0}
-        row = direction_map[self.player.direction]
+        row = 0
+        if self.player.ud_dir == 1:
+            row = 3
+        elif self.player.lr_dir == -1:
+            row = 2
+        elif self.player.ud_dir == -1:
+            row = 1
+        elif self.player.lr_dir == 1:
+            row = 0
         self.player.idle_image.clip_draw(int(self.player.frame) * 64, 64 * row, 64, 64,self.player.x, self.player.y, 100, 100)
 
 
@@ -88,24 +92,18 @@ class Walk:
         self.player = player
 
     def enter(self, e):
-        speed = 10  # 이동 속도
-
         if a_down(e) or d_up(e):
-            self.player.direction = 'left'
-            self.player.dx = -speed
-            self.player.dy = 0
+            self.player.ud_dir = 0
+            self.player.lr_dir = -1
         elif d_down(e) or a_up(e):
-            self.player.direction = 'right'
-            self.player.dx = speed
-            self.player.dy = 0
+            self.player.ud_dir = 0
+            self.player.lr_dir = 1
         elif w_down(e) or s_up(e):
-            self.player.direction = 'up'
-            self.player.dx = 0
-            self.player.dy = speed
+            self.player.ud_dir = 1
+            self.player.lr_dir = 0
         elif s_down(e) or w_up(e):
-            self.player.direction = 'down'
-            self.player.dx = 0
-            self.player.dy = -speed
+            self.player.ud_dir = 0
+            self.player.lr_dir = -1
         elif f_down(e):
             pass
 
@@ -114,7 +112,17 @@ class Walk:
 
     def do(self):
         self.player.frame = (self.player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 9
-        self.player.x += RUN_SPEED_PPS * game_framework.frame_time
+        self.player.x += self.player.lr_dir * RUN_SPEED_PPS * game_framework.frame_time
+        self.player.y += self.player.ud_dir * RUN_SPEED_PPS * game_framework.frame_time
+
+        dt = game_framework.frame_time
+        # 이동 벡터를 먼저 계산 (px per second * dt)
+        dx = self.player.lr_dir * RUN_SPEED_PPS * dt
+        dy = self.player.ud_dir * RUN_SPEED_PPS * dt
+
+        # 디버깅용으로 player에 저장해두면 유용
+        self.player.dx = dx
+        self.player.dy = dy
 
         new_x = self.player.x + self.player.dx
         new_y = self.player.y + self.player.dy
@@ -129,8 +137,11 @@ class Walk:
             self.player.y = new_y
 
     def draw(self):
-        direction_map = {'up': 3, 'left': 2, 'down': 1, 'right': 0}
-        row = direction_map[self.player.direction]
+        row = 0
+        if self.player.ud_dir == 1: row = 3
+        elif self.player.lr_dir == -1: row = 2
+        elif self.player.ud_dir == -1: row = 1
+        elif self.player.lr_dir == 1: row = 0
         self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * row, 64, 64,self.player.x, self.player.y, 100, 100)
 
 class Player:
@@ -144,9 +155,11 @@ class Player:
 
         self.frame = 0
 
-        self.dx = 0
-        self.dy = 0
-        self.direction = 'down'
+        self.dx = 0.0
+        self.dy = 0.0
+
+        self.ud_dir = 0 # up down direction (up: 1, down: -1, none: 0)
+        self.lr_dir = 0 # left right direction (left: -1, right: 1, none: 0)
 
         # 마을의 이동 가능 통로 영역
         self.village_paths = [
