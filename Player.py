@@ -1,7 +1,21 @@
 import time
+
+import game_framework
 from state_machine import StateMachine
-from pico2d import load_image, get_time
+from pico2d import load_image, load_font, get_time
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f
+
+# Player Run Speed
+PIXEL_PER_METER = (10.0 / 0.3) # 10 pixel 30 cm
+RUN_SPEED_KMPH = 20.0 # Km / Hour
+RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+# By Action Speed
+TIME_PER_ACTION = 0.5
+ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+FRAMES_PER_ACTION = 8
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -60,12 +74,13 @@ class Idle:
         pass
 
     def do(self):
-        self.player.frame = (self.player.frame + 1) % 2
+        self.player.frame = (self.player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 2
+
 
     def draw(self):
         direction_map = {'up': 3, 'left': 2, 'down': 1, 'right': 0}
         row = direction_map[self.player.direction]
-        self.player.idle_image.clip_draw(self.player.frame * 64, 64 * row, 64, 64,self.player.x, self.player.y, 100, 100)
+        self.player.idle_image.clip_draw(int(self.player.frame) * 64, 64 * row, 64, 64,self.player.x, self.player.y, 100, 100)
 
 
 class Walk:
@@ -98,7 +113,8 @@ class Walk:
         pass
 
     def do(self):
-        self.player.frame = (self.player.frame + 1) % 9
+        self.player.frame = (self.player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 9
+        self.player.x += RUN_SPEED_PPS * game_framework.frame_time
 
         new_x = self.player.x + self.player.dx
         new_y = self.player.y + self.player.dy
@@ -115,7 +131,7 @@ class Walk:
     def draw(self):
         direction_map = {'up': 3, 'left': 2, 'down': 1, 'right': 0}
         row = direction_map[self.player.direction]
-        self.player.walk_image.clip_draw(self.player.frame * 64, 64 * row, 64, 64,self.player.x, self.player.y, 100, 100)
+        self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * row, 64, 64,self.player.x, self.player.y, 100, 100)
 
 class Player:
     def __init__(self):
@@ -155,8 +171,10 @@ class Player:
         self.shop_paths = []
 
         self.dungeon_main_paths = [
-            {'type': 'rect', 'min_x': 70, 'max_x': 1000, 'min_y': 60, 'max_y': 200},  # 기본 아래 구역 - 임시 설정
-        ]
+            {'type': 'rect', 'min_x': 70, 'max_x': 895, 'min_y': 60, 'max_y': 220},  # 기본 아래 구역1
+            {'type': 'rect', 'min_x': 895, 'max_x': 1000, 'min_y': 60, 'max_y': 210},  # 기본 아래 구역2
+            {'type': 'rect', 'min_x': 115, 'max_x': 290, 'min_y': 200, 'max_y': 310}, # 좌측 돌부리 - 중앙 나무 판자
+            ]
 
         self.dungeon_inside_paths = []
 
