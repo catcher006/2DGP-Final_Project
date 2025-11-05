@@ -102,8 +102,8 @@ class Walk:
             self.player.ud_dir = 1
             self.player.lr_dir = 0
         elif s_down(e) or w_up(e):
-            self.player.ud_dir = 0
-            self.player.lr_dir = -1
+            self.player.ud_dir = -1
+            self.player.lr_dir = 0
         elif f_down(e):
             pass
 
