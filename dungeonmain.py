@@ -2,7 +2,7 @@ from pico2d import load_image
 
 class Dungeonmain:
     def __init__(self):
-        self.image = load_image('dungeon_main.png')
+        self.image = load_image('./image/background/dungeon_main.png')
     def enter(self, e): pass
     def exit(self, e): pass
     def do(self): pass

@@ -2,7 +2,7 @@ from pico2d import load_image
 
 class Village:
     def __init__(self):
-        self.image = load_image('village.png')
+        self.image = load_image('./image/background/village.png')
     def enter(self, e): pass
     def exit(self, e): pass
     def do(self): pass
