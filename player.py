@@ -193,7 +193,7 @@ class Player:
             ]
 
         self.stage1_paths = [
-            {'type': 'rect', 'min_x': 50, 'max_x': 1000, 'min_y': 50, 'max_y': 580}
+            {'type': 'rect', 'min_x': 105, 'max_x': 940, 'min_y': 85, 'max_y': 540},  # 기본 이동 구역
         ]
 
         self.is_attacking = False  # 공격 상태
