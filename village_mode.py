@@ -6,7 +6,7 @@ import game_framework
 import title_mode
 from village import Village
 from Back_Object import Back_Object
-from Front_object import Front_Object
+from village_front_object import Village_Front_Object
 from Player import Player
 
 
@@ -43,7 +43,7 @@ def init():
     player.allowed_paths = player.village_paths
     game_world.add_object((player), 2)
 
-    front_object = Front_Object()
+    front_object = Village_Front_Object()
     game_world.add_object((front_object), 3)
 
 def update():
