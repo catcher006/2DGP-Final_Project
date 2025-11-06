@@ -4,9 +4,7 @@ import village_mode
 import game_world
 import game_framework
 from dungeonmain import Dungeonmain
-from Back_Object import Back_Object
-from Front_object import Front_Object
-from Player import Player
+from player import Player
 
 
 def handle_events():
