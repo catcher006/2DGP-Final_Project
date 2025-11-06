@@ -192,7 +192,9 @@ class Player:
             {'type': 'rect', 'min_x': 780, 'max_x': 880, 'min_y': 330, 'max_y': 400},  # 2번 문
             ]
 
-        self.dungeon_inside_paths = []
+        self.stage1_paths = [
+            {'type': 'rect', 'min_x': 50, 'max_x': 1000, 'min_y': 50, 'max_y': 580}
+        ]
 
         self.is_attacking = False  # 공격 상태
         self.attack_start_time = 0  # 공격 시작 시간
