@@ -24,14 +24,14 @@ def init():
     global front_object
 
     stage1 = Stage1()
-    game_world.add_object((Stage1), 0)
+    game_world.add_object(stage1, 0)
 
     # back_object = Back_Object()
     # game_world.add_object((back_object), 1)
 
     player = Player()
     # 던전 메인 모드에서는 던전 메인 경로만 허용
-    player.allowed_paths = player.dungeon_main_paths
+    # player.allowed_paths = player.dungeon_main_paths
     player.x = 535
     player.y = 560
 
