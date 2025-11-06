@@ -1,9 +1,8 @@
 from pico2d import *
 
-import village_mode
 import game_world
 import game_framework
-from dungeonmain import Dungeonmain
+from stage1 import Stage1
 from player import Player
 
 
@@ -19,13 +18,13 @@ def handle_events():
 
 def init():
     global world
-    global dungeonmain
+    global stage1
     global player
     global back_object
     global front_object
 
-    dungeonmain = Dungeonmain()
-    game_world.add_object((dungeonmain), 0)
+    stage1 = Stage1()
+    game_world.add_object((Stage1), 0)
 
     # back_object = Back_Object()
     # game_world.add_object((back_object), 1)
@@ -34,7 +33,7 @@ def init():
     # 던전 메인 모드에서는 던전 메인 경로만 허용
     player.allowed_paths = player.dungeon_main_paths
     player.x = 535
-    player.y = 60
+    player.y = 560
 
     game_world.add_object((player), 2)
 
