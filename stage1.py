@@ -2,7 +2,8 @@ from pico2d import load_image
 
 class Stage1:
     def __init__(self):
-        self.image = load_image('./image/background/stage1/0.png')
+        self.room_number = 0
+        self.image = load_image("./image/background/stage1/%d.png" % self.room_number)
     def enter(self, e): pass
     def exit(self, e): pass
     def do(self): pass
