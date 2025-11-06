@@ -5,9 +5,9 @@ import game_world
 import game_framework
 import title_mode
 from village import Village
-from Back_Object import Back_Object
+from village_back_object import Village_Back_Object
 from village_front_object import Village_Front_Object
-from Player import Player
+from player import Player
 
 
 def handle_events():
@@ -35,7 +35,7 @@ def init():
     village = Village()
     game_world.add_object((village), 0)
 
-    back_object = Back_Object()
+    back_object = Village_Back_Object()
     game_world.add_object((back_object), 1)
 
     player = Player()
