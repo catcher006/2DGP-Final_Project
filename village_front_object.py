@@ -2,7 +2,7 @@ from pico2d import *
 
 class Village_Front_Object:
     def __init__(self):
-        self.image = load_image('village_objects_2.png')
+        self.image = load_image('village_objects.png')
 
     def update(self):
         pass
