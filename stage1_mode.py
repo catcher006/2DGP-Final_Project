@@ -32,7 +32,7 @@ def init():
     player = Player()
     player.allowed_paths = player.stage1_paths
     player.x = 535
-    player.y = 560
+    player.y = 540
 
     game_world.add_object((player), 2)
 
