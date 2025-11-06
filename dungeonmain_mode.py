@@ -39,8 +39,7 @@ def init():
     # game_world.add_object((back_object), 1)
 
     player = Player()
-    # 던전 메인 모드에서는 던전 메인 경로만 허용
-    player.allowed_paths = player.dungeon_main_paths
+    player.move_validator = dungeonmain.is_walkable
     player.x = 535
     player.y = 60
 

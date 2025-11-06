@@ -30,7 +30,7 @@ def init():
     # game_world.add_object((back_object), 1)
 
     player = Player()
-    player.allowed_paths = player.stage1_paths
+    player.move_validator = stage1.is_walkable
     player.x = 535
     player.y = 540
 

@@ -39,8 +39,8 @@ def init():
     game_world.add_object((back_object), 1)
 
     player = Player()
-    # 마을 모드에서는 마을 경로만 허용
-    player.allowed_paths = player.village_paths
+    # 마을 모드에서 이동 검사 콜백을 마을 객체에 위임
+    player.move_validator = village.is_walkable
     game_world.add_object((player), 2)
 
     front_object = Village_Front_Object()

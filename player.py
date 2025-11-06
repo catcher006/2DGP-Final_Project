@@ -159,42 +159,8 @@ class Player:
         self.ud_dir = 0 # up down direction (up: 1, down: -1, none: 0)
         self.lr_dir = 0 # left right direction (left: -1, right: 1, none: 0)
 
-        # 마을의 이동 가능 통로 영역
-        self.village_paths = [
-            {'type': 'rect', 'min_x': 10, 'max_x': 1014, 'min_y': 120, 'max_y': 190},  # 중앙 메인 통로 - 가로구역
-            {'type': 'rect', 'min_x': 480, 'max_x': 590, 'min_y': 40, 'max_y': 380},  # 중앙 메인 통로 - 세로구역
-            {'type': 'polygon', 'points': [
-                (190, 190),  # 하단 왼쪽
-                (270, 190),  # 하단 오른쪽
-                (260, 210),  # 상단 오른쪽
-                (210, 210)  # 상단 왼쪽
-            ]}, # 집 입구 통로
-            {'type': 'polygon', 'points': [
-                (730, 190),  # 하단 왼쪽
-                (800, 190),  # 하단 오른쪽
-                (810, 220),  # 상단 오른쪽
-                (770, 230)  # 상단 왼쪽
-            ]} # 상점 입구 통로
-        ]
-
-        self.house_paths = []
-
-        self.shop_paths = []
-
-        self.dungeon_main_paths = [
-            {'type': 'rect', 'min_x': 70, 'max_x': 895, 'min_y': 60, 'max_y': 220},  # 기본 아래 구역1
-            {'type': 'rect', 'min_x': 895, 'max_x': 1000, 'min_y': 60, 'max_y': 210},  # 기본 아래 구역2
-            {'type': 'rect', 'min_x': 115, 'max_x': 880, 'min_y': 200, 'max_y': 280},  # 좌측 돌부리 - 우측 용암
-            {'type': 'rect', 'min_x': 115, 'max_x': 290, 'min_y': 200, 'max_y': 310}, # 좌측 돌부리 - 중앙 나무 판자
-            {'type': 'rect', 'min_x': 380, 'max_x': 930, 'min_y': 280, 'max_y': 330},  # 좌측 돌부리 - 우측 용암
-            {'type': 'rect', 'min_x': 195, 'max_x': 290, 'min_y': 310, 'max_y': 400},  # 1번 문
-            {'type': 'rect', 'min_x': 505, 'max_x': 585, 'min_y': 330, 'max_y': 400},  # 2번 문
-            {'type': 'rect', 'min_x': 780, 'max_x': 880, 'min_y': 330, 'max_y': 400},  # 2번 문
-            ]
-
-        self.stage1_paths = [
-            {'type': 'rect', 'min_x': 105, 'max_x': 940, 'min_y': 85, 'max_y': 540},  # 기본 이동 구역
-        ]
+        # 이동 검사 콜백: 모드가 주입
+        self.move_validator = None
 
         self.is_attacking = False  # 공격 상태
         self.attack_start_time = 0  # 공격 시작 시간
@@ -225,14 +191,7 @@ class Player:
         self.state_machine.handle_state_event(('INPUT', event))
 
     def can_move_to(self, x, y):
-        # self.allowed_paths가 설정되어 있으면 그것을 사용, 없으면 기본 village_paths를 사용
-        paths = getattr(self, 'allowed_paths', None) or self.village_paths
+        if callable(self.move_validator):
+            return self.move_validator(x, y)
 
-        for p in paths:
-            if p.get('type') == 'rect':
-                if p['min_x'] <= x <= p['max_x'] and p['min_y'] <= y <= p['max_y']:
-                    return True
-            elif p.get('type') == 'polygon':
-                if point_in_polygon(x, y, p['points']):
-                    return True
         return False
