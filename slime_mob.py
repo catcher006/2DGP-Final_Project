@@ -7,7 +7,7 @@ from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f
 
 # mob Run Speed
 PIXEL_PER_METER = (10.0 / 0.3) # 10 pixel 30 cm
-RUN_SPEED_KMPH = 10.0 # Km / Hour
+RUN_SPEED_KMPH = 40.0 # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -56,7 +56,42 @@ class Move:
         pass
 
     def do(self):
+        dt = game_framework.frame_time
+
+        # 프레임 증가량 계산
+        delta = FRAMES_PER_ACTION * ACTION_PER_TIME * dt
+
+        # 이전 프레임을 저장하고 새 프레임 계산 (모듈러 연산으로 랩 발생 가능)
+        prev_frame = self.mob.frame
+        new_frame = (prev_frame + delta) % 6
+
+        # 프레임이 한바퀴 돌아 랩된 경우 방향 재설정
+        if new_frame < prev_frame:
+            self.mob.lr_dir = random.randint(-1, 1)
+            if self.mob.lr_dir == 0:
+                self.mob.ud_dir = random.choice([-1, 1])
+            else:
+                self.mob.ud_dir = random.randint(-1, 1)
+
+        # 이동 벡터를 먼저 계산 (px per second * dt)
+        dx = self.mob.lr_dir * RUN_SPEED_PPS * dt
+        dy = self.mob.ud_dir * RUN_SPEED_PPS * dt
+
+        # 디버깅용으로 player에 저장해두면 유용
+        self.mob.dx = dx
+        self.mob.dy = dy
+
+        new_x = self.mob.x + self.mob.dx
+        new_y = self.mob.y + self.mob.dy
+
+        # 실제 이동 가능 여부 검사
+        can_move = self.mob.can_move_to(new_x, new_y)
+
         self.mob.frame = (self.mob.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 6
+
+        if can_move:
+            self.mob.x = new_x
+            self.mob.y = new_y
 
     def draw(self):
         self.mob.move_image.clip_draw(int(self.mob.frame) * 48, 0, 48, 31, self.mob.x, self.mob.y, 96, 62)
