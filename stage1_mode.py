@@ -4,6 +4,7 @@ import game_world
 import game_framework
 from stage1 import Stage1
 from player import Player
+from slime_mob import Slime_Mob
 
 
 def handle_events():
@@ -35,6 +36,12 @@ def init():
     player.y = 540
 
     game_world.add_object((player), 2)
+
+    slime_mobs = [Slime_Mob() for _ in range(5)]
+    for slime_mob in slime_mobs:
+        slime_mob.move_validator = stage1.is_walkable
+    game_world.add_objects(slime_mobs, 2)
+
 
     # front_object = Front_Object()
     # game_world.add_object((front_object), 3)

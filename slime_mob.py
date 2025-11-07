@@ -4,6 +4,45 @@ from state_machine import StateMachine
 from pico2d import load_image, load_font, get_time
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f
 
+
+# mob Run Speed
+PIXEL_PER_METER = (10.0 / 0.3) # 10 pixel 30 cm
+RUN_SPEED_KMPH = 10.0 # Km / Hour
+RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+# By Action Speed
+TIME_PER_ACTION = 0.5
+ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+FRAMES_PER_ACTION = 8
+
+# 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
+def point_in_polygon(x, y, polygon):
+    n = len(polygon)
+    inside = False
+
+    j = n - 1
+    for i in range(n):
+        if ((polygon[i][1] > y) != (polygon[j][1] > y)) and \
+           (x < (polygon[j][0] - polygon[i][0]) * (y - polygon[i][1]) / (polygon[j][1] - polygon[i][1]) + polygon[i][0]):
+            inside = not inside
+        j = i
+
+    return inside
+
+class Idle:
+    def __init__(self, player):
+        self.player = player
+
+    def enter(self, e):
+        pass
+    def exit(self, e):
+        pass
+
+    def do(self):
+        self.player.frame = (self.player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 1
+
 class Slime_Mob:
     def __init__(self):
         self.move_image = load_image('./image/mobs/slime/Green_Slime_Jump.png')
@@ -26,6 +65,14 @@ class Slime_Mob:
 
         self.hp = 100  # 체력 추가
         self.is_alive = True  # 생존 상태 추가
+
+        self.IDLE = Idle(self)
+
+        # 상태 머신 생성
+        self.state_machine = StateMachine(
+            self.IDLE,
+            {}
+        )
 
     def draw(self):
         self.state_machine.draw()
