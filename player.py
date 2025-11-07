@@ -123,7 +123,7 @@ class Walk:
         new_x = self.player.x + self.player.dx
         new_y = self.player.y + self.player.dy
 
-        print(f"Trying to move to ({new_x}, {new_y})")
+        # print(f"Trying to move to ({new_x}, {new_y})")
 
         # 실제 이동 가능 여부 검사
         can_move = self.player.can_move_to(new_x, new_y)
