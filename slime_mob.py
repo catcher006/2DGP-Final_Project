@@ -70,7 +70,7 @@ class Slime_Mob:
         self.x = random.randint(105,940)
         self.y = random.randint(85,540)
 
-        self.frame = 0
+        self.frame = random.randint(0,5)
 
         self.dx = 0.0
         self.dy = 0.0

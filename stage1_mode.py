@@ -39,7 +39,7 @@ def init():
 
     slime_mobs = [Slime_Mob() for _ in range(5)]
     for slime_mob in slime_mobs:
-        slime_mob.move_validator = stage1.is_walkable
+        slime_mob.move_validator = stage1.is_mob_walkable
     game_world.add_objects(slime_mobs, 2)
 
 
