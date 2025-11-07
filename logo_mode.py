@@ -9,7 +9,7 @@ logo_start_time = 0.0
 def init():
     global image, running, logo_start_time
 
-    image = load_image('logo_credit.png')
+    image = load_image('./image/background/logo_credit.png')
     logo_start_time = get_time()
 
 def finish():
