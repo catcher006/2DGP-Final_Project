@@ -1,4 +1,5 @@
 import game_framework
+import random
 from state_machine import StateMachine
 from pico2d import load_image, load_font, get_time
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f
@@ -9,8 +10,8 @@ class Slime_Mob:
         self.idle_image = load_image('./image/mobs/slime/Green_Slime_Idle.png')
         self.dead_image = load_image('./image/mobs/slime/Green_Slime_Dead.png')
 
-        self.x = 510
-        self.y = 160
+        self.x = random.randint(105,940)
+        self.y = random.randint(85,540)
 
         self.frame = 0
 
