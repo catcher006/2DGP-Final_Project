@@ -1,6 +1,6 @@
 from pico2d import load_image
 
-class Stage1_0:
+class Stage1_1:
     def __init__(self):
         self.paths = [
             {'type': 'rect', 'min_x': 105, 'max_x': 940, 'min_y': 85, 'max_y': 540},  # 기본 이동 구역
@@ -14,7 +14,7 @@ class Stage1_0:
             {'type': 'rect', 'min_x': 105, 'max_x': 940, 'min_y': 85, 'max_y': 540},  # 기본 이동 구역
         ]
 
-        self.image = load_image("./image/background/stage1/0.png")
+        self.image = load_image("./image/background/stage1/1.png")
     def enter(self, e): pass
     def exit(self, e): pass
     def do(self): pass
