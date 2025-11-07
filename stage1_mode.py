@@ -39,7 +39,7 @@ def init():
 
     slime_mob = Slime_Mob()
     slime_mob.move_validator = stage1.is_walkable
-    game_world.add_objects(slime_mob, 2)
+    game_world.add_object(slime_mob, 2)
 
 
     # front_object = Front_Object()

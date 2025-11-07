@@ -32,8 +32,8 @@ def point_in_polygon(x, y, polygon):
     return inside
 
 class Idle:
-    def __init__(self, player):
-        self.player = player
+    def __init__(self, mob):
+        self.mob = mob
 
     def enter(self, e):
         pass
@@ -41,7 +41,25 @@ class Idle:
         pass
 
     def do(self):
-        self.player.frame = (self.player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 1
+        self.mob.frame = (self.mob.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 1
+
+    def draw(self):
+        self.mob.idle_image.clip_draw(int(self.mob.frame) * 38, 0, 38, 23, self.mob.x, self.mob.y, 64, 48)
+
+class Move:
+    def __init__(self, mob):
+        self.mob = mob
+
+    def enter(self, e):
+        pass
+    def exit(self, e):
+        pass
+
+    def do(self):
+        self.mob.frame = (self.mob.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 6
+
+    def draw(self):
+        self.mob.move_image.clip_draw(int(self.mob.frame) * 48, 0, 48, 31, self.mob.x, self.mob.y, 96, 62)
 
 class Slime_Mob:
     def __init__(self):
@@ -67,10 +85,11 @@ class Slime_Mob:
         self.is_alive = True  # 생존 상태 추가
 
         self.IDLE = Idle(self)
+        self.MOVE = Move(self)
 
         # 상태 머신 생성
         self.state_machine = StateMachine(
-            self.IDLE,
+            self.MOVE,
             {}
         )
 
