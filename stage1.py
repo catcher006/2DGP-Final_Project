@@ -14,9 +14,7 @@ class Stage1:
             {'type': 'rect', 'min_x': 105, 'max_x': 940, 'min_y': 85, 'max_y': 540},  # 기본 이동 구역
         ]
 
-        self.room_number = 0
-        self.max_room_number = 7
-        self.image = load_image("./image/background/stage1/%d.png" % self.room_number)
+        self.image = load_image("./image/background/stage1/0.png")
     def enter(self, e): pass
     def exit(self, e): pass
     def do(self): pass
@@ -54,8 +52,3 @@ class Stage1:
                 if self._point_in_polygon(x, y, p['points']):
                     return True
         return False
-
-    def set_room(self, room_number):
-        if 0 <= room_number <= self.max_room_number:
-            self.room_number = room_number
-
