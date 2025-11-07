@@ -1,6 +1,6 @@
 from pico2d import load_image
 
-class Stage1:
+class Stage1_0:
     def __init__(self):
         self.paths = [
             {'type': 'rect', 'min_x': 105, 'max_x': 940, 'min_y': 85, 'max_y': 540},  # 기본 이동 구역
