@@ -71,7 +71,7 @@ class Move:
             if self.mob.lr_dir == 0:
                 self.mob.ud_dir = random.choice([-1, 1])
             else:
-                self.mob.ud_dir = random.randint(-1, 1)
+                self.mob.ud_dir = 0
 
         # 이동 벡터를 먼저 계산 (px per second * dt)
         dx = self.mob.lr_dir * RUN_SPEED_PPS * dt
@@ -98,9 +98,11 @@ class Move:
 
 class Slime_Mob:
     def __init__(self):
-        self.move_image = load_image('./image/mobs/slime/Green_Slime_Jump.png')
-        self.idle_image = load_image('./image/mobs/slime/Green_Slime_Idle.png')
-        self.dead_image = load_image('./image/mobs/slime/Green_Slime_Dead.png')
+        self.mob_type = random.choice(["Green", 'Blue', 'Yellow'])
+
+        self.move_image = load_image("./image/mobs/slime/" + self.mob_type + "_Slime_Jump.png")
+        self.idle_image = load_image("./image/mobs/slime/" + self.mob_type + "_Slime_Idle.png")
+        self.dead_image = load_image("./image/mobs/slime/" + self.mob_type + "_Slime_Dead.png")
 
         self.x = random.randint(105,940)
         self.y = random.randint(85,540)
