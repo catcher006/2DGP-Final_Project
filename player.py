@@ -16,6 +16,7 @@ RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 8
+FRAMES_PER_IDLE_ACTION = 2
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -71,7 +72,7 @@ class Idle:
         pass
 
     def do(self):
-        self.player.frame = (self.player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 2
+        self.player.frame = (self.player.frame + FRAMES_PER_IDLE_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 2
 
 
     def draw(self):
@@ -123,7 +124,7 @@ class Walk:
         new_x = self.player.x + self.player.dx
         new_y = self.player.y + self.player.dy
 
-        # print(f"Trying to move to ({new_x}, {new_y})")
+        print(f"Trying to move to ({new_x}, {new_y})")
 
         # 실제 이동 가능 여부 검사
         can_move = self.player.can_move_to(new_x, new_y)
