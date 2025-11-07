@@ -4,8 +4,8 @@ import random
 import dungeonmain_mode
 import game_world
 import game_framework
-import stage1_0_mode
-from stage1_1 import Stage1_1
+import stage1_1_mode
+from stage1_2 import Stage1_2
 from player import Player
 from slime_mob import Slime_Mob
 
@@ -25,25 +25,25 @@ def handle_events():
             elif 500 <= player.x <=  550 and 0 <= player.y <= 20: # 하단 문
                 game_framework.change_mode(dungeonmain_mode)
             elif 0 <= player.x <=  20 and 270 <= player.y <= 370: # 좌측 문
-                game_framework.change_mode(stage1_0_mode)
+                game_framework.change_mode(stage1_1_mode)
         else:
             player.handle_event(event)
 
 def init():
     global world
-    global stage1_1
+    global stage1_2
     global player
     global back_object
     global front_object
 
-    stage1_1 = Stage1_1()
-    game_world.add_object(stage1_1, 0)
+    stage1_2 = Stage1_2()
+    game_world.add_object(stage1_2, 0)
 
     # back_object = Back_Object()
     # game_world.add_object((back_object), 1)
 
     player = Player()
-    player.move_validator = stage1_1.is_walkable
+    player.move_validator = stage1_2.is_walkable
     player.x = 535
     player.y = 540
 
@@ -51,7 +51,7 @@ def init():
 
     slime_mobs = [Slime_Mob() for _ in range(random.randint(0, 2))]
     for slime_mob in slime_mobs:
-        slime_mob.move_validator = stage1_1.is_mob_walkable
+        slime_mob.move_validator = stage1_2.is_mob_walkable
     game_world.add_objects(slime_mobs, 2)
 
 
