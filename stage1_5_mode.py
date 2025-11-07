@@ -4,7 +4,7 @@ import random
 import dungeonmain_mode
 import game_world
 import game_framework
-import stage1_2_mode
+import stage1_2_mode, stage1_4_mode
 from stage1_5 import Stage1_5
 from player import Player
 from slime_mob import Slime_Mob
@@ -25,7 +25,7 @@ def handle_events():
             elif 500 <= player.x <=  550 and 0 <= player.y <= 20: # 하단 문
                 game_framework.change_mode(dungeonmain_mode)
             elif 0 <= player.x <=  20 and 270 <= player.y <= 370: # 좌측 문
-                game_framework.change_mode(dungeonmain_mode)
+                game_framework.change_mode(stage1_4_mode)
         else:
             player.handle_event(event)
 
