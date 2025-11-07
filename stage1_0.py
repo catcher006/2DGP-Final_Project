@@ -7,7 +7,6 @@ class Stage1_0:
             {'type': 'rect', 'min_x': 500, 'max_x': 550, 'min_y': 540, 'max_y': 600},  # 위쪽 문
             {'type': 'rect', 'min_x': 940, 'max_x': 1010, 'min_y': 270, 'max_y': 370},  # 우측 문
             {'type': 'rect', 'min_x': 500, 'max_x': 550, 'min_y': 0, 'max_y': 85},  # 아래쪽 문
-            {'type': 'rect', 'min_x': 0, 'max_x': 105, 'min_y': 270, 'max_y': 370},  # 좌측 문
         ]
 
         self.mob_paths = [

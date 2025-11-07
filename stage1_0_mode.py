@@ -19,14 +19,10 @@ def handle_events():
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
-            if 500 <= player.x <=  550 and 580 <= player.y <= 600: # 상단 문
-                game_framework.change_mode(dungeonmain_mode)
-            elif 990 <= player.x <=  1100 and 270 <= player.y <= 370: # 우측 문
+            if 990 <= player.x <=  1100 and 270 <= player.y <= 370: # 우측 문
                 game_framework.change_mode(stage1_1_mode)
             elif 500 <= player.x <=  550 and 0 <= player.y <= 20: # 하단 문
                 game_framework.change_mode(stage1_3_mode)
-            elif 0 <= player.x <=  20 and 270 <= player.y <= 370: # 좌측 문
-                game_framework.change_mode(dungeonmain_mode)
         else:
             player.handle_event(event)
 
