@@ -161,7 +161,7 @@ class Player:
         self.lr_dir = 0 # left right direction (left: -1, right: 1, none: 0)
 
         self.move_door = 0
-        # 이동한 문 위치 (0: 상단, 1: 하단, 2: 좌측, 3: 우측)
+        # 이동한 문 위치 (0: 상단, 1: 우측, 2: 하단, 3: 좌측)
         # 4: 던전메인_스테이지1_입구
         # 5: 던전메인_스테이지2_입구
         # 6: 던전메인_스테이지3_입구
