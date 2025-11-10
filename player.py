@@ -160,14 +160,6 @@ class Player:
         self.ud_dir = 0 # up down direction (up: 1, down: -1, none: 0)
         self.lr_dir = 0 # left right direction (left: -1, right: 1, none: 0)
 
-        self.move_door = 0
-        # 이동한 문 위치 (0: 상단, 1: 우측, 2: 하단, 3: 좌측)
-        # 4: 던전메인_스테이지1_입구
-        # 5: 던전메인_스테이지2_입구
-        # 6: 던전메인_스테이지3_입구
-        # 7: 던전메인_입구
-        # 8: 던전_입구 (마을)
-
         # 이동 검사 콜백: 모드가 주입
         self.move_validator = None
 

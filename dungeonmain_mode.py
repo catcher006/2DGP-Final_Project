@@ -18,7 +18,6 @@ def handle_events():
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             if player.x >= 195 and player.x <= 290 and player.y >= 380 and player.y <= 400:  # 1번 스테이지 입구 좌표 범위
                 game_framework.change_mode(stage1_0_mode)
-                player.move_door = 0
             elif player.x >= 505 and player.x <= 585 and player.y >= 380 and player.y <= 400:  # 2번 스테이지 입구 좌표 범위
                 print("Stage 2 Entered") # 스테이지 2로 이동
             elif player.x >= 780 and player.x <= 880 and player.y >= 380 and player.y <= 400:  # 3번 스테이지 입구 좌표 범위
@@ -41,7 +40,6 @@ def init():
 
     player = Player()
     player.move_validator = dungeonmain.is_walkable
-
     player.x = 535
     player.y = 60
 
