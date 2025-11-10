@@ -43,8 +43,10 @@ def init():
 
     player = Player()
     player.move_validator = stage1_0.is_walkable
-    player.x = 535
-    player.y = 540
+
+    if player.move_door == 0:
+        player.x = 525
+        player.y = 580
 
     game_world.add_object((player), 2)
 
