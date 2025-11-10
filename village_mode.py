@@ -21,11 +21,11 @@ def handle_events():
             game_framework.change_mode(title_mode)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             if player.x >= 480 and player.x <=  590 and player.y >= 370 and player.y <= 380: # 던전 입구 좌표 범위
-                game_framework.change_mode(dungeonmain_mode)
+                game_framework.change_mode(dungeonmain_mode,(535, 60))
         else:
             player.handle_event(event)
 
-def init():
+def init(player_start_pos=None):
     global world
     global village
     global player
@@ -41,6 +41,11 @@ def init():
     player = Player()
     # 마을 모드에서 이동 검사 콜백을 마을 객체에 위임
     player.move_validator = village.is_walkable
+    # 시작 좌표 설정
+    if player_start_pos:
+        player.x, player.y = player_start_pos
+    else:
+        player.x, player.y = 510, 160  # 기본 좌표
     game_world.add_object((player), 2)
 
     front_object = Village_Front_Object()
