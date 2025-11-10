@@ -5,7 +5,7 @@ running = None
 stack = None
 
 
-def change_mode(mode):
+def change_mode(mode, *args):
     global stack
     if (len(stack) > 0):
         # execute the current mode's finish function
@@ -13,7 +13,7 @@ def change_mode(mode):
         # remove the current mode
         stack.pop()
     stack.append(mode)
-    mode.init()
+    mode.init(*args)
 
 
 def push_mode(mode):
