@@ -22,6 +22,8 @@ def handle_events():
                 print("Stage 2 Entered") # 스테이지 2로 이동
             elif player.x >= 780 and player.x <= 880 and player.y >= 380 and player.y <= 400:  # 3번 스테이지 입구 좌표 범위
                 print("Stage 3 Entered") # 스테이지 3로 이동
+            elif player.x >= 500 and player.x <= 600 and player.y >= 60 and player.y <= 80:  # 마을 입구 좌표 범위
+                game_framework.change_mode(village_mode,(535, 380))
         else:
             player.handle_event(event)
 
