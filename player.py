@@ -77,13 +77,13 @@ class Idle:
 
     def draw(self):
         row = 0
-        if self.player.ud_dir == 1:
+        if self.player.ydir == 1:
             row = 3
-        elif self.player.lr_dir == -1:
+        elif self.player.xdir == -1:
             row = 2
-        elif self.player.ud_dir == -1:
+        elif self.player.ydir == -1:
             row = 1
-        elif self.player.lr_dir == 1:
+        elif self.player.xdir == 1:
             row = 0
         self.player.idle_image.clip_draw(int(self.player.frame) * 64, 64 * row, 64, 64,self.player.x, self.player.y, 100, 100)
 
@@ -94,17 +94,17 @@ class Walk:
 
     def enter(self, e):
         if a_down(e) or d_up(e):
-            self.player.ud_dir = 0
-            self.player.lr_dir = -1
+            self.player.ydir = 0
+            self.player.xdir = -1
         elif d_down(e) or a_up(e):
-            self.player.ud_dir = 0
-            self.player.lr_dir = 1
+            self.player.ydir = 0
+            self.player.xdir = 1
         elif w_down(e) or s_up(e):
-            self.player.ud_dir = 1
-            self.player.lr_dir = 0
+            self.player.ydir = 1
+            self.player.xdir = 0
         elif s_down(e) or w_up(e):
-            self.player.ud_dir = -1
-            self.player.lr_dir = 0
+            self.player.ydir = -1
+            self.player.xdir = 0
         elif f_down(e):
             pass
 
@@ -114,8 +114,8 @@ class Walk:
     def do(self):
         dt = game_framework.frame_time
         # 이동 벡터를 먼저 계산 (px per second * dt)
-        dx = self.player.lr_dir * RUN_SPEED_PPS * dt
-        dy = self.player.ud_dir * RUN_SPEED_PPS * dt
+        dx = self.player.xdir * RUN_SPEED_PPS * dt
+        dy = self.player.ydir * RUN_SPEED_PPS * dt
 
         # 디버깅용으로 player에 저장해두면 유용
         self.player.dx = dx
@@ -137,10 +137,10 @@ class Walk:
 
     def draw(self):
         row = 0
-        if self.player.ud_dir == 1: row = 3
-        elif self.player.lr_dir == -1: row = 2
-        elif self.player.ud_dir == -1: row = 1
-        elif self.player.lr_dir == 1: row = 0
+        if self.player.ydir == 1: row = 3
+        elif self.player.xdir == -1: row = 2
+        elif self.player.ydir == -1: row = 1
+        elif self.player.xdir == 1: row = 0
         self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * row, 64, 64,self.player.x, self.player.y, 100, 100)
 
 class Player:
@@ -157,8 +157,8 @@ class Player:
         self.dx = 0.0
         self.dy = 0.0
 
-        self.ud_dir = 0 # up down direction (up: 1, down: -1, none: 0)
-        self.lr_dir = 0 # left right direction (left: -1, right: 1, none: 0)
+        self.xdir = 0 # up down direction (up: 1, down: -1, none: 0)
+        self.ydir = 0 # left right direction (left: -1, right: 1, none: 0)
 
         # 이동 검사 콜백: 모드가 주입
         self.move_validator = None
