@@ -17,7 +17,7 @@ def handle_events():
             game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             if player.x >= 195 and player.x <= 290 and player.y >= 380 and player.y <= 400:  # 1번 스테이지 입구 좌표 범위
-                game_framework.change_mode(stage1_0_mode)
+                game_framework.change_mode(stage1_0_mode,(525, 600))
             elif player.x >= 505 and player.x <= 585 and player.y >= 380 and player.y <= 400:  # 2번 스테이지 입구 좌표 범위
                 print("Stage 2 Entered") # 스테이지 2로 이동
             elif player.x >= 780 and player.x <= 880 and player.y >= 380 and player.y <= 400:  # 3번 스테이지 입구 좌표 범위
@@ -25,7 +25,7 @@ def handle_events():
         else:
             player.handle_event(event)
 
-def init():
+def init(player_start_pos=None):
     global world
     global dungeonmain
     global player
@@ -40,8 +40,11 @@ def init():
 
     player = Player()
     player.move_validator = dungeonmain.is_walkable
-    player.x = 535
-    player.y = 60
+    # 시작 좌표 설정
+    if player_start_pos:
+        player.x, player.y = player_start_pos
+    else:
+        player.x, player.y = 535, 60  # 기본 좌표
 
     game_world.add_object((player), 2)
 
