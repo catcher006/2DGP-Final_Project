@@ -19,9 +19,9 @@ def handle_events():
             game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             if 990 <= player.x <=  1100 and 270 <= player.y <= 370: # 우측 문
-                game_framework.change_mode(stage1_2_mode)
+                game_framework.change_mode(stage1_2_mode, (50, 320))
             elif 50 <= player.x <= 70 and 270 <= player.y <= 370:  # 좌측 문
-                game_framework.change_mode(stage1_0_mode)
+                game_framework.change_mode(stage1_0_mode, (1010, 320))
         else:
             player.handle_event(event)
 
