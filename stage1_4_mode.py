@@ -26,7 +26,7 @@ def handle_events():
         else:
             player.handle_event(event)
 
-def init():
+def init(player_start_pos=None):
     global world
     global stage1_4
     global player
@@ -41,8 +41,11 @@ def init():
 
     player = Player()
     player.move_validator = stage1_4.is_walkable
-    player.x = 535
-    player.y = 540
+    # 시작 좌표 설정
+    if player_start_pos:
+        player.x, player.y = player_start_pos
+    else:
+        player.x, player.y = 535, 60  # 기본 좌표
 
     game_world.add_object((player), 2)
 
