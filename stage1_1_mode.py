@@ -9,6 +9,11 @@ from stage1_1 import Stage1_1
 from player import Player
 from slime_mob import Slime_Mob
 
+stage1_1 = None
+player = None
+slime_mobs = []
+_initialized = False
+
 
 def handle_events():
     global running
@@ -31,28 +36,34 @@ def init():
     global player
     global back_object
     global front_object
+    global slime_mobs
+    global _initialized
 
-    stage1_1 = Stage1_1()
-    game_world.add_object(stage1_1, 0)
+    if not _initialized:
+        stage1_1 = Stage1_1()
+        game_world.add_object(stage1_1, 0)
 
-    # back_object = Back_Object()
-    # game_world.add_object((back_object), 1)
+        # back_object = Back_Object()
+        # game_world.add_object((back_object), 1)
 
-    player = Player()
-    player.move_validator = stage1_1.is_walkable
-    player.x = 535
-    player.y = 540
+        player = Player()
+        player.move_validator = stage1_1.is_walkable
+        player.x = 535
+        player.y = 540
 
-    game_world.add_object((player), 2)
+        game_world.add_object((player), 2)
 
-    slime_mobs = [Slime_Mob() for _ in range(random.randint(0, 2))]
-    for slime_mob in slime_mobs:
-        slime_mob.move_validator = stage1_1.is_mob_walkable
-    game_world.add_objects(slime_mobs, 2)
+        slime_mobs = [Slime_Mob() for _ in range(random.randint(0, 2))]
+        for slime_mob in slime_mobs:
+            slime_mob.move_validator = stage1_1.is_mob_walkable
+        game_world.add_objects(slime_mobs, 2)
 
+        # front_object = Front_Object()
+        # game_world.add_object((front_object), 3)
 
-    # front_object = Front_Object()
-    # game_world.add_object((front_object), 3)
+        _initialized = True
+    else:
+        resume()
 
 def update():
     game_world.update()
@@ -63,10 +74,44 @@ def draw():
     update_canvas()
 
 def finish():
-    game_world.clear()
+    global stage1_1, player, slime_mobs, _initialized
+    try:
+        if stage1_1: game_world.remove_object(stage1_1)
+    except:
+        pass
+    try:
+        if player: game_world.remove_object(player)
+    except:
+        pass
+    for m in list(slime_mobs):
+        try:
+            game_world.remove_object(m)
+        except:
+            pass
+    stage1_1 = None
+    player = None
+    slime_mobs = []
+    _initialized = False
 
 def pause():
-    pass
+    try:
+        if stage1_1: game_world.remove_object(stage1_1)
+    except:
+        pass
+    try:
+        if player: game_world.remove_object(player)
+    except:
+        pass
+    for m in list(slime_mobs):
+        try:
+            game_world.remove_object(m)
+        except:
+            pass
 
 def resume():
-    pass
+    if stage1_1:
+        game_world.add_object(stage1_1, 0)
+    if player:
+        game_world.add_object(player, 2)
+    if slime_mobs:
+        game_world.add_objects(slime_mobs, 2)
