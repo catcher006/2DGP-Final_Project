@@ -32,35 +32,11 @@ def point_in_polygon(x, y, polygon):
 
     return inside
 
-def a_down(e):
-    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
+def event_stop(e):
+    return e[0] == 'STOP'
 
-def a_up(e):
-    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_a
-
-def d_down(e):
-    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_d
-
-def d_up(e):
-    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_d
-
-def w_down(e):
-    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_w
-
-def w_up(e):
-    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_w
-
-def s_down(e):
-    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_s
-
-def s_up(e):
-    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_s
-
-def f_down(e):
-    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_f
-
-def f_up(e):
-    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_f
+def event_run(e):
+    return e[0] == 'RUN'
 
 class Idle:
     def __init__(self, player):
@@ -76,16 +52,15 @@ class Idle:
 
 
     def draw(self):
-        row = 0
         if self.player.ydir == 1:
-            row = 3
+            self.player.face_dir = 3
         elif self.player.xdir == -1:
-            row = 2
+            self.player.face_dir = 2
         elif self.player.ydir == -1:
-            row = 1
+            self.player.face_dir = 1
         elif self.player.xdir == 1:
-            row = 0
-        self.player.idle_image.clip_draw(int(self.player.frame) * 64, 64 * row, 64, 64,self.player.x, self.player.y, 100, 100)
+            self.player.face_dir = 0
+        self.player.idle_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
 
 
 class Walk:
@@ -93,20 +68,7 @@ class Walk:
         self.player = player
 
     def enter(self, e):
-        if a_down(e) or d_up(e):
-            self.player.ydir = 0
-            self.player.xdir = -1
-        elif d_down(e) or a_up(e):
-            self.player.ydir = 0
-            self.player.xdir = 1
-        elif w_down(e) or s_up(e):
-            self.player.ydir = 1
-            self.player.xdir = 0
-        elif s_down(e) or w_up(e):
-            self.player.ydir = -1
-            self.player.xdir = 0
-        elif f_down(e):
-            pass
+        pass
 
     def exit(self, e):
         pass
@@ -136,12 +98,11 @@ class Walk:
             self.player.y = new_y
 
     def draw(self):
-        row = 0
-        if self.player.ydir == 1: row = 3
-        elif self.player.xdir == -1: row = 2
-        elif self.player.ydir == -1: row = 1
-        elif self.player.xdir == 1: row = 0
-        self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * row, 64, 64,self.player.x, self.player.y, 100, 100)
+        if self.player.ydir == 1: self.player.face_dir = 3
+        elif self.player.xdir == -1: self.player.face_dir = 2
+        elif self.player.ydir == -1: self.player.face_dir = 1
+        elif self.player.xdir == 1: self.player.face_dir = 0
+        self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
 
 class Player:
     def __init__(self):
@@ -160,6 +121,8 @@ class Player:
         self.xdir = 0 # up down direction (up: 1, down: -1, none: 0)
         self.ydir = 0 # left right direction (left: -1, right: 1, none: 0)
 
+        self.face_dir = 0 # 마지막 방향 저장 (0: 오른쪽, 1: 아래, 2: 왼쪽, 3: 위)
+
         # 이동 검사 콜백: 모드가 주입
         self.move_validator = None
 
@@ -172,12 +135,12 @@ class Player:
         self.IDLE = Idle(self)
         self.WALK = Walk(self)
 
-        # 상태 머신 생성
+        # 상태 머신 생성d
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE: {a_down: self.WALK, a_up: self.WALK, d_down: self.WALK, d_up: self.WALK, w_down: self.WALK, w_up: self.WALK, s_down: self.WALK, s_up: self.WALK},
-                self.WALK: {a_down: self.IDLE, a_up: self.IDLE, d_down: self.IDLE, d_up: self.IDLE, w_down: self.IDLE, w_up: self.IDLE, s_down: self.IDLE, s_up: self.IDLE}
+                self.IDLE: { event_run: self.WALK },
+                self.WALK: { event_stop: self.IDLE }
             }
 
         )
@@ -189,7 +152,25 @@ class Player:
         self.state_machine.update()
 
     def handle_event(self, event):
-        self.state_machine.handle_state_event(('INPUT', event))
+        if event.key in (SDLK_a, SDLK_d, SDLK_w, SDLK_s):
+            cur_xdir, cur_ydir = self.xdir, self.ydir
+            if event.type == SDL_KEYDOWN:
+                if event.key == SDLK_a: self.xdir -= 1
+                elif event.key == SDLK_d: self.xdir += 1
+                elif event.key == SDLK_w: self.ydir += 1
+                elif event.key == SDLK_s: self.ydir -= 1
+            elif event.type == SDL_KEYUP:
+                if event.key == SDLK_a: self.xdir += 1
+                elif event.key == SDLK_d: self.xdir -= 1
+                elif event.key == SDLK_w: self.ydir -= 1
+                elif event.key == SDLK_s: self.ydir += 1
+            if cur_xdir != self.xdir or cur_ydir != self.ydir:  # 방향키에 따른 변화가 있으면
+                if self.xdir == 0 and self.ydir == 0:  # 멈춤
+                    self.state_machine.handle_state_event(('STOP', self.face_dir))  # 스탑 시 이전 방향 전달
+                else:  # 움직임
+                    self.state_machine.handle_state_event(('RUN', None))
+        else:
+            self.state_machine.handle_state_event(('INPUT', event))
 
     def can_move_to(self, x, y):
         if callable(self.move_validator):
