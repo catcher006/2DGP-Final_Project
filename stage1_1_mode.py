@@ -20,12 +20,12 @@ def handle_events():
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             if 990 <= player.x <=  1100 and 270 <= player.y <= 370: # 우측 문
                 game_framework.change_mode(stage1_2_mode)
-            elif 0 <= player.x <=  20 and 270 <= player.y <= 370: # 좌측 문
+            elif 50 <= player.x <= 70 and 270 <= player.y <= 370:  # 좌측 문
                 game_framework.change_mode(stage1_0_mode)
         else:
             player.handle_event(event)
 
-def init():
+def init(player_start_pos=None):
     global world
     global stage1_1
     global player
@@ -40,8 +40,11 @@ def init():
 
     player = Player()
     player.move_validator = stage1_1.is_walkable
-    player.x = 535
-    player.y = 540
+    # 시작 좌표 설정
+    if player_start_pos:
+        player.x, player.y = player_start_pos
+    else:
+        player.x, player.y = 535, 100  # 기본 좌표
 
     game_world.add_object((player), 2)
 
