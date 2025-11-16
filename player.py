@@ -19,6 +19,10 @@ FRAMES_PER_ACTION = 8
 FRAMES_PER_IDLE_ACTION = 2
 FRAMES_PER_DEAD_ACTION = 6
 
+# 모드 호환을 위한 전역 변수 사용
+player_hp = 100
+player_is_alive = True
+
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
     n = len(polygon)
@@ -156,8 +160,6 @@ class Player:
 
         self.is_attacking = False  # 공격 상태
         self.attack_start_time = 0  # 공격 시작 시간
-        self.hp = 100  # 체력 추가
-        self.is_alive = True  # 생존 상태 추가
 
         # 데미지 관련 추가
         self.last_damage_time = 0
@@ -180,7 +182,7 @@ class Player:
 
     def draw(self):
         self.state_machine.draw()
-        self.font.draw(self.x - 35, self.y + 40, f'hp: {self.hp:02d}', (0, 0, 255))
+        self.font.draw(self.x - 35, self.y + 40, f'hp: {player_hp:02d}', (0, 0, 255))
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
@@ -198,7 +200,7 @@ class Player:
 
     def handle_event(self, event):
         # 죽었으면 입력 무시
-        if not self.is_alive:
+        if not player_is_alive:
             return
 
         if event.key in (SDLK_a, SDLK_d, SDLK_w, SDLK_s):
@@ -228,18 +230,20 @@ class Player:
         return False
 
     def handle_collision(self, group, other):
-        if group == 'player:slime_mob' and self.is_alive:
+        global player_hp, player_is_alive
+
+        if group == 'player:slime_mob' and player_is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                self.hp -= 10
+                player_hp -= 10
                 self.last_damage_time = current_time
 
-                if self.hp <= 0:
-                    self.is_alive = False
+                if player_hp <= 0:
+                    player_is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("Player is dead!")
 
                 # 디버그 출력 (선택사항)
-                print(f"Player damaged! HP: {self.hp}")
+                print(f"Player damaged! HP: {player_hp}")
