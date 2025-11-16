@@ -21,34 +21,16 @@ def handle_events():
             game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             # 모드 전환 전에 현재 상태 저장
-            if len(slime_mobs) >= 1:
-                stage1_manger.stage1_0_last_mob1_pos = (slime_mobs[0].x, slime_mobs[0].y)
-            if len(slime_mobs) >= 2:
-                stage1_manger.stage1_0_last_mob2_pos = (slime_mobs[1].x, slime_mobs[1].y)
-
-            # 모든 슬라임의 상태를 리스트로 저장
-            mobs_state = []
-            for slime in slime_mobs:
-                state = {
-                    'type': getattr(slime, 'mob_type', None),
-                    'x': getattr(slime, 'x', None),
-                    'y': getattr(slime, 'y', None),
-                    'frame': getattr(slime, 'frame', 0),
-                    'is_move': getattr(slime, 'is_move', True),
-                    'lr_dir': getattr(slime, 'lr_dir', 0),
-                    'ud_dir': getattr(slime, 'ud_dir', 0),
-                    'hp': getattr(slime, 'hp', 100),
-                    'is_alive': getattr(slime, 'is_alive', True)
-                }
-                mobs_state.append(state)
-            stage1_manger.stage1_0_mobs = mobs_state
+            save_current_state()
 
             if 500 <= player.x <=  550 and 580 <= player.y <= 600: # 상단 문 (메인 던전으로 가는 문)
+                finish()
                 game_framework.change_mode(dungeonmain_mode,(240, 400))
             elif 990 <= player.x <=  1010 and 270 <= player.y <= 370: # 우측 문
-                debug_stage1_manager_state()
+                finish()
                 game_framework.change_mode(stage1_1_mode,(50, 320))
             elif 500 <= player.x <=  550 and 0 <= player.y <= 20: # 하단 문
+                finish()
                 game_framework.change_mode(stage1_3_mode,(525, 600))
         else:
             player.handle_event(event)
@@ -59,6 +41,9 @@ def init(player_start_pos=None):
     global player
     global back_object
     global front_object
+
+    # 기존 충돌 페어 초기화
+    game_world.collision_pairs.clear()
 
     stage1_0 = Stage1_0()
     game_world.add_object(stage1_0, 0)
@@ -138,11 +123,25 @@ def pause():
 def resume():
     pass
 
-# 슬라임 몹 정보 저장 확인 디버그 함수
-def debug_stage1_manager_state():
-    print("=== Stage1 Manager Debug Info ===")
-    print(f"stage1_0_create: {stage1_manger.stage1_0_create}")
-    print(f"stage1_0_mobs: {stage1_manger.stage1_0_mobs}")
-    print(f"stage1_0_last_mob1_pos: {stage1_manger.stage1_0_last_mob1_pos}")
-    print(f"stage1_0_last_mob2_pos: {stage1_manger.stage1_0_last_mob2_pos}")
-    print("================================")
+# 현재 상태를 저장하는 함수
+def save_current_state():
+    if len(slime_mobs) >= 1:
+        stage1_manger.stage1_0_last_mob1_pos = (slime_mobs[0].x, slime_mobs[0].y)
+    if len(slime_mobs) >= 2:
+        stage1_manger.stage1_0_last_mob2_pos = (slime_mobs[1].x, slime_mobs[1].y)
+
+    mobs_state = []
+    for slime in slime_mobs:
+        state = {
+            'type': getattr(slime, 'mob_type', None),
+            'x': getattr(slime, 'x', None),
+            'y': getattr(slime, 'y', None),
+            'frame': getattr(slime, 'frame', 0),
+            'is_move': getattr(slime, 'is_move', True),
+            'lr_dir': getattr(slime, 'lr_dir', 0),
+            'ud_dir': getattr(slime, 'ud_dir', 0),
+            'hp': getattr(slime, 'hp', 100),
+            'is_alive': getattr(slime, 'is_alive', True)
+        }
+        mobs_state.append(state)
+    stage1_manger.stage1_0_mobs = mobs_state
