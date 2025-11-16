@@ -7,7 +7,7 @@ from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f
 
 # mob Run Speed
 PIXEL_PER_METER = (10.0 / 0.3) # 10 pixel 30 cm
-RUN_SPEED_KMPH = 40.0 # Km / Hour
+RUN_SPEED_KMPH = 10.0 # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -49,9 +49,11 @@ class Idle:
 class Move:
     def __init__(self, mob):
         self.mob = mob
+        self.direction_change_counter = 0  # 방향 변경 카운터 추가
 
     def enter(self, e):
-        pass
+        self.direction_change_counter = 0  # 상태 진입 시 카운터 초기화
+
     def exit(self, e):
         pass
 
@@ -65,13 +67,18 @@ class Move:
         prev_frame = self.mob.frame
         new_frame = (prev_frame + delta) % 6
 
-        # 프레임이 한바퀴 돌아 랩된 경우 방향 재설정
+        # 프레임이 한바퀴 돌아 랩된 경우 카운터 증가
         if new_frame < prev_frame:
-            self.mob.lr_dir = random.randint(-1, 1)
-            if self.mob.lr_dir == 0:
-                self.mob.ud_dir = random.choice([-1, 1])
-            else:
-                self.mob.ud_dir = 0
+            self.direction_change_counter += 1
+
+            # 4바퀴마다 방향 재설정
+            if self.direction_change_counter >= 4:
+                self.mob.lr_dir = random.randint(-1, 1)
+                if self.mob.lr_dir == 0:
+                    self.mob.ud_dir = random.choice([-1, 1])
+                else:
+                    self.mob.ud_dir = 0
+                self.direction_change_counter = 0  # 카운터 리셋
 
         # 이동 벡터를 먼저 계산 (px per second * dt)
         dx = self.mob.lr_dir * RUN_SPEED_PPS * dt
