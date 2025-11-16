@@ -17,6 +17,7 @@ TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 8
 FRAMES_PER_IDLE_ACTION = 2
+FRAMES_PER_DEAD_ACTION = 6
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -37,6 +38,30 @@ def event_stop(e):
 
 def event_run(e):
     return e[0] == 'RUN'
+
+def event_die(e):
+    return e[0] == 'DIE'
+
+
+class Dead:
+    def __init__(self, player):
+        self.player = player
+
+    def enter(self, e):
+        self.player.frame = 0
+        print("Entered Dead state!")  # 디버그용
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        if self.player.frame < 5:
+            self.player.frame += FRAMES_PER_DEAD_ACTION * ACTION_PER_TIME * game_framework.frame_time
+
+
+    def draw(self):
+        self.player.dead_image.clip_draw(int(self.player.frame) * 64, 0, 64, 64, self.player.x, self.player.y, 100, 100)
+
 
 class Idle:
     def __init__(self, player):
@@ -141,13 +166,14 @@ class Player:
         # 상태들 생성
         self.IDLE = Idle(self)
         self.WALK = Walk(self)
+        self.DEAD = Dead(self)
 
         # 상태 머신 생성
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE: { event_run: self.WALK },
-                self.WALK: { event_stop: self.IDLE }
+                self.IDLE: { event_run: self.WALK, event_die: self.DEAD },
+                self.WALK: { event_stop: self.IDLE, event_die: self.DEAD }
             }
 
         )
@@ -171,6 +197,10 @@ class Player:
         self.state_machine.update()
 
     def handle_event(self, event):
+        # 죽었으면 입력 무시
+        if not self.is_alive:
+            return
+
         if event.key in (SDLK_a, SDLK_d, SDLK_w, SDLK_s):
             cur_xdir, cur_ydir = self.xdir, self.ydir
             if event.type == SDL_KEYDOWN:
@@ -198,7 +228,7 @@ class Player:
         return False
 
     def handle_collision(self, group, other):
-        if group == 'player:slime_mob':
+        if group == 'player:slime_mob' and self.is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
@@ -208,6 +238,8 @@ class Player:
 
                 if self.hp <= 0:
                     self.is_alive = False
+                    self.state_machine.handle_state_event(('DIE', None))
+                    print("Player is dead!")
 
                 # 디버그 출력 (선택사항)
                 print(f"Player damaged! HP: {self.hp}")
