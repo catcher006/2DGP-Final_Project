@@ -131,7 +131,6 @@ def debug_stage1_manager_state():
     print("=== Stage1 Manager Debug Info ===")
     print(f"stage1_0_create: {stage1_manger.stage1_0_create}")
     print(f"stage1_0_mobs: {stage1_manger.stage1_0_mobs}")
-    print(f"stage1_0_last_player_pos: {stage1_manger.stage1_0_last_player_pos}")
     print(f"stage1_0_last_mob1_pos: {stage1_manger.stage1_0_last_mob1_pos}")
     print(f"stage1_0_last_mob2_pos: {stage1_manger.stage1_0_last_mob2_pos}")
     print("================================")
