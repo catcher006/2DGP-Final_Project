@@ -56,6 +56,9 @@ def init(player_start_pos=None):
     global back_object
     global front_object
 
+    # 기존 충돌 페어 초기화
+    game_world.collision_pairs.clear()
+
     stage1_5 = Stage1_5()
     game_world.add_object(stage1_5, 0)
 
@@ -108,12 +111,17 @@ def init(player_start_pos=None):
 
     game_world.add_objects(slime_mobs, 2)
 
+    game_world.add_collision_pair('player:slime_mob', player, None)
+    for slime_mob in slime_mobs:
+        game_world.add_collision_pair('player:slime_mob', None, slime_mob)
+
 
     # front_object = Front_Object()
     # game_world.add_object((front_object), 3)
 
 def update():
     game_world.update()
+    game_world.handle_collsions()
 
 def draw():
     clear_canvas()
