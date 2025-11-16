@@ -17,6 +17,8 @@ TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 8
 
+time_out = lambda e: e[0] == 'TIMEOUT'
+
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
     n = len(polygon)
@@ -36,23 +38,14 @@ class Idle:
         self.mob = mob
 
     def enter(self, e):
-        pass
-    def exit(self, e):
-        pass
-
-    def do(self):
-        self.mob.frame = (self.mob.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 1
-
-    def draw(self):
-        self.mob.idle_image.clip_draw(int(self.mob.frame) * 38, 0, 38, 23, self.mob.x, self.mob.y, 64, 48)
-
-class Move:
-    def __init__(self, mob):
-        self.mob = mob
-        self.direction_change_counter = 0  # 방향 변경 카운터 추가
-
-    def enter(self, e):
-        self.direction_change_counter = 0  # 상태 진입 시 카운터 초기화
+        # 방향을 랜덤으로 설정
+        self.mob.lr_dir = random.randint(-1, 1)
+        if self.mob.lr_dir == 0:
+            self.mob.ud_dir = random.choice([-1, 1])
+        else:
+            self.mob.ud_dir = 0
+        self.mob.frame = random.randint(0, 5)
+        self.timer = 0.0  # 별도 타이머 추가
 
     def exit(self, e):
         pass
@@ -60,41 +53,58 @@ class Move:
     def do(self):
         dt = game_framework.frame_time
 
-        # 프레임 증가량 계산
+        # 타이머 증가
+        self.timer += dt
+
+        # 4바퀴 시간 (24프레임 * 0.5초 / 8프레임 = 1.5초)
+        if self.timer >= 1.5:
+            self.mob.state_machine.handle_state_event(('TIMEOUT', 0))
+            return
+
+        # 프레임 애니메이션 (0~5 범위 유지)
         delta = FRAMES_PER_ACTION * ACTION_PER_TIME * dt
+        self.mob.frame = (self.mob.frame + delta) % 6
 
-        # 이전 프레임을 저장하고 새 프레임 계산 (모듈러 연산으로 랩 발생 가능)
-        prev_frame = self.mob.frame
-        new_frame = (prev_frame + delta) % 6
+    def draw(self):
+        self.mob.idle_image.clip_draw(int(self.mob.frame) * 48, 0, 48, 31, self.mob.x, self.mob.y, 96, 62)
 
-        # 프레임이 한바퀴 돌아 랩된 경우 카운터 증가
-        if new_frame < prev_frame:
-            self.direction_change_counter += 1
+class Move:
+    def __init__(self, mob):
+        self.mob = mob
 
-            # 4바퀴마다 방향 재설정
-            if self.direction_change_counter >= 4:
-                self.mob.lr_dir = random.randint(-1, 1)
-                if self.mob.lr_dir == 0:
-                    self.mob.ud_dir = random.choice([-1, 1])
-                else:
-                    self.mob.ud_dir = 0
-                self.direction_change_counter = 0  # 카운터 리셋
+    def enter(self, e):
+        self.mob.frame = random.randint(0, 5)
+        self.timer = 0.0  # 별도 타이머 추가
 
-        # 이동 벡터를 먼저 계산 (px per second * dt)
+    def exit(self, e):
+        pass
+
+    def do(self):
+        dt = game_framework.frame_time
+
+        # 타이머 증가
+        self.timer += dt
+
+        # 2바퀴 시간 (12프레임 * 0.5초 / 8프레임 = 0.75초)
+        if self.timer >= 0.75:
+            self.mob.state_machine.handle_state_event(('TIMEOUT', 0))
+            return
+
+        # 프레임 애니메이션 (0~5 범위 유지)
+        delta = FRAMES_PER_ACTION * ACTION_PER_TIME * dt
+        self.mob.frame = (self.mob.frame + delta) % 6
+
+        # 이동 벡터 계산
         dx = self.mob.lr_dir * RUN_SPEED_PPS * dt
         dy = self.mob.ud_dir * RUN_SPEED_PPS * dt
 
-        # 디버깅용으로 player에 저장해두면 유용
         self.mob.dx = dx
         self.mob.dy = dy
 
         new_x = self.mob.x + self.mob.dx
         new_y = self.mob.y + self.mob.dy
 
-        # 실제 이동 가능 여부 검사
         can_move = self.mob.can_move_to(new_x, new_y)
-
-        self.mob.frame = (self.mob.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 6
 
         if can_move:
             self.mob.x = new_x
@@ -115,6 +125,7 @@ class Slime_Mob:
         self.y = random.randint(85,540)
 
         self.frame = random.randint(0,5)
+        self.is_move = True
 
         self.dx = 0.0
         self.dy = 0.0
@@ -131,10 +142,16 @@ class Slime_Mob:
         self.IDLE = Idle(self)
         self.MOVE = Move(self)
 
+        # is_move 값에 따라 초기 상태 결정
+        initial_state = self.MOVE if self.is_move else self.IDLE
+
         # 상태 머신 생성
         self.state_machine = StateMachine(
-            self.MOVE,
-            {}
+            initial_state,
+            {
+                self.MOVE: {time_out: self.IDLE},
+                self.IDLE: {time_out: self.MOVE}
+            }
         )
 
     def draw(self):

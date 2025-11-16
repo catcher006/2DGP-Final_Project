@@ -33,6 +33,7 @@ def handle_events():
                     'x': getattr(slime, 'x', None),
                     'y': getattr(slime, 'y', None),
                     'frame': getattr(slime, 'frame', 0),
+                    'is_move': getattr(slime, 'is_move', True),
                     'lr_dir': getattr(slime, 'lr_dir', 0),
                     'ud_dir': getattr(slime, 'ud_dir', 0),
                     'hp': getattr(slime, 'hp', 100),
@@ -97,6 +98,7 @@ def init(player_start_pos=None):
                 slime.x = mob_state.get('x', slime.x)
                 slime.y = mob_state.get('y', slime.y)
                 slime.frame = mob_state.get('frame', slime.frame)
+                slime.is_move = mob_state.get('is_move', slime.is_move)
                 slime.lr_dir = mob_state.get('lr_dir', slime.lr_dir)
                 slime.ud_dir = mob_state.get('ud_dir', slime.ud_dir)
                 slime.hp = mob_state.get('hp', slime.hp)
