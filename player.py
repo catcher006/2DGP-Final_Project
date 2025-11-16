@@ -134,11 +134,15 @@ class Player:
         self.hp = 100  # 체력 추가
         self.is_alive = True  # 생존 상태 추가
 
+        # 데미지 관련 추가
+        self.last_damage_time = 0
+        self.damage_cooldown = TIME_PER_ACTION * 3
+
         # 상태들 생성
         self.IDLE = Idle(self)
         self.WALK = Walk(self)
 
-        # 상태 머신 생성d
+        # 상태 머신 생성
         self.state_machine = StateMachine(
             self.IDLE,
             {
@@ -195,6 +199,15 @@ class Player:
 
     def handle_collision(self, group, other):
         if group == 'player:slime_mob':
-            self.hp -= 10
-            if self.hp <= 0:
-                self.is_alive = False
+            current_time = time.time()
+
+            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                self.hp -= 10
+                self.last_damage_time = current_time
+
+                if self.hp <= 0:
+                    self.is_alive = False
+
+                # 디버그 출력 (선택사항)
+                print(f"Player damaged! HP: {self.hp}")
