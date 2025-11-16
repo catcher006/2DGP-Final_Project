@@ -76,7 +76,12 @@ def init(player_start_pos=None):
         slime_mobs = [Slime_Mob() for _ in range(random.randint(0, 2))]
         for slime_mob in slime_mobs:
             slime_mob.move_validator = stage1_1.is_mob_walkable
-            stage1_manger.stage1_1_create = True
+        # 슬라임이 0개여도 생성 완료로 표시
+        stage1_manger.stage1_1_create = True
+
+        # 초기 상태를 빈 리스트로 저장 (0개인 경우 대비)
+        if not slime_mobs:
+            stage1_manger.stage1_1_mobs = []
     else:
         # 저장된 상태에서 복원
         saved_mobs = stage1_manger.stage1_1_mobs  # 함수가 아닌 변수 직접 사용
