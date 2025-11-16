@@ -1,7 +1,7 @@
 import game_framework
 import random
 from state_machine import StateMachine
-from pico2d import load_image, load_font, get_time
+from pico2d import load_image, load_font, get_time, draw_rectangle
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f
 
 
@@ -67,6 +67,23 @@ class Idle:
 
     def draw(self):
         self.mob.idle_image.clip_draw(int(self.mob.frame) * 48, 0, 48, 31, self.mob.x, self.mob.y, 96, 62)
+        draw_rectangle(*self.get_bb())
+
+    def get_bb(self):
+        frame = int(self.mob.frame)  # frame을 정수로 변환
+
+        if frame == 0:
+            return self.mob.x - 45, self.mob.y - 30, self.mob.x + 30, self.mob.y + 15
+        elif frame == 1:
+             return self.mob.x - 45, self.mob.y - 32, self.mob.x + 30, self.mob.y + 12
+        elif frame == 2:
+            return self.mob.x - 38, self.mob.y - 30, self.mob.x + 25, self.mob.y + 24
+        elif frame == 3:
+            return self.mob.x - 38, self.mob.y - 24, self.mob.x + 25, self.mob.y + 30
+        elif frame == 4:
+            return self.mob.x - 38, self.mob.y - 30, self.mob.x + 25, self.mob.y + 24
+        elif frame == 5:
+            return self.mob.x - 48, self.mob.y - 32, self.mob.x + 35, self.mob.y + 12
 
 class Move:
     def __init__(self, mob):
@@ -112,6 +129,23 @@ class Move:
 
     def draw(self):
         self.mob.move_image.clip_draw(int(self.mob.frame) * 48, 0, 48, 31, self.mob.x, self.mob.y, 96, 62)
+        draw_rectangle(*self.get_bb())
+
+    def get_bb(self):
+        frame = int(self.mob.frame)  # frame을 정수로 변환
+
+        if frame == 0:
+            return self.mob.x - 45, self.mob.y - 30, self.mob.x + 30, self.mob.y + 15
+        elif frame == 1:
+            return self.mob.x - 45, self.mob.y - 32, self.mob.x + 30, self.mob.y + 12
+        elif frame == 2:
+            return self.mob.x - 38, self.mob.y - 30, self.mob.x + 25, self.mob.y + 24
+        elif frame == 3:
+            return self.mob.x - 38, self.mob.y - 24, self.mob.x + 25, self.mob.y + 30
+        elif frame == 4:
+            return self.mob.x - 38, self.mob.y - 30, self.mob.x + 25, self.mob.y + 24
+        elif frame == 5:
+            return self.mob.x - 48, self.mob.y - 32, self.mob.x + 35, self.mob.y + 12
 
 class Slime_Mob:
     def __init__(self):
