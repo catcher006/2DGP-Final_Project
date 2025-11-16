@@ -67,23 +67,6 @@ class Idle:
 
     def draw(self):
         self.mob.idle_image.clip_draw(int(self.mob.frame) * 48, 0, 48, 31, self.mob.x, self.mob.y, 96, 62)
-        draw_rectangle(*self.get_bb())
-
-    def get_bb(self):
-        frame = int(self.mob.frame)  # frame을 정수로 변환
-
-        if frame == 0:
-            return self.mob.x - 45, self.mob.y - 30, self.mob.x + 30, self.mob.y + 15
-        elif frame == 1:
-             return self.mob.x - 45, self.mob.y - 32, self.mob.x + 30, self.mob.y + 12
-        elif frame == 2:
-            return self.mob.x - 38, self.mob.y - 30, self.mob.x + 25, self.mob.y + 24
-        elif frame == 3:
-            return self.mob.x - 38, self.mob.y - 24, self.mob.x + 25, self.mob.y + 30
-        elif frame == 4:
-            return self.mob.x - 38, self.mob.y - 30, self.mob.x + 25, self.mob.y + 24
-        elif frame == 5:
-            return self.mob.x - 48, self.mob.y - 32, self.mob.x + 35, self.mob.y + 12
 
 class Move:
     def __init__(self, mob):
@@ -129,23 +112,6 @@ class Move:
 
     def draw(self):
         self.mob.move_image.clip_draw(int(self.mob.frame) * 48, 0, 48, 31, self.mob.x, self.mob.y, 96, 62)
-        draw_rectangle(*self.get_bb())
-
-    def get_bb(self):
-        frame = int(self.mob.frame)  # frame을 정수로 변환
-
-        if frame == 0:
-            return self.mob.x - 45, self.mob.y - 30, self.mob.x + 30, self.mob.y + 15
-        elif frame == 1:
-            return self.mob.x - 45, self.mob.y - 32, self.mob.x + 30, self.mob.y + 12
-        elif frame == 2:
-            return self.mob.x - 38, self.mob.y - 30, self.mob.x + 25, self.mob.y + 24
-        elif frame == 3:
-            return self.mob.x - 38, self.mob.y - 24, self.mob.x + 25, self.mob.y + 30
-        elif frame == 4:
-            return self.mob.x - 38, self.mob.y - 30, self.mob.x + 25, self.mob.y + 24
-        elif frame == 5:
-            return self.mob.x - 48, self.mob.y - 32, self.mob.x + 35, self.mob.y + 12
 
 class Slime_Mob:
     def __init__(self):
@@ -190,6 +156,23 @@ class Slime_Mob:
 
     def draw(self):
         self.state_machine.draw()
+        draw_rectangle(*self.get_bb())
+
+    def get_bb(self):
+        frame = int(self.frame)  # frame을 정수로 변환
+
+        if frame == 0:
+            return self.x - 45, self.y - 30, self.x + 30, self.y + 15
+        elif frame == 1:
+            return self.x - 45, self.y - 32, self.x + 30, self.y + 12
+        elif frame == 2:
+            return self.x - 38, self.y - 30, self.x + 25, self.y + 24
+        elif frame == 3:
+            return self.x - 38, self.y - 24, self.x + 25, self.y + 30
+        elif frame == 4:
+            return self.x - 38, self.y - 30, self.x + 25, self.y + 24
+        elif frame == 5:
+            return self.x - 48, self.y - 32, self.x + 35, self.y + 12
 
     def update(self):
         self.state_machine.update()
@@ -202,3 +185,6 @@ class Slime_Mob:
             return self.move_validator(x, y)
 
         return False
+
+    def handle_collision(self, group, other):
+        pass
