@@ -62,17 +62,6 @@ class Idle:
 
     def draw(self):
         self.player.idle_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
-        draw_rectangle(*self.get_bb())  # 충돌박스 그리기
-
-    def get_bb(self):
-        if self.player.face_dir == 3:
-            return self.player.x - 22, self.player.y - 47, self.player.x + 22, self.player.y + 25
-        elif self.player.face_dir == 2:
-            return self.player.x - 15, self.player.y - 47, self.player.x + 15, self.player.y + 25
-        elif self.player.face_dir == 1:
-            return self.player.x - 22, self.player.y - 47, self.player.x + 22, self.player.y + 25
-        elif self.player.face_dir == 0:
-            return self.player.x - 18, self.player.y - 47, self.player.x + 15, self.player.y + 25
 
 
 class Walk:
@@ -115,17 +104,6 @@ class Walk:
         elif self.player.ydir == -1: self.player.face_dir = 1
         elif self.player.xdir == 1: self.player.face_dir = 0
         self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
-        draw_rectangle(*self.get_bb())
-
-    def get_bb(self):
-        if self.player.face_dir == 3:
-            return self.player.x - 22, self.player.y - 47, self.player.x + 22, self.player.y + 25
-        elif self.player.face_dir == 2:
-            return self.player.x - 15, self.player.y - 47, self.player.x + 15, self.player.y + 25
-        elif self.player.face_dir == 1:
-            return self.player.x - 22, self.player.y - 47, self.player.x + 22, self.player.y + 25
-        elif self.player.face_dir == 0:
-            return self.player.x - 18, self.player.y - 47, self.player.x + 15, self.player.y + 25
 
 class Player:
     def __init__(self):
@@ -173,7 +151,17 @@ class Player:
     def draw(self):
         self.state_machine.draw()
         self.font.draw(self.x - 35, self.y + 40, f'hp: {self.hp:02d}', (0, 0, 255))
+        draw_rectangle(*self.get_bb())
 
+    def get_bb(self):
+        if self.face_dir == 3:
+            return self.x - 22, self.y - 47, self.x + 22, self.y + 25
+        elif self.face_dir == 2:
+            return self.x - 15, self.y - 47, self.x + 15, self.y + 25
+        elif self.face_dir == 1:
+            return self.x - 22, self.y - 47, self.x + 22, self.y + 25
+        elif self.face_dir == 0:
+            return self.x - 18, self.y - 47, self.x + 15, self.y + 25
 
     def update(self):
         self.state_machine.update()
@@ -204,3 +192,9 @@ class Player:
             return self.move_validator(x, y)
 
         return False
+
+    def handle_collision(self, group, other):
+        if group == 'player:slime_mob':
+            self.hp -= 10
+            if self.hp <= 0:
+                self.is_alive = False
