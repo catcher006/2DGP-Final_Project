@@ -108,7 +108,7 @@ class Slime_Mob:
         self.mob_type = random.choice(["Green", 'Blue', 'Yellow'])
 
         self.move_image = load_image("./image/mobs/slime/" + self.mob_type + "_Slime_Jump.png")
-        self.idle_image = load_image("./image/mobs/slime/" + self.mob_type + "_Slime_Idle.png")
+        self.idle_image = load_image("./image/mobs/slime/" + self.mob_type + "_Slime_Jump.png")
         self.dead_image = load_image("./image/mobs/slime/" + self.mob_type + "_Slime_Dead.png")
 
         self.x = random.randint(105,940)

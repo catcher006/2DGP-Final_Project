@@ -92,7 +92,7 @@ def init(player_start_pos=None):
                 if mob_state.get('type'):
                     slime.mob_type = mob_state['type']
                     slime.move_image = load_image(f"./image/mobs/slime/{slime.mob_type}_Slime_Jump.png")
-                    slime.idle_image = load_image(f"./image/mobs/slime/{slime.mob_type}_Slime_Idle.png")
+                    slime.idle_image = load_image(f"./image/mobs/slime/{slime.mob_type}_Slime_Jump.png")
                     slime.dead_image = load_image(f"./image/mobs/slime/{slime.mob_type}_Slime_Dead.png")
                 slime.x = mob_state.get('x', slime.x)
                 slime.y = mob_state.get('y', slime.y)
