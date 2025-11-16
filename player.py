@@ -2,7 +2,7 @@ import time
 
 import game_framework
 from state_machine import StateMachine
-from pico2d import load_image, load_font, get_time
+from pico2d import *
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f
 
 # Player Run Speed
@@ -48,10 +48,6 @@ class Idle:
         pass
 
     def do(self):
-        self.player.frame = (self.player.frame + FRAMES_PER_IDLE_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 2
-
-
-    def draw(self):
         if self.player.ydir == 1:
             self.player.face_dir = 3
         elif self.player.xdir == -1:
@@ -60,7 +56,23 @@ class Idle:
             self.player.face_dir = 1
         elif self.player.xdir == 1:
             self.player.face_dir = 0
+
+        self.player.frame = (self.player.frame + FRAMES_PER_IDLE_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 2
+
+
+    def draw(self):
         self.player.idle_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
+        draw_rectangle(*self.get_bb())  # 충돌박스 그리기
+
+    def get_bb(self):
+        if self.player.face_dir == 3:
+            return self.player.x - 22, self.player.y - 47, self.player.x + 22, self.player.y + 25
+        elif self.player.face_dir == 2:
+            return self.player.x - 15, self.player.y - 47, self.player.x + 15, self.player.y + 25
+        elif self.player.face_dir == 1:
+            return self.player.x - 22, self.player.y - 47, self.player.x + 22, self.player.y + 25
+        elif self.player.face_dir == 0:
+            return self.player.x - 18, self.player.y - 47, self.player.x + 15, self.player.y + 25
 
 
 class Walk:
@@ -86,7 +98,7 @@ class Walk:
         new_x = self.player.x + self.player.dx
         new_y = self.player.y + self.player.dy
 
-        print(f"Trying to move to ({new_x}, {new_y})")
+        # print(f"Trying to move to ({new_x}, {new_y})")
 
         # 실제 이동 가능 여부 검사
         can_move = self.player.can_move_to(new_x, new_y)
@@ -103,12 +115,25 @@ class Walk:
         elif self.player.ydir == -1: self.player.face_dir = 1
         elif self.player.xdir == 1: self.player.face_dir = 0
         self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
+        draw_rectangle(*self.get_bb())
+
+    def get_bb(self):
+        if self.player.face_dir == 3:
+            return self.player.x - 22, self.player.y - 47, self.player.x + 22, self.player.y + 25
+        elif self.player.face_dir == 2:
+            return self.player.x - 15, self.player.y - 47, self.player.x + 15, self.player.y + 25
+        elif self.player.face_dir == 1:
+            return self.player.x - 22, self.player.y - 47, self.player.x + 22, self.player.y + 25
+        elif self.player.face_dir == 0:
+            return self.player.x - 18, self.player.y - 47, self.player.x + 15, self.player.y + 25
 
 class Player:
     def __init__(self):
         self.walk_image = load_image('player_none_none_walk.png')
         self.idle_image = load_image('player_none_none_idle.png')
         self.dead_image = load_image('player_none_none_dead.png')
+
+        self.font = load_font('ENCR10B.TTF', 16)
 
         self.x = 510
         self.y = 160
@@ -147,6 +172,8 @@ class Player:
 
     def draw(self):
         self.state_machine.draw()
+        self.font.draw(self.x - 35, self.y + 40, f'hp: {self.hp:02d}', (0, 0, 255))
+
 
     def update(self):
         self.state_machine.update()
