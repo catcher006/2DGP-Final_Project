@@ -1,5 +1,7 @@
 import time
 
+import pygame
+
 import game_framework
 import stage1_manger
 from state_machine import StateMachine
@@ -24,7 +26,7 @@ FRAMES_PER_DEAD_ACTION = 6
 player_hp = 100
 player_is_alive = True
 player_plate_id = 'none'
-player_weapon_id = 'normalsword'
+player_weapon_id = 'none'
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -96,7 +98,7 @@ class Idle:
 
 
     def draw(self):
-        if not stage1_manger.stage1_in_game:
+        if not stage1_manger.stage1_in_game or player_weapon_id is 'none':
             self.player.idle_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64, self.player.x, self.player.y, 100, 100)
         else:
             self.player.combat_idle_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64, self.player.x, self.player.y, 100, 100)
@@ -168,12 +170,39 @@ class Sword:
         self.player.sword_image.clip_draw(int(self.player.frame) * 128, 128 * self.player.face_dir, 128, 128, self.player.x, self.player.y, 200, 200)
 
 class Player:
+    walk_image = None
+    idle_image = None
+    dead_image = None
+    sword_image = None
+    combat_idle_image = None
+
+    def load_walk_images(self):
+        if Player.walk_image is None:
+            Player.walk_image = load_image('./image/player/' + player_plate_id + '/' + player_weapon_id + '/' + 'walk.png')
+
+    def load_idle_images(self):
+        if Player.idle_image is None:
+            Player.idle_image = load_image('./image/player/' + player_plate_id + '/' + player_weapon_id + '/' + 'idle.png')
+
+    def load_dead_images(self):
+        if Player.dead_image is None:
+            Player.dead_image = load_image('./image/player/' + player_plate_id + '/' + player_weapon_id + '/' + 'dead.png')
+
+    def load_sword_images(self):
+        if Player.sword_image is None:
+            Player.sword_image = load_image('./image/player/' + player_plate_id + '/' + player_weapon_id + '/' + 'attack.png')
+
+    def load_combat_idle_images(self):
+        if Player.combat_idle_image is None:
+            Player.combat_idle_image = load_image('./image/player/' + player_plate_id + '/' + player_weapon_id + '/' + 'combat_idle.png')
+
     def __init__(self):
-        self.walk_image = load_image('player_none_none_walk.png')
-        self.idle_image = load_image('player_none_none_idle.png')
-        self.dead_image = load_image('player_none_none_dead.png')
-        self.sword_image = load_image('player_none_normalsword_attack.png')
-        self.combat_idle_image = load_image('player_none_normalsword_combat_idle.png')
+        self.load_walk_images()
+        self.load_idle_images()
+        self.load_dead_images()
+        if not player_weapon_id is 'none':
+            self.load_sword_images()
+        self.load_combat_idle_images()
 
         self.font = load_font('ENCR10B.TTF', 16)
 
