@@ -1,9 +1,10 @@
 import time
 
 import game_framework
+import stage1_manger
 from state_machine import StateMachine
 from pico2d import *
-from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f
+from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f, SDLK_SPACE
 
 # Player Run Speed
 PIXEL_PER_METER = (10.0 / 0.3) # 10 pixel 30 cm
@@ -45,6 +46,9 @@ def event_run(e):
 
 def event_die(e):
     return e[0] == 'DIE'
+
+def space_down(e):  # e is space down ?
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
 
 
 class Dead:
@@ -134,11 +138,36 @@ class Walk:
         elif self.player.xdir == 1: self.player.face_dir = 0
         self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
 
+
+class Attack:
+    def __init__(self, player):
+        self.player = player
+
+    def enter(self, e):
+        self.player.is_attacking = True
+        self.player.attack_start_time = time.time()
+        self.player.frame = 0
+
+    def exit(self, e):
+        self.player.is_attacking = False
+
+    def do(self):
+        # 공격 애니메이션 처리
+        if self.player.frame < 5:
+            self.player.frame += FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time
+        else:
+            # 공격 애니메이션이 끝나면 대기 상태로 전환
+            self.player.state_machine.handle_state_event(('STOP', None))
+
+    def draw(self):
+        self.player.attack_image.clip_draw(int(self.player.frame) * 64, 0, 64, 64, self.player.x, self.player.y, 100, 100)
+
 class Player:
     def __init__(self):
         self.walk_image = load_image('player_none_none_walk.png')
         self.idle_image = load_image('player_none_none_idle.png')
         self.dead_image = load_image('player_none_none_dead.png')
+        self.attack_image = load_image('player_none_normalsword_attack.png')
 
         self.font = load_font('ENCR10B.TTF', 16)
 
@@ -169,13 +198,16 @@ class Player:
         self.IDLE = Idle(self)
         self.WALK = Walk(self)
         self.DEAD = Dead(self)
+        self.ATTACK = Attack(self)
 
         # 상태 머신 생성
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE: { event_run: self.WALK, event_die: self.DEAD },
-                self.WALK: { event_stop: self.IDLE, event_die: self.DEAD }
+                self.IDLE: { event_run: self.WALK, space_down: self.ATTACK, event_die: self.DEAD },
+                self.WALK: { event_stop: self.IDLE, space_down: self.ATTACK, event_die: self.DEAD },
+                self.ATTACK: { event_stop: self.IDLE, event_die: self.DEAD },
+                self.DEAD: {}
             }
 
         )
@@ -221,6 +253,9 @@ class Player:
                 else:  # 움직임
                     self.state_machine.handle_state_event(('RUN', None))
         else:
+            # 공격키일 때 현재 공격 가능 여부 확인
+            if space_down(('INPUT', event)) and not stage1_manger.stage1_in_game:
+                return
             self.state_machine.handle_state_event(('INPUT', event))
 
     def can_move_to(self, x, y):
