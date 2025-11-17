@@ -22,8 +22,8 @@ FRAMES_PER_DEAD_ACTION = 6
 # 모드 호환을 위한 전역 변수 사용
 player_hp = 100
 player_is_alive = True
-player_plate_id = 'none'
-player_weapon_id = 'silverbow'
+player_plate_id = 'normalplate'
+player_weapon_id = 'none'
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -167,6 +167,10 @@ class Attack:
         self.player.is_attacking = False
 
     def do(self):
+        if check_weapon() is 'none':
+            # 무기가 없으면 공격 상태에서 바로 대기 상태로 전환
+            self.player.state_machine.handle_state_event(('STOP', None))
+            return
         # 공격 애니메이션 처리
         if self.player.frame < 13:
             self.player.frame += FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time
