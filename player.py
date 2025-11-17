@@ -1,7 +1,4 @@
 import time
-
-import pygame
-
 import game_framework
 import stage1_manger
 from state_machine import StateMachine
@@ -26,7 +23,7 @@ FRAMES_PER_DEAD_ACTION = 6
 player_hp = 100
 player_is_alive = True
 player_plate_id = 'none'
-player_weapon_id = 'normalsword'
+player_weapon_id = 'silverbow'
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -53,6 +50,14 @@ def event_die(e):
 
 def space_down(e):  # e is space down ?
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
+
+def check_weapon():
+    if player_weapon_id in ['normalsword', 'silversword', 'goldsword']:
+        return 'sword'
+    elif player_weapon_id in ['normalbow', 'silverbow', 'goldbow']:
+        return 'bow'
+    else:
+        return 'none'
 
 
 class Dead:
@@ -143,10 +148,13 @@ class Walk:
         elif self.player.ydir == -1: self.player.face_dir = 1
         elif self.player.xdir == 1: self.player.face_dir = 0
 
-        self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
+        if check_weapon() is 'bow':
+            self.player.walk_image.clip_draw(int(self.player.frame) * 128, 128 * self.player.face_dir, 128, 128, self.player.x, self.player.y, 200, 200)
+        else:
+            self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
 
 
-class Sword:
+class Attack:
     def __init__(self, player):
         self.player = player
 
@@ -167,7 +175,10 @@ class Sword:
             self.player.state_machine.handle_state_event(('STOP', None))
 
     def draw(self):
-        self.player.sword_image.clip_draw(int(self.player.frame) * 128, 128 * self.player.face_dir, 128, 128, self.player.x, self.player.y, 200, 200)
+        if check_weapon() is 'sword':
+            self.player.sword_image.clip_draw(int(self.player.frame) * 128, 128 * self.player.face_dir, 128, 128, self.player.x, self.player.y, 200, 200)
+        elif check_weapon() is 'bow':
+            self.player.bow_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
 
 class Player:
     walk_image = None
@@ -191,12 +202,12 @@ class Player:
 
     def load_sword_images(self):
         if Player.sword_image is None:
-            if player_weapon_id is 'normalsword' or player_weapon_id is 'silversword' or player_weapon_id is 'goldsword':
+            if check_weapon() is 'sword':
                 Player.sword_image = load_image('./image/player/' + player_plate_id + '/' + player_weapon_id + '/' + 'sword_attack.png')
 
     def load_bow_images(self):
         if Player.sword_image is None:
-            if player_weapon_id is 'normalbow' or player_weapon_id is 'silverbow' or player_weapon_id is 'goldbow':
+            if check_weapon() is 'bow':
                 Player.bow_image = load_image('./image/player/' + player_plate_id + '/' + player_weapon_id + '/' + 'bow_attack.png')
 
     def load_combat_idle_images(self):
@@ -207,9 +218,9 @@ class Player:
         self.load_walk_images()
         self.load_idle_images()
         self.load_dead_images()
-        if player_weapon_id is 'normalsword' or player_weapon_id is 'silversword' or player_weapon_id is 'goldsword':
+        if check_weapon() is 'sword':
             self.load_sword_images()
-        if player_weapon_id is 'normalbow' or player_weapon_id is 'silverbow' or player_weapon_id is 'goldbow':
+        elif check_weapon() is 'bow':
             self.load_bow_images()
         self.load_combat_idle_images()
 
@@ -242,15 +253,15 @@ class Player:
         self.IDLE = Idle(self)
         self.WALK = Walk(self)
         self.DEAD = Dead(self)
-        self.SWORD = Sword(self)
+        self.ATTACK = Attack(self)
 
         # 상태 머신 생성
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE: { event_run: self.WALK, space_down: self.SWORD, event_die: self.DEAD },
-                self.WALK: { event_stop: self.IDLE, space_down: self.SWORD, event_die: self.DEAD },
-                self.SWORD: { event_stop: self.IDLE, event_die: self.DEAD },
+                self.IDLE: { event_run: self.WALK, space_down: self.ATTACK, event_die: self.DEAD },
+                self.WALK: { event_stop: self.IDLE, space_down: self.ATTACK, event_die: self.DEAD },
+                self.ATTACK: { event_stop: self.IDLE, event_die: self.DEAD },
                 self.DEAD: {}
             }
 
