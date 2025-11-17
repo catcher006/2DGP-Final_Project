@@ -1,5 +1,6 @@
 from pico2d import *
 
+import stage1_manger
 import village_mode
 import stage1_0_mode
 import game_world
@@ -17,6 +18,7 @@ def handle_events():
             game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             if player.x >= 195 and player.x <= 290 and player.y >= 380 and player.y <= 400:  # 1번 스테이지 입구 좌표 범위
+                stage1_manger.stage1_in_game = True
                 game_framework.change_mode(stage1_0_mode,(525, 600))
             elif player.x >= 505 and player.x <= 585 and player.y >= 380 and player.y <= 400:  # 2번 스테이지 입구 좌표 범위
                 print("Stage 2 Entered") # 스테이지 2로 이동

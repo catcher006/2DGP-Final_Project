@@ -44,6 +44,7 @@ def handle_events():
             stage1_manger.stage1_0_mobs = mobs_state
 
             if 500 <= player.x <=  550 and 580 <= player.y <= 600: # 상단 문 (메인 던전으로 가는 문)
+                stage1_manger.stage1_in_game = False
                 game_framework.change_mode(dungeonmain_mode,(240, 400))
             elif 990 <= player.x <=  1010 and 270 <= player.y <= 370: # 우측 문
                 debug_stage1_manager_state()

@@ -1,3 +1,6 @@
+# stage1 진행 상태 확인 전역 변수
+stage1_in_game = False
+
 # 각 방 생성 여부 전역 변수
 stage1_0_create = None
 stage1_1_create = None
@@ -50,6 +53,11 @@ def reset_stage1_manager():
     global stage1_5_last_mob1_pos, stage1_5_last_mob2_pos
     global stage1_6_last_mob1_pos, stage1_6_last_mob2_pos
     global stage1_7_last_mob1_pos, stage1_7_last_mob2_pos
+    global stage1_0_mobs, stage1_1_mobs, stage1_2_mobs, stage1_3_mobs
+    global stage1_4_mobs, stage1_5_mobs, stage1_6_mobs, stage1_7_mobs
+    global stage1_in_game
+
+    stage1_in_game = False
 
     stage1_0_create = None
     stage1_1_create = None
