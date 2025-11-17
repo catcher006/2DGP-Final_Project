@@ -7,6 +7,7 @@ import game_framework
 import stage1_1_mode
 import stage1_3_mode
 import stage1_manger
+from player_sword import Player_Sword
 from stage1_0 import Stage1_0
 from player import Player
 from slime_mob import Slime_Mob
@@ -75,8 +76,6 @@ def init(player_start_pos=None):
     # 시작 좌표 설정
     if player_start_pos:
         player.x, player.y = player_start_pos
-    else:
-        player.x, player.y = 535, 540  # 기본 좌표
 
     game_world.add_object((player), 2)
 
@@ -119,6 +118,13 @@ def init(player_start_pos=None):
     game_world.add_collision_pair('player:slime_mob', player, None)
     for slime_mob in slime_mobs:
         game_world.add_collision_pair('player:slime_mob', None, slime_mob)
+
+    player_sword = Player_Sword()
+    game_world.add_object(player_sword, 2)
+
+    game_world.add_collision_pair('player_sword:slime_mob', player_sword, None)
+    for slime_mob in slime_mobs:
+        game_world.add_collision_pair('player_sword:slime_mob', None, slime_mob)
 
 
     # front_object = Front_Object()

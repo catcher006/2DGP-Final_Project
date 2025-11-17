@@ -20,10 +20,12 @@ FRAMES_PER_IDLE_ACTION = 2
 FRAMES_PER_DEAD_ACTION = 6
 
 # 모드 호환을 위한 전역 변수 사용
+player_x = 0
+player_y = 0
 player_hp = 100
 player_is_alive = True
 player_plate_id = 'normalplate'
-player_weapon_id = 'none'
+player_weapon_id = 'goldsword'
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -99,6 +101,10 @@ class Idle:
         elif self.player.xdir == 1:
             self.player.face_dir = 0
 
+        global player_x, player_y
+        player_x = self.player.x
+        player_y = self.player.y
+
         self.player.frame = (self.player.frame + FRAMES_PER_IDLE_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 2
 
 
@@ -141,6 +147,10 @@ class Walk:
         if can_move:
             self.player.x = new_x
             self.player.y = new_y
+
+        global player_x, player_y
+        player_x = self.player.x
+        player_y = self.player.y
 
     def draw(self):
         if self.player.ydir == 1: self.player.face_dir = 3
@@ -232,6 +242,10 @@ class Player:
 
         self.x = 510
         self.y = 160
+
+        global player_x, player_y
+        player_x = self.x
+        player_y = self.y
 
         self.frame = 0
 
