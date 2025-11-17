@@ -160,7 +160,7 @@ class Sword:
             self.player.state_machine.handle_state_event(('STOP', None))
 
     def draw(self):
-        self.player.sword_image.clip_draw(int(self.player.frame) * 64, 0, 64, 64, self.player.x, self.player.y, 100, 100)
+        self.player.sword_image.clip_draw(int(self.player.frame) * 128, 128 * self.player.face_dir, 128, 128, self.player.x, self.player.y, 200, 200)
 
 class Player:
     def __init__(self):
