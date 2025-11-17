@@ -153,7 +153,7 @@ class Sword:
 
     def do(self):
         # 공격 애니메이션 처리
-        if self.player.frame < 5:
+        if self.player.frame < 13:
             self.player.frame += FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time
         else:
             # 공격 애니메이션이 끝나면 대기 상태로 전환
