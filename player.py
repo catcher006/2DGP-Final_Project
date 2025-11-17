@@ -139,7 +139,7 @@ class Walk:
         self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
 
 
-class Attack:
+class Sword:
     def __init__(self, player):
         self.player = player
 
@@ -160,14 +160,14 @@ class Attack:
             self.player.state_machine.handle_state_event(('STOP', None))
 
     def draw(self):
-        self.player.attack_image.clip_draw(int(self.player.frame) * 64, 0, 64, 64, self.player.x, self.player.y, 100, 100)
+        self.player.sword_image.clip_draw(int(self.player.frame) * 64, 0, 64, 64, self.player.x, self.player.y, 100, 100)
 
 class Player:
     def __init__(self):
         self.walk_image = load_image('player_none_none_walk.png')
         self.idle_image = load_image('player_none_none_idle.png')
         self.dead_image = load_image('player_none_none_dead.png')
-        self.attack_image = load_image('player_none_normalsword_attack.png')
+        self.sword_image = load_image('player_none_normalsword_attack.png')
 
         self.font = load_font('ENCR10B.TTF', 16)
 
@@ -198,15 +198,15 @@ class Player:
         self.IDLE = Idle(self)
         self.WALK = Walk(self)
         self.DEAD = Dead(self)
-        self.ATTACK = Attack(self)
+        self.SWORD = Sword(self)
 
         # 상태 머신 생성
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE: { event_run: self.WALK, space_down: self.ATTACK, event_die: self.DEAD },
-                self.WALK: { event_stop: self.IDLE, space_down: self.ATTACK, event_die: self.DEAD },
-                self.ATTACK: { event_stop: self.IDLE, event_die: self.DEAD },
+                self.IDLE: { event_run: self.WALK, space_down: self.SWORD, event_die: self.DEAD },
+                self.WALK: { event_stop: self.IDLE, space_down: self.SWORD, event_die: self.DEAD },
+                self.SWORD: { event_stop: self.IDLE, event_die: self.DEAD },
                 self.DEAD: {}
             }
 
