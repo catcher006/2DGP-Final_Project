@@ -35,8 +35,8 @@ def init(player_start_pos=None):
     village = Village()
     game_world.add_object((village), 0)
 
-    back_object = Village_Back_Object()
-    game_world.add_object((back_object), 1)
+    # back_object = Village_Back_Object()
+    # game_world.add_object((back_object), 1)
 
     player = Player()
     # 마을 모드에서 이동 검사 콜백을 마을 객체에 위임
