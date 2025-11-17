@@ -26,7 +26,7 @@ FRAMES_PER_DEAD_ACTION = 6
 player_hp = 100
 player_is_alive = True
 player_plate_id = 'none'
-player_weapon_id = 'none'
+player_weapon_id = 'normalsword'
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -175,6 +175,7 @@ class Player:
     dead_image = None
     sword_image = None
     combat_idle_image = None
+    bow_image = None
 
     def load_walk_images(self):
         if Player.walk_image is None:
@@ -190,7 +191,13 @@ class Player:
 
     def load_sword_images(self):
         if Player.sword_image is None:
-            Player.sword_image = load_image('./image/player/' + player_plate_id + '/' + player_weapon_id + '/' + 'attack.png')
+            if player_weapon_id is 'normalsword' or player_weapon_id is 'silversword' or player_weapon_id is 'goldsword':
+                Player.sword_image = load_image('./image/player/' + player_plate_id + '/' + player_weapon_id + '/' + 'sword_attack.png')
+
+    def load_bow_images(self):
+        if Player.sword_image is None:
+            if player_weapon_id is 'normalbow' or player_weapon_id is 'silverbow' or player_weapon_id is 'goldbow':
+                Player.bow_image = load_image('./image/player/' + player_plate_id + '/' + player_weapon_id + '/' + 'bow_attack.png')
 
     def load_combat_idle_images(self):
         if Player.combat_idle_image is None:
@@ -200,8 +207,10 @@ class Player:
         self.load_walk_images()
         self.load_idle_images()
         self.load_dead_images()
-        if not player_weapon_id is 'none':
+        if player_weapon_id is 'normalsword' or player_weapon_id is 'silversword' or player_weapon_id is 'goldsword':
             self.load_sword_images()
+        if player_weapon_id is 'normalbow' or player_weapon_id is 'silverbow' or player_weapon_id is 'goldbow':
+            self.load_bow_images()
         self.load_combat_idle_images()
 
         self.font = load_font('ENCR10B.TTF', 16)
