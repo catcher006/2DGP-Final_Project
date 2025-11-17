@@ -23,6 +23,8 @@ FRAMES_PER_DEAD_ACTION = 6
 # 모드 호환을 위한 전역 변수 사용
 player_hp = 100
 player_is_alive = True
+player_plate_id = 'none'
+player_weapon_id = 'normalsword'
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -94,8 +96,10 @@ class Idle:
 
 
     def draw(self):
-        self.player.idle_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
-
+        if not stage1_manger.stage1_in_game:
+            self.player.idle_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64, self.player.x, self.player.y, 100, 100)
+        else:
+            self.player.combat_idle_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64, self.player.x, self.player.y, 100, 100)
 
 class Walk:
     def __init__(self, player):
@@ -136,6 +140,7 @@ class Walk:
         elif self.player.xdir == -1: self.player.face_dir = 2
         elif self.player.ydir == -1: self.player.face_dir = 1
         elif self.player.xdir == 1: self.player.face_dir = 0
+
         self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
 
 
@@ -168,6 +173,7 @@ class Player:
         self.idle_image = load_image('player_none_none_idle.png')
         self.dead_image = load_image('player_none_none_dead.png')
         self.sword_image = load_image('player_none_normalsword_attack.png')
+        self.combat_idle_image = load_image('player_none_normalsword_combat_idle.png')
 
         self.font = load_font('ENCR10B.TTF', 16)
 
