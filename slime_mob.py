@@ -1,10 +1,11 @@
 import time
-
+import game_world
 import game_framework
 import random
 
 from player import player_weapon_id
 from state_machine import StateMachine
+from coin import Coin
 from pico2d import load_image, load_font, get_time, draw_rectangle
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f
 
@@ -45,6 +46,7 @@ class Dead:
         self.mob = mob
         self.max_frame = 5
         self.played = False
+        self.spawned = False # 코인 생성 여부 플래그
 
     def enter(self, e):
         # 애니메이션을 처음부터 시작하고 이동 정지
@@ -52,6 +54,7 @@ class Dead:
         self.played = False
         self.mob.dx = 0.0
         self.mob.dy = 0.0
+        self.spawned = False
 
     def exit(self, e):
         pass
@@ -59,6 +62,18 @@ class Dead:
     def do(self):
         # 이미 끝났으면 더 이상 진행하지 않음
         if self.played:
+            # 애니메이션이 끝났고 아직 코인 생성/삭제가 되지 않았으면 처리
+            if not self.spawned:
+                coin = Coin()
+                coin.x, coin.y = self.mob.x, self.mob.y
+                game_world.add_object(coin, 2)  # 적절한 레이어(depth) 선택 (여기서는 2)
+                # 몹을 게임 월드에서 제거
+                try:
+                    game_world.remove_object(self.mob)
+                except ValueError:
+                    # 이미 제거된 경우 무시
+                    pass
+                self.spawned = True
             return
 
         dt = game_framework.frame_time
