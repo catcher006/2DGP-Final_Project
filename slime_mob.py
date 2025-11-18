@@ -41,19 +41,33 @@ def point_in_polygon(x, y, polygon):
 class Dead:
     def __init__(self, mob):
         self.mob = mob
+        self.max_frame = 5
+        self.played = False
 
     def enter(self, e):
-        pass
+        # 애니메이션을 처음부터 시작하고 이동 정지
+        self.mob.frame = 0.0
+        self.played = False
+        self.mob.dx = 0.0
+        self.mob.dy = 0.0
 
     def exit(self, e):
         pass
 
     def do(self):
-        dt = game_framework.frame_time
+        # 이미 끝났으면 더 이상 진행하지 않음
+        if self.played:
+            return
 
-        # 프레임 애니메이션 (0~5 범위 유지)
+        dt = game_framework.frame_time
         delta = FRAMES_PER_ACTION * ACTION_PER_TIME * dt
-        self.mob.frame = (self.mob.frame + delta) % 6
+        new_frame = self.mob.frame + delta
+
+        if new_frame >= self.max_frame:
+            self.mob.frame = float(self.max_frame)
+            self.played = True
+        else:
+            self.mob.frame = new_frame
 
     def draw(self):
         self.mob.dead_image.clip_draw(int(self.mob.frame) * 30, 0, 30, 26, self.mob.x, self.mob.y, 96, 62)
