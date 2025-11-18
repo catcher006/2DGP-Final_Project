@@ -256,6 +256,7 @@ class Slime_Mob:
                 self.last_damage_time = current_time
 
                 if self.hp <= 0:
+                    self.hp = 0
                     self.is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("slime_mob is dead!")
