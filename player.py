@@ -22,6 +22,8 @@ FRAMES_PER_DEAD_ACTION = 6
 # 모드 호환을 위한 전역 변수 사용
 player_x = 0
 player_y = 0
+player_frame = 0
+player_face_dir = 0
 player_hp = 100
 player_is_alive = True
 player_plate_id = 'normalplate'
@@ -158,6 +160,9 @@ class Walk:
         elif self.player.ydir == -1: self.player.face_dir = 1
         elif self.player.xdir == 1: self.player.face_dir = 0
 
+        global player_face_dir
+        player_face_dir = self.player.face_dir
+
         if check_weapon() is 'bow':
             self.player.walk_image.clip_draw(int(self.player.frame) * 128, 128 * self.player.face_dir, 128, 128, self.player.x, self.player.y, 200, 200)
         else:
@@ -184,6 +189,8 @@ class Attack:
         # 공격 애니메이션 처리
         if self.player.frame < 13:
             self.player.frame += FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time
+            global player_frame
+            player_frame = self.player.frame
         else:
             # 공격 애니메이션이 끝나면 대기 상태로 전환
             self.player.state_machine.handle_state_event(('STOP', None))

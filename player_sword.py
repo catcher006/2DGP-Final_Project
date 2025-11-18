@@ -4,20 +4,97 @@ from pico2d import *
 
 class Player_Sword():
     def __init__(self):
-        global player
         self.x = getattr(player, 'player_x', 0)
         self.y = getattr(player, 'player_y', 0)
-        self.frame = getattr(player, 'player_frame', 0)
+        self.frame = int(getattr(player, 'player_frame', 0))
+        self.face_dir = int(getattr(player, 'player_face_dir', 0))
 
     def draw(self):
-        draw_rectangle(*self.get_bb())
+        bb = self.get_bb()
+        if bb:
+            draw_rectangle(*bb)
 
     def get_bb(self):
-        return self.x + 10, self.y - 40, self.x + 40, self.y - 15
+        f = int(self.frame)
+        d = int(self.face_dir)
+
+        # 프레임이 12를 넘으면 12로 고정
+        if f > 12:
+            f = 12
+
+        if d == 0:
+            if f == 0: return self.x - 68, self.y - 10, self.x - 40, self.y + 8  # frame : 0
+            elif f == 1: return self.x - 68, self.y - 48, self.x + 30, self.y + 8  # frame : 1
+            elif f == 2: return self.x + 12, self.y - 48, self.x + 83, self.y - 6  # frame : 2
+            elif f == 3: return self.x - 25, self.y - 42, self.x + 83, self.y - 6  # frame : 3
+            elif f == 4: return self.x - 25, self.y - 28, self.x + 50, self.y - 6  # frame : 4
+            elif f == 5: return self.x - 25, self.y - 28, self.x + 25, self.y - 8  # frame : 5
+            elif f == 6: return self.x + 15, self.y - 28, self.x + 38, self.y - 10  # frame : 6
+            elif f == 7: return self.x - 30, self.y - 23, self.x + 15, self.y - 17  # frame : 7
+            elif f == 8: return self.x - 30, self.y - 23, self.x + 35, self.y - 4  # frame : 8
+            elif f == 9: return self.x + 5, self.y - 48, self.x + 83, self.y - 6  # frame : 9
+            elif f == 10: return self.x - 52, self.y - 50, self.x + 55, self.y - 20  # frame : 10
+            elif f == 11: return self.x - 52, self.y - 52, self.x + 25, self.y - 15  # frame : 11
+            else: return self.x - 52, self.y - 34, self.x - 22, self.y - 12  # frame : 12
+
+        elif d == 1:
+            if f == 0: return self.x - 28, self.y + 5, self.x - 20, self.y + 42  # frame : 0
+            elif f == 1: return self.x - 56, self.y - 23, self.x - 20, self.y + 36  # frame : 1
+            elif f == 2: return self.x - 56, self.y - 48, self.x + 52, self.y - 18  # frame : 2
+            elif f == 3: return self.x - 12, self.y - 48, self.x + 52, self.y - 8  # frame : 3
+            elif f == 4: return self.x + 12, self.y - 34, self.x + 54, self.y - 8  # frame : 4
+            elif f == 5: return self.x + 12, self.y - 25, self.x + 24, self.y - 10  # frame : 5
+            elif f == 6: return self.x - 20, self.y - 30, self.x + 18, self.y - 14  # frame : 6
+            elif f == 7: return self.x + 8, self.y - 30, self.x + 22, self.y - 12  # frame : 7
+            elif f == 8: return self.x + 8, self.y - 40, self.x + 56, self.y - 12  # frame : 8
+            elif f == 9: return self.x - 68, self.y - 56, self.x + 56, self.y - 12  # frame : 9
+            elif f == 10: return self.x - 76, self.y - 56, self.x, self.y + 4  # frame : 10
+            elif f == 11: return self.x - 76, self.y - 50, self.x - 30, self.y + 4  # frame : 11
+            else: return self.x - 74, self.y - 10, self.x - 30, self.y + 4  # frame : 12
+
+        elif d == 2:
+            if f == 0: return self.x + 34, self.y - 10, self.x + 66, self.y + 8  # frame : 0
+            elif f == 1: return self.x - 30, self.y - 46, self.x + 66, self.y + 8  # frame : 1
+            elif f == 2: return self.x - 84, self.y - 48, self.x - 16, self.y - 6  # frame : 2
+            elif f == 3: return self.x - 84, self.y - 42, self.x + 24, self.y - 6  # frame : 3
+            elif f == 4: return self.x - 54, self.y - 28, self.x + 24, self.y - 6  # frame : 4
+            elif f == 5: return self.x - 26, self.y - 28, self.x + 24, self.y - 10  # frame : 5
+            elif f == 6: return self.x - 38, self.y - 28, self.x - 8, self.y - 10  # frame : 6
+            elif f == 7: return self.x - 8, self.y - 22, self.x + 30, self.y - 18  # frame : 7
+            elif f == 8: return self.x - 36, self.y - 22, self.x + 30, self.y - 6  # frame : 8
+            elif f == 9: return self.x - 84, self.y - 48, self.x - 8, self.y - 6  # frame : 9
+            elif f == 10: return self.x - 58, self.y - 52, self.x + 52, self.y - 18  # frame : 10
+            elif f == 11: return self.x - 16, self.y - 52, self.x + 52, self.y - 18  # frame : 11
+            else: return self.x + 26, self.y - 32, self.x + 52, self.y - 18  # frame : 12
+
+        elif d == 3:
+            if f == 0: return self.x + 14, self.y - 44, self.x + 32, self.y - 26  # frame : 0
+            elif f == 1: return self.x + 24, self.y - 44, self.x + 60, self.y - 4  # frame : 1
+            elif f == 2: return self.x - 44, self.y - 20, self.x + 60, self.y + 14  # frame : 2
+            elif f == 3: return self.x - 48, self.y - 40, self.x, self.y + 14  # frame : 3
+            elif f == 4: return self.x - 50, self.y - 40, self.x, self.y + 14  # frame : 4
+            elif f == 5: return self.x - 38, self.y - 40, self.x - 20, self.y - 20  # frame : 5
+            elif f == 6: return self.x - 24, self.y - 30, self.x + 24, self.y - 4  # frame : 6
+            elif f == 7: return self.x - 22, self.y - 48, self.x - 16, self.y - 24  # frame : 7
+            elif f == 8: return self.x - 52, self.y - 46, self.x - 22, self.y - 4  # frame : 8
+            elif f == 9: return self.x - 48, self.y - 6, self.x + 44, self.y + 18  # frame : 9
+            elif f == 10: return self.x - 28, self.y - 14, self.x + 78, self.y + 18  # frame : 10
+            elif f == 11: return self.x + 32, self.y - 14, self.x + 78, self.y + 12  # frame : 11
+            else: return self.x + 32, self.y - 14, self.x + 78, self.y - 8  # frame : 12
+
+            # 기본값 반환 (d가 0-3이 아닌 경우)
+            return self.x - 20, self.y - 20, self.x + 20, self.y + 20
+
+
 
     def update(self):
         self.x = getattr(player, 'player_x', self.x)
         self.y = getattr(player, 'player_y', self.y)
+        self.frame = int(getattr(player, 'player_frame', self.frame))
+        self.face_dir = int(getattr(player, 'player_face_dir', self.face_dir))
+
+    def do(self):
+        pass
 
     def handle_event(self, event):
         pass
