@@ -7,12 +7,13 @@ class Player_Sword():
         global player
         self.x = getattr(player, 'player_x', 0)
         self.y = getattr(player, 'player_y', 0)
+        self.frame = getattr(player, 'player_frame', 0)
 
     def draw(self):
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
-        return self.x - 100, self.y - 100, self.x + 100, self.y + 100
+        return self.x + 10, self.y - 40, self.x + 40, self.y - 15
 
     def update(self):
         self.x = getattr(player, 'player_x', self.x)
