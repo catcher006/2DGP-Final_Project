@@ -2,6 +2,8 @@ import time
 
 import game_framework
 import random
+
+from player import player_weapon_id
 from state_machine import StateMachine
 from pico2d import load_image, load_font, get_time, draw_rectangle
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f
@@ -245,7 +247,12 @@ class Slime_Mob:
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                self.hp -= 10
+                if player_weapon_id == 'normalsword':
+                    self.hp -= 10
+                elif player_weapon_id == 'silversword':
+                    self.hp -= 20
+                elif player_weapon_id == 'goldsword':
+                    self.hp -= 30
                 self.last_damage_time = current_time
 
                 if self.hp <= 0:
