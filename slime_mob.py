@@ -1,3 +1,5 @@
+import time
+
 import game_framework
 import random
 from state_machine import StateMachine
@@ -19,6 +21,9 @@ FRAMES_PER_ACTION = 8
 
 time_out = lambda e: e[0] == 'TIMEOUT'
 
+def event_die(e):
+    return e[0] == 'DIE'
+
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
     n = len(polygon)
@@ -32,6 +37,26 @@ def point_in_polygon(x, y, polygon):
         j = i
 
     return inside
+
+class Dead:
+    def __init__(self, mob):
+        self.mob = mob
+
+    def enter(self, e):
+        pass
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        dt = game_framework.frame_time
+
+        # 프레임 애니메이션 (0~5 범위 유지)
+        delta = FRAMES_PER_ACTION * ACTION_PER_TIME * dt
+        self.mob.frame = (self.mob.frame + delta) % 6
+
+    def draw(self):
+        self.mob.dead_image.clip_draw(int(self.mob.frame) * 30, 0, 30, 26, self.mob.x, self.mob.y, 96, 62)
 
 class Idle:
     def __init__(self, mob):
@@ -141,8 +166,13 @@ class Slime_Mob:
         self.hp = 100  # 체력 추가
         self.is_alive = True  # 생존 상태 추가
 
+        # 데미지 관련 추가
+        self.last_damage_time = 0
+        self.damage_cooldown = TIME_PER_ACTION
+
         self.IDLE = Idle(self)
         self.MOVE = Move(self)
+        self.DEAD = Dead(self)
 
         # is_move 값에 따라 초기 상태 결정
         initial_state = self.MOVE if self.is_move else self.IDLE
@@ -151,8 +181,9 @@ class Slime_Mob:
         self.state_machine = StateMachine(
             initial_state,
             {
-                self.MOVE: {time_out: self.IDLE},
-                self.IDLE: {time_out: self.MOVE}
+                self.MOVE: {time_out: self.IDLE, event_die: Dead(self)},
+                self.IDLE: {time_out: self.MOVE, event_die: Dead(self)},
+                self.DEAD: {}
             }
         )
 
@@ -195,6 +226,18 @@ class Slime_Mob:
         return False
 
     def handle_collision(self, group, other):
-        if group == 'player_sword:slime_mob':
-            # 플레이어와 충돌 시 데미지 처리
-            self.hp -= 50
+        if group == 'player_sword:slime_mob' and self.is_alive:
+            current_time = time.time()
+
+            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                self.hp -= 10
+                self.last_damage_time = current_time
+
+                if self.hp <= 0:
+                    self.is_alive = False
+                    self.state_machine.handle_state_event(('DIE', None))
+                    print("slime_mob is dead!")
+
+                # 디버그 출력 (선택사항)
+                print(f"slime_mob damaged! HP: {self.hp}")
