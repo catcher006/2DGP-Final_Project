@@ -82,8 +82,7 @@ class Player_Sword():
             elif f == 11: return self.x + 32, self.y - 14, self.x + 78, self.y + 12  # frame : 11
             else: return self.x + 32, self.y - 14, self.x + 78, self.y - 8  # frame : 12
 
-            # 기본값 반환 (d가 0-3이 아닌 경우)
-            return self.x - 20, self.y - 20, self.x + 20, self.y + 20
+        return None
 
 
 

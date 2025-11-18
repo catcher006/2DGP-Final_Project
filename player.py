@@ -1,5 +1,6 @@
 import time
 import game_framework
+import game_world
 import stage1_manger
 from state_machine import StateMachine
 from pico2d import *
@@ -174,12 +175,29 @@ class Attack:
         self.player = player
 
     def enter(self, e):
+        from player_sword import Player_Sword
         self.player.is_attacking = True
         self.player.attack_start_time = time.time()
         self.player.frame = 0
 
+        # 공격 시작할 때 Player_Sword 객체를 생성하고 게임 월드에 추가
+        self.player_sword = Player_Sword()
+        game_world.add_object(self.player_sword, 2)
+
+        # 충돌 그룹에 추가
+        game_world.add_collision_pair('player_sword:slime_mob', self.player_sword, None)
+        # 기존 슬라임들과 충돌 페어 추가
+        for layer in game_world.world:
+            for obj in layer:
+                if hasattr(obj, 'handle_collision') and 'slime' in str(type(obj)).lower():
+                    game_world.add_collision_pair('player_sword:slime_mob', None, obj)
+
     def exit(self, e):
         self.player.is_attacking = False
+
+        # 공격이 끝나면 Player_Sword 객체를 게임 월드에서 제거
+        if hasattr(self, 'player_sword'):
+            game_world.remove_object(self.player_sword)
 
     def do(self):
         if check_weapon() is 'none':

@@ -119,13 +119,6 @@ def init(player_start_pos=None):
     for slime_mob in slime_mobs:
         game_world.add_collision_pair('player:slime_mob', None, slime_mob)
 
-    player_sword = Player_Sword()
-    game_world.add_object(player_sword, 2)
-
-    game_world.add_collision_pair('player_sword:slime_mob', player_sword, None)
-    for slime_mob in slime_mobs:
-        game_world.add_collision_pair('player_sword:slime_mob', None, slime_mob)
-
 
     # front_object = Front_Object()
     # game_world.add_object((front_object), 3)
