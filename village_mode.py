@@ -5,9 +5,9 @@ import game_world
 import game_framework
 import title_mode
 from village import Village
-from village_back_object import Village_Back_Object
 from village_front_object import Village_Front_Object
 from player import Player
+from ui import Ui
 
 
 def handle_events():
@@ -51,6 +51,9 @@ def init(player_start_pos=None):
     front_object = Village_Front_Object()
     game_world.add_object((front_object), 3)
 
+    ui = Ui()
+    game_world.add_object(ui, 4)
+
 def update():
     game_world.update()
 
@@ -78,3 +81,6 @@ def resume(player_start_pos=None):
     game_world.add_object(village, 0)
     game_world.add_object(player, 2)
     game_world.add_object(front_object, 3)
+
+    ui = Ui()
+    game_world.add_object(ui, 4)

@@ -7,6 +7,7 @@ import game_framework
 from dungeonmain import Dungeonmain
 from player import Player
 from stage1_0 import Stage1_0
+from ui import Ui
 
 
 def handle_events():
@@ -61,6 +62,9 @@ def init(player_start_pos=None):
     # front_object = Front_Object()
     # game_world.add_object((front_object), 3)
 
+    ui = Ui()
+    game_world.add_object(ui, 4)
+
 def update():
     game_world.update()
 
@@ -85,3 +89,6 @@ def resume(player_start_pos=None):
 
     game_world.add_object(dungeonmain, 0)
     game_world.add_object(player, 2)
+
+    ui = Ui()
+    game_world.add_object(ui, 4)
