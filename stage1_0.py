@@ -18,6 +18,7 @@ class Stage1_0:
 
         self.image = load_image("./image/background/stage1/0.png")
         self.saved_mobs = [] # 몹 상태 저장용 리스트
+        self.saved_coins = []  # 코인 상태 저장용 리스트w
 
     def enter(self, e): pass
     def exit(self, e): pass

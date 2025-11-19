@@ -9,6 +9,7 @@ import stage1_3_mode
 from stage1_0 import Stage1_0
 from player import Player
 from slime_mob import Slime_Mob
+from coin import Coin
 
 
 def handle_events():
@@ -32,7 +33,7 @@ def handle_events():
             player.handle_event(event)
 
 def init(player_start_pos=None):
-    global world, slime_mobs
+    global world, slime_mobs, coins
     global stage1_0
     global player
 
@@ -47,8 +48,11 @@ def init(player_start_pos=None):
         slime_mobs = [Slime_Mob() for _ in range(random.randint(0, 2))]
         for slime_mob in slime_mobs:
             slime_mob.move_validator = stage1_0.is_mob_walkable
+
+        coins = []
     else:
         slime_mobs = []
+        coins = []
 
     game_world.add_object(stage1_0, 0)
 
@@ -66,6 +70,12 @@ def init(player_start_pos=None):
         for slime_mob in slime_mobs:
             game_world.add_collision_pair('player:slime_mob', None, slime_mob)
 
+    if coins:
+        game_world.add_objects(coins, 2)
+        game_world.add_collision_pair('player:coin', player, None)
+        for coin in coins:
+            game_world.add_collision_pair('player:coin', None, coin)
+
 def update():
     game_world.update()
     game_world.handle_collsions()
@@ -79,7 +89,7 @@ def finish():
     game_world.clear()
 
 def pause():
-    global slime_mobs, stage1_0
+    global slime_mobs, stage1_0, coins
 
     # 기존 saved_mobs 초기화 후 현재 살아있는 몹만 저장
     stage1_0.saved_mobs = []
@@ -93,14 +103,23 @@ def pause():
                 'frame': slime_mob.frame
             })
 
-    print(f"Pause: Saved {len(stage1_0.saved_mobs)} slime mobs")
+    # 코인 저장
+    stage1_0.saved_coins = []
+    for coin in coins:
+        stage1_0.saved_coins.append({
+            'x': coin.x,
+            'y': coin.y,
+            'frame': coin.frame
+        })
+
+    print(f"Pause: Saved {len(stage1_0.saved_mobs)} slime mobs, {len(stage1_0.saved_coins)} coins")
 
     game_world.clear()
     game_world.collision_pairs.clear()
 
 
 def resume(player_start_pos=None):
-    global slime_mobs, stage1_0, player
+    global slime_mobs, stage1_0, player, coins
 
     if player_start_pos:
         player.x, player.y = player_start_pos
@@ -134,3 +153,23 @@ def resume(player_start_pos=None):
         print(f"Resume: Restored {len(slime_mobs)} slime mobs")
     else:
         print("Resume: No saved mobs to restore")
+
+    # 코인 복원
+    if stage1_0.saved_coins:
+        coins = []
+        for coin_data in stage1_0.saved_coins:
+            coin = Coin()
+            coin.x = coin_data['x']
+            coin.y = coin_data['y']
+            coin.frame = coin_data['frame']
+            coins.append(coin)
+
+        game_world.add_objects(coins, 2)
+
+        game_world.add_collision_pair('player:coin', player, None)
+        for coin in coins:
+            game_world.add_collision_pair('player:coin', None, coin)
+
+        print(f"Resume: Restored {len(slime_mobs)} slime mobs, {len(coins)} coins")
+    else:
+        print(f"Resume: Restored {len(slime_mobs)} slime mobs, 0 coins")

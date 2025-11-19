@@ -41,3 +41,7 @@ class Coin:
         elif frame_idx == 7:
             return self.x - 15, self.y - 16, self.x + 12, self.y + 15  # frame : 7
         return None
+
+    def handle_collision(self, group, other):
+        if group == 'player:coin':
+            pass

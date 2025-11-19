@@ -385,3 +385,6 @@ class Player:
 
                 # 디버그 출력 (선택사항)
                 print(f"Player damaged! HP: {player_hp}")
+
+        elif group == 'player:coin':
+            pass

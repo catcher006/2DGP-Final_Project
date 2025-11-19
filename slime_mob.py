@@ -2,7 +2,7 @@ import time
 import game_world
 import game_framework
 import random
-
+import stage1_0_mode
 from player import player_weapon_id
 from state_machine import StateMachine
 from coin import Coin
@@ -64,15 +64,17 @@ class Dead:
         if self.played:
             # 애니메이션이 끝났고 아직 코인 생성/삭제가 되지 않았으면 처리
             if not self.spawned:
+                # 몹이 죽을 때 코인 생성
                 coin = Coin()
-                coin.x, coin.y = self.mob.x, self.mob.y
-                game_world.add_object(coin, 2)  # 적절한 레이어(depth) 선택 (여기서는 2)
-                # 몹을 게임 월드에서 제거
-                try:
-                    game_world.remove_object(self.mob)
-                except ValueError:
-                    # 이미 제거된 경우 무시
-                    pass
+                coin.x = self.mob.x
+                coin.y = self.mob.y
+                stage1_0_mode.coins.append(coin)
+                game_world.add_object(coin, 2)
+                game_world.add_collision_pair('player:coin', None, coin)
+                print(f"Coin created at ({coin.x}, {coin.y})")
+
+                game_world.remove_object(self.mob)
+
                 self.spawned = True
             return
 
