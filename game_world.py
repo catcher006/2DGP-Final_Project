@@ -4,7 +4,8 @@
 # world[1] : 백 오브젝트 이미지
 # world[2] : 플레이어 오브젝트 이미지
 # world[3] : 앞 오브젝트 이미지
-world = [[], [], [], []] # 게임 내 객체를 추가하는 함수
+# world[4] : UI 오브젝트
+world = [[], [], [], [], []] # 게임 내 객체를 추가하는 함수
 
 def add_object(o, depth = 0): # 게임 내 객체를 추가하는 함수
     world[depth].append(o)

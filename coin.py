@@ -1,5 +1,8 @@
 from pico2d import load_image, draw_rectangle
 import game_framework
+import game_world
+import stage1_0_mode
+from ui import Ui
 
 # By Action Speed
 TIME_PER_ACTION = 0.5
@@ -43,5 +46,14 @@ class Coin:
         return None
 
     def handle_collision(self, group, other):
+        print(f"Collision detected! Group: {group}")  # 디버그 출력
+
         if group == 'player:coin':
-            pass
+            print(f"Coin collected! Current coins: {Ui.coin}")  # 디버그 출력
+
+            Ui.coin += 50
+            game_world.remove_object(self)
+            if self in stage1_0_mode.coins:
+                stage1_0_mode.coins.remove(self)
+
+            print(f"After collection: {Ui.coin}")  # 디버그 출력

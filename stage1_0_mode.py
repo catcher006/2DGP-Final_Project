@@ -10,6 +10,7 @@ from stage1_0 import Stage1_0
 from player import Player
 from slime_mob import Slime_Mob
 from coin import Coin
+from ui import Ui
 
 
 def handle_events():
@@ -63,6 +64,8 @@ def init(player_start_pos=None):
 
     game_world.add_object(player, 2)
 
+    game_world.add_collision_pair('player:coin', player, None)
+
     # 첫 방문 시에만 몹 추가
     if slime_mobs:
         game_world.add_objects(slime_mobs, 2)
@@ -75,6 +78,9 @@ def init(player_start_pos=None):
         game_world.add_collision_pair('player:coin', player, None)
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
+
+    ui = Ui()
+    game_world.add_object(ui, 4)
 
 def update():
     game_world.update()
@@ -173,3 +179,6 @@ def resume(player_start_pos=None):
         print(f"Resume: Restored {len(slime_mobs)} slime mobs, {len(coins)} coins")
     else:
         print(f"Resume: Restored {len(slime_mobs)} slime mobs, 0 coins")
+
+    ui = Ui()
+    game_world.add_object(ui, 4)

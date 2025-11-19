@@ -259,6 +259,9 @@ class Slime_Mob:
         return False
 
     def handle_collision(self, group, other):
+        if not self.is_alive:
+            return
+
         if group == 'player_sword:slime_mob' and self.is_alive:
             current_time = time.time()
 
