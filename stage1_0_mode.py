@@ -6,8 +6,6 @@ import game_world
 import game_framework
 import stage1_1_mode
 import stage1_3_mode
-import stage1_manger
-from player_sword import Player_Sword
 from stage1_0 import Stage1_0
 from player import Player
 from slime_mob import Slime_Mob
@@ -37,44 +35,40 @@ def init(player_start_pos=None):
     global world, slime_mobs
     global stage1_0
     global player
-    global back_object
-    global front_object
 
     # 기존 충돌 페어 초기화
     game_world.collision_pairs.clear()
 
-    stage1_0 = Stage1_0()
-    game_world.add_object(stage1_0, 0)
+    # Stage1_0 인스턴스는 항상 존재하도록 보장
+    if 'stage1_0' not in globals() or stage1_0 is None:
+        stage1_0 = Stage1_0()
 
-    # back_object = Back_Object()
-    # game_world.add_object((back_object), 1)
+    # 첫 방문 시에만 stage1_0 인스턴스 생성
+    if not stage1_0.is_created:
+        stage1_0 = Stage1_0()
+        stage1_0.is_created = True
 
-    player = Player()
-    player.move_validator = stage1_0.is_walkable
-    # 시작 좌표 설정
-    if player_start_pos:
-        player.x, player.y = player_start_pos
-
-    game_world.add_object((player), 2)
-
-    # 첫 방문인 경우만 새로 생성
-    if stage1_manger.stage1_0_create is None:
         slime_mobs = [Slime_Mob() for _ in range(random.randint(0, 2))]
         for slime_mob in slime_mobs:
             slime_mob.move_validator = stage1_0.is_mob_walkable
-        stage1_manger.stage1_0_create = True
+    else:
+        slime_mobs = []
 
+    game_world.add_object(stage1_0, 0)
+
+    player = Player()
+    player.move_validator = stage1_0.is_walkable
+    if player_start_pos:
+        player.x, player.y = player_start_pos
+
+    game_world.add_object(player, 2)
+
+    # 첫 방문 시에만 몹 추가
+    if slime_mobs:
         game_world.add_objects(slime_mobs, 2)
         game_world.add_collision_pair('player:slime_mob', player, None)
         for slime_mob in slime_mobs:
             game_world.add_collision_pair('player:slime_mob', None, slime_mob)
-    else:
-        # 재방문인 경우 빈 리스트로 초기화 (resume에서 복원)
-        slime_mobs = []
-
-
-    # front_object = Front_Object()
-    # game_world.add_object((front_object), 3)
 
 def update():
     game_world.update()
@@ -89,47 +83,39 @@ def finish():
     game_world.clear()
 
 def pause():
-    """push_mode로 나갈 때 현재 상태 저장 및 게임 월드 정리"""
-    global slime_mobs
+    global slime_mobs, stage1_0
 
-    # 현재 살아있는 slime_mob들의 상태를 저장
-    alive_mobs = []
+    # 기존 saved_mobs 초기화 후 현재 살아있는 몹만 저장
+    stage1_0.saved_mobs = []
     for slime_mob in slime_mobs:
         if slime_mob.is_alive:
-            mob_data = {
+            stage1_0.saved_mobs.append({
                 'type': slime_mob.mob_type,
                 'x': slime_mob.x,
                 'y': slime_mob.y,
                 'hp': slime_mob.hp,
                 'frame': slime_mob.frame
-            }
-            alive_mobs.append(mob_data)
+            })
 
-    # 상태 저장
-    stage1_manger.stage1_0_mobs = alive_mobs
-    print(f"Pause: Saved {len(alive_mobs)} slime mobs")
+    print(f"Pause: Saved {len(stage1_0.saved_mobs)} slime mobs")
 
-    # 월드와 충돌 페어를 완전히 정리해서 다른 모드로 갔을 때 잔존 오브젝트가 없게 함
     game_world.clear()
     game_world.collision_pairs.clear()
 
 
 def resume(player_start_pos=None):
-    """pop_mode로 돌아올 때 저장된 상태 복원"""
     global slime_mobs, stage1_0, player
 
     if player_start_pos:
         player.x, player.y = player_start_pos
 
-    # 배경과 플레이어 다시 추가 (player 객체는 모듈 변수로 유지됨)
     game_world.add_object(stage1_0, 0)
     game_world.add_object(player, 2)
 
-    # 저장된 몹 데이터가 있으면 복원
-    if stage1_manger.stage1_0_mobs is not None:
+    # stage1_0 인스턴스에 저장된 몹 복원
+    if stage1_0.saved_mobs:
         slime_mobs = []
-
-        for mob_data in stage1_manger.stage1_0_mobs:
+        for mob_data in stage1_0.saved_mobs:
             slime_mob = Slime_Mob()
             slime_mob.mob_type = mob_data['type']
             slime_mob.x = mob_data['x']
@@ -138,17 +124,13 @@ def resume(player_start_pos=None):
             slime_mob.frame = mob_data['frame']
             slime_mob.move_validator = stage1_0.is_mob_walkable
 
-            # 이미지 다시 로드
             slime_mob.move_image = load_image("./image/mobs/slime/" + slime_mob.mob_type + "_Slime_Jump.png")
             slime_mob.idle_image = load_image("./image/mobs/slime/" + slime_mob.mob_type + "_Slime_Jump.png")
             slime_mob.dead_image = load_image("./image/mobs/slime/" + slime_mob.mob_type + "_Slime_Dead.png")
 
             slime_mobs.append(slime_mob)
 
-        # 게임 월드에 추가
         game_world.add_objects(slime_mobs, 2)
-
-        # 충돌 페어 재설정
         game_world.add_collision_pair('player:slime_mob', player, None)
         for slime_mob in slime_mobs:
             game_world.add_collision_pair('player:slime_mob', None, slime_mob)

@@ -1,8 +1,8 @@
 from pico2d import *
 
-import stage1_manger
 import village_mode
 import stage1_0_mode
+import stage1_0
 import game_world
 import game_framework
 from dungeonmain import Dungeonmain
@@ -11,6 +11,7 @@ from player import Player
 
 def handle_events():
     global running
+    global stage1_0
 
     event_list = get_events()
     for event in event_list:
@@ -20,18 +21,18 @@ def handle_events():
         elif event.type in (SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP):
             continue
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
-            if player.x >= 195 and player.x <= 290 and player.y >= 380 and player.y <= 400:  # 1번 스테이지 입구 좌표 범위
-                stage1_manger.stage1_in_game = True
-
-                if stage1_manger.stage1_0_create is None:
+            if 195 <= player.x <= 290 and 380 <= player.y <= 400:  # 1번 스테이지 입구 좌표 범위
+                # stage1_0_mode의 stage1_0 인스턴스 확인
+                stage1_0_instance = getattr(stage1_0_mode, 'stage1_0', None)
+                if stage1_0_instance is None or not stage1_0_instance.is_created:
                     game_framework.push_mode(stage1_0_mode, (525, 600))
                 else:
                     game_framework.pop_mode(stage1_0_mode, (525, 600))
-            elif player.x >= 505 and player.x <= 585 and player.y >= 380 and player.y <= 400:  # 2번 스테이지 입구 좌표 범위
+            elif 505 <= player.x <= 585 and 380 <= player.y <= 400:  # 2번 스테이지 입구 좌표 범위
                 print("Stage 2 Entered") # 스테이지 2로 이동
-            elif player.x >= 780 and player.x <= 880 and player.y >= 380 and player.y <= 400:  # 3번 스테이지 입구 좌표 범위
+            elif 780 <= player.x <= 880 and 380 <= player.y <= 400:  # 3번 스테이지 입구 좌표 범위
                 print("Stage 3 Entered") # 스테이지 3로 이동
-            elif player.x >= 500 and player.x <= 600 and player.y >= 60 and player.y <= 80:  # 마을 입구 좌표 범위
+            elif 500 <= player.x <= 600 and 60 <= player.y <= 80:  # 마을 입구 좌표 범위
                 game_framework.pop_mode(village_mode,(535, 380))
         else:
             player.handle_event(event)
