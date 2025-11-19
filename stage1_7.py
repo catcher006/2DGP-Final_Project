@@ -1,6 +1,9 @@
 from pico2d import load_image
 
 class Stage1_7:
+
+    stage1_7_create = False
+
     def __init__(self):
         self.paths = [
             {'type': 'rect', 'min_x': 105, 'max_x': 940, 'min_y': 85, 'max_y': 540},  # 기본 이동 구역
@@ -13,6 +16,9 @@ class Stage1_7:
         ]
 
         self.image = load_image("./image/background/stage1/7.png")
+        self.saved_mobs = []
+        self.saved_coins = []
+
     def enter(self, e): pass
     def exit(self, e): pass
     def do(self): pass
