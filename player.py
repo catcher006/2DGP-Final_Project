@@ -312,7 +312,7 @@ class Player:
 
     def draw(self):
         self.state_machine.draw()
-        self.font.draw(self.x - 35, self.y + 40, f'hp: {player_hp:02d}', (0, 0, 255))
+        self.font.draw(self.x - 35, self.y + 40, f'hp: {player_hp:02d}', (255, 0, 255))
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
