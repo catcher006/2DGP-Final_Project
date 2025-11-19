@@ -18,7 +18,7 @@ class Stage1_0:
 
         self.image = load_image("./image/background/stage1/0.png")
         self.saved_mobs = [] # 몹 상태 저장용 리스트
-        self.saved_coins = []  # 코인 상태 저장용 리스트w
+        self.saved_coins = []  # 코인 상태 저장용 리스트
 
     def enter(self, e): pass
     def exit(self, e): pass
@@ -57,27 +57,3 @@ class Stage1_0:
                 if self._point_in_polygon(x, y, p['points']):
                     return True
         return False
-
-    # alive한 몹들의 직렬화된 상태를 저장
-    def save_mobs(self, mobs):
-        alive = []
-        for m in mobs:
-            if getattr(m, "is_alive", False):
-                alive.append({
-                    "type": getattr(m, "mob_type", None),
-                    "x": getattr(m, "x", 0),
-                    "y": getattr(m, "y", 0),
-                    "hp": getattr(m, "hp", 0),
-                    "frame": getattr(m, "frame", 0)
-                })
-        self.saved_mobs = alive
-
-    def has_saved_mobs(self):
-        return bool(self.saved_mobs)
-
-    # 저장된 몹 데이터 리스트를 반환 (복원 담당 로직은 모드에서 수행)
-    def restore_mobs_data(self):
-        return list(self.saved_mobs)
-
-    def clear_saved_mobs(self):
-        self.saved_mobs = []
