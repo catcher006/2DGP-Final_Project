@@ -21,7 +21,7 @@ def handle_events():
             game_framework.change_mode(title_mode)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             if player.x >= 480 and player.x <=  590 and player.y >= 370 and player.y <= 380: # 던전 입구 좌표 범위
-                game_framework.change_mode(dungeonmain_mode,(535, 60))
+                game_framework.push_mode(dungeonmain_mode,(535, 60))
         else:
             player.handle_event(event)
 
@@ -63,7 +63,18 @@ def finish():
     game_world.clear()
 
 def pause():
-    pass
+    # 현재 모드의 모든 객체를 게임 월드에서 제거
+    game_world.clear()
+    # 충돌 페어도 정리
+    game_world.collision_pairs.clear()
 
-def resume():
-    pass
+def resume(player_start_pos=None):
+    # 필요시 village 객체들을 다시 초기화
+    global village, back_object, front_object, player
+
+    if player_start_pos:
+        player.x, player.y = player_start_pos
+
+    game_world.add_object(village, 0)
+    game_world.add_object(player, 2)
+    game_world.add_object(front_object, 3)
