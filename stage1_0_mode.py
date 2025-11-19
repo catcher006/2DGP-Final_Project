@@ -39,14 +39,10 @@ def init(player_start_pos=None):
     # 기존 충돌 페어 초기화
     game_world.collision_pairs.clear()
 
-    # Stage1_0 인스턴스는 항상 존재하도록 보장
-    if 'stage1_0' not in globals() or stage1_0 is None:
-        stage1_0 = Stage1_0()
+    stage1_0 = Stage1_0()
 
-    # 첫 방문 시에만 stage1_0 인스턴스 생성
-    if not stage1_0.is_created:
-        stage1_0 = Stage1_0()
-        stage1_0.is_created = True
+    if not Stage1_0.stage1_0_create:
+        Stage1_0.stage1_0_create = True
 
         slime_mobs = [Slime_Mob() for _ in range(random.randint(0, 2))]
         for slime_mob in slime_mobs:

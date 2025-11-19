@@ -1,6 +1,7 @@
 import time
 import game_framework
 import game_world
+import stage1_0
 import stage1_0_mode
 from state_machine import StateMachine
 from pico2d import *
@@ -112,8 +113,9 @@ class Idle:
 
 
     def draw(self):
-        stage1_0 = getattr(stage1_0_mode, 'stage1_0', None)
-        if stage1_0 is None or not stage1_0.is_created or player_weapon_id == 'none':
+        from stage1_0 import Stage1_0
+
+        if not Stage1_0.stage1_0_create or player_weapon_id == 'none':
             self.player.idle_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64, self.player.x, self.player.y, 100, 100)
         else:
             self.player.combat_idle_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64, self.player.x, self.player.y, 100, 100)
@@ -352,9 +354,10 @@ class Player:
                 else:  # 움직임
                     self.state_machine.handle_state_event(('RUN', None))
         else:
-            stage1_0 = getattr(stage1_0_mode, 'stage1_0', None)
+            from stage1_0 import Stage1_0
+
             # 공격키일 때 현재 공격 가능 여부 확인
-            if space_down(('INPUT', event)) and not stage1_0.is_created:
+            if space_down(('INPUT', event)) and not Stage1_0.stage1_0_create:
                 return
             self.state_machine.handle_state_event(('INPUT', event))
 

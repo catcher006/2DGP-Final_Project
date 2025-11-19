@@ -2,11 +2,11 @@ from pico2d import *
 
 import village_mode
 import stage1_0_mode
-import stage1_0
 import game_world
 import game_framework
 from dungeonmain import Dungeonmain
 from player import Player
+from stage1_0 import Stage1_0
 
 
 def handle_events():
@@ -22,9 +22,7 @@ def handle_events():
             continue
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             if 195 <= player.x <= 290 and 380 <= player.y <= 400:  # 1번 스테이지 입구 좌표 범위
-                # stage1_0_mode의 stage1_0 인스턴스 확인
-                stage1_0_instance = getattr(stage1_0_mode, 'stage1_0', None)
-                if stage1_0_instance is None or not stage1_0_instance.is_created:
+                if not Stage1_0.stage1_0_create:
                     game_framework.push_mode(stage1_0_mode, (525, 600))
                 else:
                     game_framework.pop_mode(stage1_0_mode, (525, 600))
