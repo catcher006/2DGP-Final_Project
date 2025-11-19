@@ -20,35 +20,13 @@ def handle_events():
     for event in event_list:
         if event.type == SDL_QUIT:
             game_framework.quit()
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
-            # 모드 전환 전에 현재 상태 저장
-            if len(slime_mobs) >= 1:
-                stage1_manger.stage1_0_last_mob1_pos = (slime_mobs[0].x, slime_mobs[0].y)
-            if len(slime_mobs) >= 2:
-                stage1_manger.stage1_0_last_mob2_pos = (slime_mobs[1].x, slime_mobs[1].y)
-
-            # 모든 슬라임의 상태를 리스트로 저장
-            mobs_state = []
-            for slime in slime_mobs:
-                state = {
-                    'type': getattr(slime, 'mob_type', None),
-                    'x': getattr(slime, 'x', None),
-                    'y': getattr(slime, 'y', None),
-                    'frame': getattr(slime, 'frame', 0),
-                    'is_move': getattr(slime, 'is_move', True),
-                    'lr_dir': getattr(slime, 'lr_dir', 0),
-                    'ud_dir': getattr(slime, 'ud_dir', 0),
-                    'hp': getattr(slime, 'hp', 100),
-                    'is_alive': getattr(slime, 'is_alive', True)
-                }
-                mobs_state.append(state)
-            stage1_manger.stage1_0_mobs = mobs_state
-
+        # 마우스 이벤트는 무시
+        elif event.type in (SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP):
+            continue
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_f:
             if 500 <= player.x <=  550 and 580 <= player.y <= 600: # 상단 문 (메인 던전으로 가는 문)
-                stage1_manger.stage1_in_game = False
-                game_framework.change_mode(dungeonmain_mode,(240, 400))
+                game_framework.pop_mode(dungeonmain_mode,(240, 400))
             elif 990 <= player.x <=  1010 and 270 <= player.y <= 370: # 우측 문
-                debug_stage1_manager_state()
                 game_framework.change_mode(stage1_1_mode,(50, 320))
             elif 500 <= player.x <=  550 and 0 <= player.y <= 20: # 하단 문
                 game_framework.change_mode(stage1_3_mode,(525, 600))
@@ -79,45 +57,20 @@ def init(player_start_pos=None):
 
     game_world.add_object((player), 2)
 
-    slime_mobs = []
-    if not stage1_manger.stage1_0_create:
+    # 첫 방문인 경우만 새로 생성
+    if stage1_manger.stage1_0_create is None:
         slime_mobs = [Slime_Mob() for _ in range(random.randint(0, 2))]
         for slime_mob in slime_mobs:
             slime_mob.move_validator = stage1_0.is_mob_walkable
-        # 슬라임이 0개여도 생성 완료로 표시
         stage1_manger.stage1_0_create = True
 
-        # 초기 상태를 빈 리스트로 저장 (0개인 경우 대비)
-        if not slime_mobs:
-            stage1_manger.stage1_0_mobs = []
+        game_world.add_objects(slime_mobs, 2)
+        game_world.add_collision_pair('player:slime_mob', player, None)
+        for slime_mob in slime_mobs:
+            game_world.add_collision_pair('player:slime_mob', None, slime_mob)
     else:
-        # 저장된 상태에서 복원
-        saved_mobs = stage1_manger.stage1_0_mobs  # 함수가 아닌 변수 직접 사용
-        if saved_mobs:
-            for mob_state in saved_mobs:
-                # dict에서 Slime_Mob 객체로 복원
-                slime = Slime_Mob()
-                if mob_state.get('type'):
-                    slime.mob_type = mob_state['type']
-                    slime.move_image = load_image(f"./image/mobs/slime/{slime.mob_type}_Slime_Jump.png")
-                    slime.idle_image = load_image(f"./image/mobs/slime/{slime.mob_type}_Slime_Jump.png")
-                    slime.dead_image = load_image(f"./image/mobs/slime/{slime.mob_type}_Slime_Dead.png")
-                slime.x = mob_state.get('x', slime.x)
-                slime.y = mob_state.get('y', slime.y)
-                slime.frame = mob_state.get('frame', slime.frame)
-                slime.is_move = mob_state.get('is_move', slime.is_move)
-                slime.lr_dir = mob_state.get('lr_dir', slime.lr_dir)
-                slime.ud_dir = mob_state.get('ud_dir', slime.ud_dir)
-                slime.hp = mob_state.get('hp', slime.hp)
-                slime.is_alive = mob_state.get('is_alive', slime.is_alive)
-                slime.move_validator = stage1_0.is_mob_walkable
-                slime_mobs.append(slime)
-
-    game_world.add_objects(slime_mobs, 2)
-
-    game_world.add_collision_pair('player:slime_mob', player, None)
-    for slime_mob in slime_mobs:
-        game_world.add_collision_pair('player:slime_mob', None, slime_mob)
+        # 재방문인 경우 빈 리스트로 초기화 (resume에서 복원)
+        slime_mobs = []
 
 
     # front_object = Front_Object()
@@ -136,16 +89,70 @@ def finish():
     game_world.clear()
 
 def pause():
-    pass
+    """push_mode로 나갈 때 현재 상태 저장 및 게임 월드 정리"""
+    global slime_mobs
 
-def resume():
-    pass
+    # 현재 살아있는 slime_mob들의 상태를 저장
+    alive_mobs = []
+    for slime_mob in slime_mobs:
+        if slime_mob.is_alive:
+            mob_data = {
+                'type': slime_mob.mob_type,
+                'x': slime_mob.x,
+                'y': slime_mob.y,
+                'hp': slime_mob.hp,
+                'frame': slime_mob.frame
+            }
+            alive_mobs.append(mob_data)
 
-# 슬라임 몹 정보 저장 확인 디버그 함수
-def debug_stage1_manager_state():
-    print("=== Stage1 Manager Debug Info ===")
-    print(f"stage1_0_create: {stage1_manger.stage1_0_create}")
-    print(f"stage1_0_mobs: {stage1_manger.stage1_0_mobs}")
-    print(f"stage1_0_last_mob1_pos: {stage1_manger.stage1_0_last_mob1_pos}")
-    print(f"stage1_0_last_mob2_pos: {stage1_manger.stage1_0_last_mob2_pos}")
-    print("================================")
+    # 상태 저장
+    stage1_manger.stage1_0_mobs = alive_mobs
+    print(f"Pause: Saved {len(alive_mobs)} slime mobs")
+
+    # 월드와 충돌 페어를 완전히 정리해서 다른 모드로 갔을 때 잔존 오브젝트가 없게 함
+    game_world.clear()
+    game_world.collision_pairs.clear()
+
+
+def resume(player_start_pos=None):
+    """pop_mode로 돌아올 때 저장된 상태 복원"""
+    global slime_mobs, stage1_0, player
+
+    if player_start_pos:
+        player.x, player.y = player_start_pos
+
+    # 배경과 플레이어 다시 추가 (player 객체는 모듈 변수로 유지됨)
+    game_world.add_object(stage1_0, 0)
+    game_world.add_object(player, 2)
+
+    # 저장된 몹 데이터가 있으면 복원
+    if stage1_manger.stage1_0_mobs is not None:
+        slime_mobs = []
+
+        for mob_data in stage1_manger.stage1_0_mobs:
+            slime_mob = Slime_Mob()
+            slime_mob.mob_type = mob_data['type']
+            slime_mob.x = mob_data['x']
+            slime_mob.y = mob_data['y']
+            slime_mob.hp = mob_data['hp']
+            slime_mob.frame = mob_data['frame']
+            slime_mob.move_validator = stage1_0.is_mob_walkable
+
+            # 이미지 다시 로드
+            slime_mob.move_image = load_image("./image/mobs/slime/" + slime_mob.mob_type + "_Slime_Jump.png")
+            slime_mob.idle_image = load_image("./image/mobs/slime/" + slime_mob.mob_type + "_Slime_Jump.png")
+            slime_mob.dead_image = load_image("./image/mobs/slime/" + slime_mob.mob_type + "_Slime_Dead.png")
+
+            slime_mobs.append(slime_mob)
+
+        # 게임 월드에 추가
+        game_world.add_objects(slime_mobs, 2)
+
+        # 충돌 페어 재설정
+        game_world.add_collision_pair('player:slime_mob', player, None)
+        for slime_mob in slime_mobs:
+            game_world.add_collision_pair('player:slime_mob', None, slime_mob)
+
+        print(f"Resume: Restored {len(slime_mobs)} slime mobs")
+    else:
+        print("Resume: No saved mobs to restore")

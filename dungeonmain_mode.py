@@ -16,16 +16,23 @@ def handle_events():
     for event in event_list:
         if event.type == SDL_QUIT:
             game_framework.quit()
+        # 마우스 이벤트는 무시
+        elif event.type in (SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP):
+            continue
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             if player.x >= 195 and player.x <= 290 and player.y >= 380 and player.y <= 400:  # 1번 스테이지 입구 좌표 범위
                 stage1_manger.stage1_in_game = True
-                game_framework.change_mode(stage1_0_mode,(525, 600))
+
+                if stage1_manger.stage1_0_create is None:
+                    game_framework.push_mode(stage1_0_mode, (525, 600))
+                else:
+                    game_framework.pop_mode(stage1_0_mode, (525, 600))
             elif player.x >= 505 and player.x <= 585 and player.y >= 380 and player.y <= 400:  # 2번 스테이지 입구 좌표 범위
                 print("Stage 2 Entered") # 스테이지 2로 이동
             elif player.x >= 780 and player.x <= 880 and player.y >= 380 and player.y <= 400:  # 3번 스테이지 입구 좌표 범위
                 print("Stage 3 Entered") # 스테이지 3로 이동
             elif player.x >= 500 and player.x <= 600 and player.y >= 60 and player.y <= 80:  # 마을 입구 좌표 범위
-                game_framework.change_mode(village_mode,(535, 380))
+                game_framework.pop_mode(village_mode,(535, 380))
         else:
             player.handle_event(event)
 
@@ -67,7 +74,15 @@ def finish():
     game_world.clear()
 
 def pause():
-    pass
+    # 현재 모드의 모든 객체를 게임 월드에서 제거
+    game_world.clear()
 
-def resume():
-    pass
+def resume(player_start_pos=None):
+    # 필요시 dungeonmain 객체들을 다시 초기화
+    global dungeonmain, player
+
+    if player_start_pos:
+        player.x, player.y = player_start_pos
+
+    game_world.add_object(dungeonmain, 0)
+    game_world.add_object(player, 2)
