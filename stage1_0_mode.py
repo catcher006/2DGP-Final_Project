@@ -7,6 +7,8 @@ import game_framework
 import stage1_1_mode
 import stage1_3_mode
 from stage1_0 import Stage1_0
+from stage1_1 import Stage1_1
+from stage1_3 import Stage1_3
 from player import Player
 from slime_mob import Slime_Mob
 from coin import Coin
@@ -27,9 +29,15 @@ def handle_events():
             if 500 <= player.x <=  550 and 580 <= player.y <= 600: # 상단 문 (메인 던전으로 가는 문)
                 game_framework.pop_mode(dungeonmain_mode,(240, 400))
             elif 990 <= player.x <=  1010 and 270 <= player.y <= 370: # 우측 문
-                game_framework.change_mode(stage1_1_mode,(50, 320))
+                if not Stage1_1.stage1_1_create:
+                    game_framework.push_mode(stage1_1_mode,(50, 320))
+                else:
+                    game_framework.pop_mode(stage1_1_mode,(50, 320))
             elif 500 <= player.x <=  550 and 0 <= player.y <= 20: # 하단 문
-                game_framework.change_mode(stage1_3_mode,(525, 600))
+                if not Stage1_3.stage1_3_create:
+                    game_framework.push_mode(stage1_3_mode,(525, 600))
+                else:
+                    game_framework.pop_mode(stage1_3_mode,(525, 600))
         else:
             player.handle_event(event)
 
