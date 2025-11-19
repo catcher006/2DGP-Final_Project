@@ -29,7 +29,7 @@ def push_mode(mode, *args):
     stack.append(entry)
     mode.init(*args)
 
-def pop_mode(target_mode=None):
+def pop_mode(target_mode=None, *args):
     global stack
     if not stack:
         return
@@ -71,7 +71,7 @@ def pop_mode(target_mode=None):
     stack.append(target_entry)
 
     # 타겟 모드 resume
-    stack[-1]['mode'].resume()
+    stack[-1]['mode'].resume(*args)
 
     print(f"Moved target mode {target_name} to top, stack depth: {len(stack)}")
 
