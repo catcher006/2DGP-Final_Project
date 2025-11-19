@@ -20,7 +20,7 @@ class Player_Sword():
 
         # 프레임이 12를 넘으면 12로 고정
         if f > 12:
-            f = 12
+            return None
 
         if d == 0:
             if f == 0: return self.x - 68, self.y - 10, self.x - 40, self.y + 8  # frame : 0
@@ -91,6 +91,10 @@ class Player_Sword():
         self.y = getattr(player, 'player_y', self.y)
         self.frame = int(getattr(player, 'player_frame', self.frame))
         self.face_dir = int(getattr(player, 'player_face_dir', self.face_dir))
+
+        # 공격 프레임이 끝나면 게임 월드에서 제거
+        if self.frame >= 13:
+            game_world.remove_object(self)
 
     def do(self):
         pass
