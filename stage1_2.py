@@ -2,7 +2,7 @@ from pico2d import load_image
 
 class Stage1_2:
 
-    stage1_0_create = False
+    stage1_2_create = False
 
     def __init__(self):
         self.paths = [
