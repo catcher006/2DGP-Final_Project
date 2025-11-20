@@ -51,8 +51,16 @@ def clear():
 
 
 def collide(a, b):
-    left_a, bottom_a, right_a, top_a = a.get_bb()
-    left_b, bottom_b, right_b, top_b = b.get_bb()
+    # get_bb()가 None을 반환할 수 있으므로 체크
+    bb_a = a.get_bb()
+    bb_b = b.get_bb()
+
+    # 둘 중 하나라도 None이면 충돌하지 않음
+    if bb_a is None or bb_b is None:
+        return False
+
+    left_a, bottom_a, right_a, top_a = bb_a
+    left_b, bottom_b, right_b, top_b = bb_b
 
     if left_a > right_b: return False
     if right_a < left_b: return False
