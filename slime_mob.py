@@ -263,11 +263,11 @@ class Slime_Mob:
             if self.mob_type == 'Green':
                 self.hp_green_image.clip_draw(0, self.hp // 5 * 66, 240, 66, self.x - 5, self.y + 35, 60, 11)
                 if self.hp >= 100:
-                    self.font.draw(self.x - 13, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
+                    self.font.draw(self.x - 13, self.y + 35, f'{self.hp:02d}', (0, 0, 0))
                 elif 50 < self.hp < 100:
-                    self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
+                    self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (0, 0, 0))
                 elif self.hp == 50:
-                    self.font.draw(self.x - 11, self.y + 35, '5', (255, 255, 255))
+                    self.font.draw(self.x - 11, self.y + 35, '5', (0, 0, 0))
                     self.font.draw(self.x - 5, self.y + 35, '0', (0, 255, 0))
                 else:
                     self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (0, 255, 0))
@@ -284,15 +284,7 @@ class Slime_Mob:
                     self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (0, 0, 255))
             elif self.mob_type == 'Yellow':
                 self.hp_yellow_image.clip_draw(0, self.hp // 5 * 66, 240, 66, self.x - 5, self.y + 35, 60, 11)
-                if self.hp >= 100:
-                    self.font.draw(self.x - 13, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
-                elif 50 < self.hp < 100:
-                    self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
-                elif self.hp == 50:
-                    self.font.draw(self.x - 11, self.y + 35, '5', (255, 255, 255))
-                    self.font.draw(self.x - 5, self.y + 35, '0', (255, 255, 0))
-                else:
-                    self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (255, 255, 0))
+                self.font.draw(self.x - 13, self.y + 35, f'{self.hp:02d}', (0, 0, 0))
 
             draw_rectangle(*self.get_bb())
 
