@@ -325,6 +325,20 @@ class Slime_Boss:
                     self.hp -= 100
                 self.last_damage_time = current_time
 
+                # 칼에 맞았을 때 넉백 (플레이어 반대 방향)
+                dx = self.x - other.x
+                dy = self.y - other.y
+                distance = (dx ** 2 + dy ** 2) ** 0.5
+
+                if distance > 0:
+                    nx = dx / distance
+                    ny = dy / distance
+
+                    self.is_knocked_back = True
+                    self.knockback_distance = 15
+                    self.knockback_dx = nx * 1.5
+                    self.knockback_dy = ny * 1.5
+
                 if self.hp <= 0:
                     self.hp = 0
                     self.is_alive = False
@@ -346,6 +360,20 @@ class Slime_Boss:
                 elif player_weapon_id == 'goldbow':
                     self.hp -= 100
                 self.last_damage_time = current_time
+
+                # 화살에 맞았을 때 넉백 (화살 방향으로)
+                dx = self.x - other.x
+                dy = self.y - other.y
+                distance = (dx ** 2 + dy ** 2) ** 0.5
+
+                if distance > 0:
+                    nx = dx / distance
+                    ny = dy / distance
+
+                    self.is_knocked_back = True
+                    self.knockback_distance = 20
+                    self.knockback_dx = nx * 2.0
+                    self.knockback_dy = ny * 2.0
 
                 if self.hp <= 0:
                     self.hp = 0
