@@ -77,10 +77,24 @@ class Dead:
                 coin = Coin()
                 coin.x = self.mob.x
                 coin.y = self.mob.y
+
                 if Stage1_0.current_mode:
                     stage1_0_mode.coins.append(coin)
                 elif Stage1_1.current_mode:
                     stage1_1_mode.coins.append(coin)
+                elif Stage1_2.current_mode:
+                    stage1_2_mode.coins.append(coin)
+                elif Stage1_3.current_mode:
+                    stage1_3_mode.coins.append(coin)
+                elif Stage1_4.current_mode:
+                    stage1_4_mode.coins.append(coin)
+                elif Stage1_5.current_mode:
+                    stage1_5_mode.coins.append(coin)
+                elif Stage1_6.current_mode:
+                    stage1_6_mode.coins.append(coin)
+                elif Stage1_7.current_mode:
+                    stage1_7_mode.coins.append(coin)
+
                 game_world.add_object(coin, 2)
                 game_world.add_collision_pair('player:coin', None, coin)
                 print(f"Coin created at ({coin.x}, {coin.y})")

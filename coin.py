@@ -1,7 +1,16 @@
 from pico2d import load_image, draw_rectangle
 import game_framework
 import game_world
-import stage1_0_mode
+import stage1_0_mode, stage1_1_mode, stage1_2_mode, stage1_3_mode
+import stage1_4_mode, stage1_5_mode, stage1_6_mode, stage1_7_mode
+from stage1_0 import Stage1_0
+from stage1_1 import Stage1_1
+from stage1_2 import Stage1_2
+from stage1_3 import Stage1_3
+from stage1_4 import Stage1_4
+from stage1_5 import Stage1_5
+from stage1_6 import Stage1_6
+from stage1_7 import Stage1_7
 from ui import Ui
 
 # By Action Speed
@@ -53,7 +62,21 @@ class Coin:
 
             Ui.coin += 50
             game_world.remove_object(self)
-            if self in stage1_0_mode.coins:
+            if Stage1_0.current_mode:
                 stage1_0_mode.coins.remove(self)
+            elif Stage1_1.current_mode:
+                stage1_1_mode.coins.remove(self)
+            elif Stage1_2.current_mode:
+                stage1_2_mode.coins.remove(self)
+            elif Stage1_3.current_mode:
+                stage1_3_mode.coins.remove(self)
+            elif Stage1_4.current_mode:
+                stage1_4_mode.coins.remove(self)
+            elif Stage1_5.current_mode:
+                stage1_5_mode.coins.remove(self)
+            elif Stage1_6.current_mode:
+                stage1_6_mode.coins.remove(self)
+            elif Stage1_7.current_mode:
+                stage1_7_mode.coins.remove(self)
 
             print(f"After collection: {Ui.coin}")  # 디버그 출력
