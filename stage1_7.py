@@ -3,6 +3,7 @@ from pico2d import load_image
 class Stage1_7:
 
     stage1_7_create = False
+    current_mode = False
 
     def __init__(self):
         self.paths = [
