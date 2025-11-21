@@ -76,6 +76,13 @@ def init(player_start_pos=None):
         game_world.add_collision_pair('player:slime_mob', player, None)
         for slime_mob in slime_mobs:
             game_world.add_collision_pair('player:slime_mob', None, slime_mob)
+            game_world.add_collision_pair('slime_mob:slime_mob', slime_mob, None)
+
+        # 다른 몹들과의 충돌 페어 추가
+        for slime_mob in slime_mobs:
+            for other_mob in slime_mobs:
+                if slime_mob != other_mob:
+                    game_world.add_collision_pair('slime_mob:slime_mob', None, other_mob)
 
     if coins:
         game_world.add_objects(coins, 2)
@@ -163,6 +170,12 @@ def resume(player_start_pos=None):
         game_world.add_collision_pair('player:slime_mob', player, None)
         for slime_mob in slime_mobs:
             game_world.add_collision_pair('player:slime_mob', None, slime_mob)
+            game_world.add_collision_pair('slime_mob:slime_mob', slime_mob, None)
+
+        for slime_mob in slime_mobs:
+            for other_mob in slime_mobs:
+                if slime_mob != other_mob:
+                    game_world.add_collision_pair('slime_mob:slime_mob', None, other_mob)
 
         print(f"Resume: Restored {len(slime_mobs)} slime mobs")
     else:
