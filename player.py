@@ -287,7 +287,7 @@ class Player:
         elif check_weapon() is 'bow':
             self.load_bow_images()
         self.load_combat_idle_images()
-        self.hp_image = load_image('./image/ui/player_hp.png')
+        self.hp_image = load_image('./image/ui/player/player_hp.png')
 
         self.font = load_font('ENCR10B.TTF', 10)
 
