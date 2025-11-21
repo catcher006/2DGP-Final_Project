@@ -18,7 +18,6 @@ class Player_Sword():
         f = int(self.frame)
         d = int(self.face_dir)
 
-        # 프레임이 12를 넘으면 12로 고정
         if f > 12:
             return None
 
@@ -92,8 +91,11 @@ class Player_Sword():
         self.frame = int(getattr(player, 'player_frame', self.frame))
         self.face_dir = int(getattr(player, 'player_face_dir', self.face_dir))
 
-        # 공격 프레임이 끝나면 게임 월드에서 제거
-        if self.frame >= 13:
+        # 공격 프레임이 끝나거나 플레이어가 공격 중이 아니거나 죽었으면 제거
+        is_attacking = getattr(player, 'player_is_attacking', False)
+        is_alive = getattr(player, 'player_is_alive', True)
+
+        if self.frame >= 13 or not is_attacking or not is_alive:
             game_world.remove_object(self)
 
     def do(self):

@@ -3,6 +3,7 @@ import game_framework
 import game_world
 import stage1_0
 import stage1_0_mode
+from player_sword import Player_Sword
 from state_machine import StateMachine
 from pico2d import *
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f, SDLK_SPACE
@@ -28,6 +29,7 @@ player_frame = 0
 player_face_dir = 0
 player_hp = 100
 player_is_alive = True
+player_is_attacking = False
 player_plate_id = 'normalplate'
 player_weapon_id = 'goldsword'
 
@@ -176,10 +178,12 @@ class Walk:
 class Attack:
     def __init__(self, player):
         self.player = player
+        self.player_sword = None # 검 객체 참조 저장
 
     def enter(self, e):
-        from player_sword import Player_Sword
         self.player.is_attacking = True
+        global player_is_attacking
+        player_is_attacking = True
         self.player.attack_start_time = time.time()
         self.player.frame = 0
 
@@ -197,10 +201,13 @@ class Attack:
 
     def exit(self, e):
         self.player.is_attacking = False
+        self.player.frame = 0
 
-        # 공격이 끝나면 Player_Sword 객체를 게임 월드에서 제거
-        if hasattr(self, 'player_sword'):
-            game_world.remove_object(self.player_sword)
+        global player_frame, player_is_attacking
+        player_frame = 0
+        player_is_attacking = False
+
+        self.player_sword = None
 
     def do(self):
         if check_weapon() is 'none':
