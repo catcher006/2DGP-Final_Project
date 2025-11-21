@@ -106,15 +106,16 @@ def pause():
 
     # 기존 saved_mobs 초기화 후 현재 살아있는 몹만 저장
     stage1_4.saved_mobs = []
-    if slime_boss.is_alive:
+    if slime_boss is not None and slime_boss.is_alive:
         stage1_4.saved_mobs.append({
             'x': slime_boss.x,
             'y': slime_boss.y,
             'hp': slime_boss.hp,
             'frame': slime_boss.frame
         })
+        print(f"Pause: Saved boss (hp: {slime_boss.hp})")
     else:
-        slime_boss = None
+        print("Pause: No boss to save")
 
     # 코인 저장
     stage1_4.saved_coins = []
