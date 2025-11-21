@@ -335,6 +335,26 @@ class Slime_Boss:
                 # 디버그 출력 (선택사항)
                 print(f"slime_mob damaged! HP: {self.hp}")
 
+        elif group == 'player_arrow:slime_boss' and self.is_alive:
+            current_time = time.time()
+
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                if player_weapon_id == 'normalbow':
+                    self.hp -= 10
+                elif player_weapon_id == 'silverbow':
+                    self.hp -= 20
+                elif player_weapon_id == 'goldbow':
+                    self.hp -= 30
+                self.last_damage_time = current_time
+
+                if self.hp <= 0:
+                    self.hp = 0
+                    self.is_alive = False
+                    self.state_machine.handle_state_event(('DIE', None))
+                    print("slime_mob is dead!")
+
+                print(f"slime_mob damaged by arrow! HP: {self.hp}")
+
         elif group == 'player:slime_boss' and self.is_alive:
             # 넉백 방향 계산
             dx = self.x - other.x

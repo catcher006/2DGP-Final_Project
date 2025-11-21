@@ -2,6 +2,7 @@ import time
 import game_framework
 import game_world
 from player_sword import Player_Sword
+from player_arrow import Player_Arrow
 from stage1_0 import Stage1_0
 from stage1_1 import Stage1_1
 from stage1_2 import Stage1_2
@@ -37,7 +38,7 @@ player_hp = 100
 player_is_alive = True
 player_is_attacking = False
 player_plate_id = 'normalplate'
-player_weapon_id = 'goldsword'
+player_weapon_id = 'goldbow'
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -193,26 +194,51 @@ class Attack:
         self.player.attack_start_time = time.time()
         self.player.frame = 0
 
-        # 공격 시작할 때 Player_Sword 객체를 생성하고 게임 월드에 추가
-        self.player_sword = Player_Sword()
-        game_world.add_object(self.player_sword, 2)
+        if check_weapon() == 'sword':
 
-        # 충돌 그룹에 추가
-        if Stage1_0.current_mode or Stage1_1.current_mode or Stage1_2.current_mode or Stage1_3.current_mode or Stage1_5.current_mode or Stage1_6.current_mode or Stage1_7.current_mode:
-            game_world.add_collision_pair('player_sword:slime_mob', self.player_sword, None)
-            # 기존 슬라임들과 충돌 페어 추가
-            for layer in game_world.world:
-                for obj in layer:
-                    if hasattr(obj, 'handle_collision') and 'slime' in str(type(obj)).lower():
-                        game_world.add_collision_pair('player_sword:slime_mob', None, obj)
+            # 공격 시작할 때 Player_Sword 객체를 생성하고 게임 월드에 추가
+            self.player_sword = Player_Sword()
+            game_world.add_object(self.player_sword, 2)
 
-        elif Stage1_4.current_mode:
-            game_world.add_collision_pair('player_sword:slime_boss', self.player_sword, None)
-            # 기존 슬라임 보스와 충돌 페어 추가
-            for layer in game_world.world:
-                for obj in layer:
-                    if hasattr(obj, 'handle_collision') and 'slime_boss' in str(type(obj)).lower():
-                        game_world.add_collision_pair('player_sword:slime_boss', None, obj)
+            # 충돌 그룹에 추가
+            if Stage1_0.current_mode or Stage1_1.current_mode or Stage1_2.current_mode or Stage1_3.current_mode or Stage1_5.current_mode or Stage1_6.current_mode or Stage1_7.current_mode:
+                game_world.add_collision_pair('player_sword:slime_mob', self.player_sword, None)
+                # 기존 슬라임들과 충돌 페어 추가
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'slime' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player_sword:slime_mob', None, obj)
+
+            elif Stage1_4.current_mode:
+                game_world.add_collision_pair('player_sword:slime_boss', self.player_sword, None)
+                # 기존 슬라임 보스와 충돌 페어 추가
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'slime_boss' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player_sword:slime_boss', None, obj)
+
+        elif check_weapon() == 'bow':
+            from player_arrow import Player_Arrow
+            from stage1_0 import Stage1_0
+            from stage1_4 import Stage1_4
+
+            player_arrow = Player_Arrow()
+            game_world.add_object(player_arrow, 2)
+
+            # 충돌 페어 추가
+            if Stage1_0.current_mode or Stage1_1.current_mode or Stage1_2.current_mode or Stage1_3.current_mode or Stage1_5.current_mode or Stage1_6.current_mode or Stage1_7.current_mode:
+                game_world.add_collision_pair('player_arrow:slime_mob', player_arrow, None)
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'slime' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player_arrow:slime_mob', None, obj)
+
+            elif Stage1_4.current_mode:
+                game_world.add_collision_pair('player_arrow:slime_boss', player_arrow, None)
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'slime_boss' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player_arrow:slime_boss', None, obj)
 
     def exit(self, e):
         self.player.is_attacking = False
