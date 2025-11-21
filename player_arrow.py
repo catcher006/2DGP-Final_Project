@@ -69,7 +69,7 @@ class Player_Arrow:
 
             # 최대 거리를 넘거나 화면 밖으로 나가면 제거
             if self.distance_traveled >= self.max_distance or \
-                    self.x < 85 or self.x > 990 or self.y < 60 or self.y > 520:
+                    self.x < 85 or self.x > 990 or self.y < 60 or self.y > 540:
                 game_world.remove_object(self)
 
         # 공격이 끝나면 (프레임 13) 아직 발사 안됐으면 제거
