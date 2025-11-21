@@ -73,31 +73,24 @@ class Dead:
         if self.played:
             # 애니메이션이 끝났고 아직 코인 생성/삭제가 되지 않았으면 처리
             if not self.spawned:
-                # 몹이 죽을 때 코인 생성
-                coin = Coin()
-                coin.x = self.boss_mob.x
-                coin.y = self.boss_mob.y
+                # 보스가 죽을 때 8개의 코인 생성
+                coin_positions = [
+                    (self.boss_mob.x, self.boss_mob.y + 30), (self.boss_mob.x - 30, self.boss_mob.y),
+                    (self.boss_mob.x + 30, self.boss_mob.y), (self.boss_mob.x, self.boss_mob.y - 30)
+                ]
 
-                if Stage1_0.current_mode:
-                    stage1_0_mode.coins.append(coin)
-                elif Stage1_1.current_mode:
-                    stage1_1_mode.coins.append(coin)
-                elif Stage1_2.current_mode:
-                    stage1_2_mode.coins.append(coin)
-                elif Stage1_3.current_mode:
-                    stage1_3_mode.coins.append(coin)
-                elif Stage1_4.current_mode:
-                    stage1_4_mode.coins.append(coin)
-                elif Stage1_5.current_mode:
-                    stage1_5_mode.coins.append(coin)
-                elif Stage1_6.current_mode:
-                    stage1_6_mode.coins.append(coin)
-                elif Stage1_7.current_mode:
-                    stage1_7_mode.coins.append(coin)
+                for pos in coin_positions:
+                    coin = Coin()
+                    coin.x, coin.y = pos
+                    coin.frame = random.randint(0, 7)
 
-                game_world.add_object(coin, 2)
-                game_world.add_collision_pair('player:coin', None, coin)
-                print(f"Coin created at ({coin.x}, {coin.y})")
+                    if Stage1_4.current_mode:
+                        stage1_4_mode.coins.append(coin)
+
+                    game_world.add_object(coin, 2)
+                    game_world.add_collision_pair('player:coin', None, coin)
+
+                print(f"8 coins created around boss at ({self.boss_mob.x}, {self.boss_mob.y})")
 
                 game_world.remove_object(self.boss_mob)
 
@@ -205,8 +198,8 @@ class Slime_Boss:
 
         self.font = load_font('ENCR10B.TTF', 16)
 
-        self.x = random.randint(105,940)
-        self.y = random.randint(85,540)
+        self.x = random.randint(155,890)
+        self.y = random.randint(135,490)
 
         self.frame = random.randint(0,5)
         self.is_move = True

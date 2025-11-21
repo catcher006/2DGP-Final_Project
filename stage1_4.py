@@ -14,7 +14,7 @@ class Stage1_4:
         ]
 
         self.mob_paths = [
-            {'type': 'rect', 'min_x': 105, 'max_x': 940, 'min_y': 85, 'max_y': 540},  # 기본 이동 구역
+            {'type': 'rect', 'min_x': 155, 'max_x': 890, 'min_y': 135, 'max_y': 490},  # 기본 이동 구역
         ]
 
         self.image = load_image("./image/background/stage1/4.png")
