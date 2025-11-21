@@ -113,6 +113,8 @@ def pause():
             'hp': slime_boss.hp,
             'frame': slime_boss.frame
         })
+    else:
+        slime_boss = None
 
     # 코인 저장
     stage1_4.saved_coins = []

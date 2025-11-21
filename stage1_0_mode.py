@@ -8,7 +8,12 @@ import stage1_1_mode
 import stage1_3_mode
 from stage1_0 import Stage1_0
 from stage1_1 import Stage1_1
+from stage1_2 import Stage1_2
 from stage1_3 import Stage1_3
+from stage1_4 import Stage1_4
+from stage1_5 import Stage1_5
+from stage1_6 import Stage1_6
+from stage1_7 import Stage1_7
 from player import Player
 from slime_mob import Slime_Mob
 from coin import Coin
@@ -27,6 +32,19 @@ def handle_events():
             continue
         elif event.type == SDL_KEYDOWN and event.key == SDLK_f:
             if 500 <= player.x <=  550 and 580 <= player.y <= 600: # 상단 문 (메인 던전으로 가는 문)
+                if Stage1_4.boss_cleared:
+                    Stage1_0.current_mode = False
+                    Stage1_0.stage1_0_create = False
+                    Stage1_1.stage1_1_create = False
+                    Stage1_2.stage1_2_create = False
+                    Stage1_3.stage1_3_create = False
+                    Stage1_4.stage1_4_create = False
+                    Stage1_5.stage1_5_create = False
+                    Stage1_6.stage1_6_create = False
+                    Stage1_7.stage1_7_create = False
+                    Stage1_4.boss_cleared = False
+                    game_framework.clear_stage1_modes((240, 400))
+
                 game_framework.pop_mode(dungeonmain_mode,(240, 400))
             elif 990 <= player.x <=  1010 and 270 <= player.y <= 370: # 우측 문
                 if not Stage1_1.stage1_1_create:

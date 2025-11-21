@@ -4,6 +4,7 @@ class Stage1_4:
 
     stage1_4_create = False
     current_mode = False
+    boss_cleared = False # 보스 처치 여부 플래그
 
     def __init__(self):
         self.paths = [
