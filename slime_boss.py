@@ -196,7 +196,9 @@ class Slime_Boss:
         self.idle_image = load_image("./image/mobs/slime_boss/slime_boss_jump.png")
         self.dead_image = load_image("./image/mobs/slime_boss/slime_boss_dead.png")
 
-        self.font = load_font('ENCR10B.TTF', 16)
+        self.hp_image = load_image("./image/ui/mobs/slime_boss/boss_slime_hp.png")
+
+        self.font = load_font('ENCR10B.TTF', 10)
 
         self.x = random.randint(155,890)
         self.y = random.randint(135,490)
@@ -247,7 +249,14 @@ class Slime_Boss:
         self.state_machine.draw()
 
         if self.is_alive or self.hp > 0:
-            self.font.draw(self.x - 35, self.y + 40, f'hp: {self.hp:02d}', (255, 0, 0))
+            self.hp_image.clip_draw(0, self.hp // 5 * 66, 240, 66, self.x - 15, self.y + 65, 60, 11)
+            if self.hp > 100:
+                self.font.draw(self.x - 23, self.y + 65, f'{self.hp:02d}', (255, 255, 255))
+            elif self.hp == 100:
+                self.font.draw(self.x - 21, self.y + 65, '1', (255, 255, 255))
+                self.font.draw(self.x - 15, self.y + 65, '00', (255, 0, 0))
+            else:
+                self.font.draw(self.x - 21, self.y + 65, f'{self.hp:02d}', (255, 0, 0))
 
             draw_rectangle(*self.get_bb())
 
