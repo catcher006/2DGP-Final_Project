@@ -53,6 +53,7 @@ def init(player_start_pos=None):
 
     if not Stage1_0.stage1_0_create:
         Stage1_0.stage1_0_create = True
+        Stage1_0.current_mode = True
 
         slime_mobs = [Slime_Mob() for _ in range(random.randint(0, 2))]
         for slime_mob in slime_mobs:
@@ -105,6 +106,8 @@ def finish():
 def pause():
     global slime_mobs, stage1_0, coins
 
+    Stage1_0.current_mode = False
+
     # 기존 saved_mobs 초기화 후 현재 살아있는 몹만 저장
     stage1_0.saved_mobs = []
     for slime_mob in slime_mobs:
@@ -134,6 +137,8 @@ def pause():
 
 def resume(player_start_pos=None):
     global slime_mobs, stage1_0, player, coins
+
+    Stage1_0.current_mode = True
 
     if player_start_pos:
         player.x, player.y = player_start_pos

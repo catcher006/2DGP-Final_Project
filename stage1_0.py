@@ -3,6 +3,7 @@ from pico2d import load_image
 class Stage1_0:
 
     stage1_0_create = False  # 방 생성 여부 플래그
+    current_mode = False # 현재 모드 확인 플래그
 
     def __init__(self):
         self.paths = [

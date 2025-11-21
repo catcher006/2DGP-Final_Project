@@ -2,7 +2,16 @@ import time
 import game_world
 import game_framework
 import random
-import stage1_0_mode
+import stage1_0_mode, stage1_1_mode, stage1_2_mode, stage1_3_mode
+import stage1_4_mode, stage1_5_mode, stage1_6_mode, stage1_7_mode
+from stage1_0 import Stage1_0
+from stage1_1 import Stage1_1
+from stage1_2 import Stage1_2
+from stage1_3 import Stage1_3
+from stage1_4 import Stage1_4
+from stage1_5 import Stage1_5
+from stage1_6 import Stage1_6
+from stage1_7 import Stage1_7
 from player import player_weapon_id
 from state_machine import StateMachine
 from coin import Coin
@@ -68,7 +77,10 @@ class Dead:
                 coin = Coin()
                 coin.x = self.mob.x
                 coin.y = self.mob.y
-                stage1_0_mode.coins.append(coin)
+                if Stage1_0.current_mode:
+                    stage1_0_mode.coins.append(coin)
+                elif Stage1_1.current_mode:
+                    stage1_1_mode.coins.append(coin)
                 game_world.add_object(coin, 2)
                 game_world.add_collision_pair('player:coin', None, coin)
                 print(f"Coin created at ({coin.x}, {coin.y})")
@@ -222,16 +234,22 @@ class Slime_Mob:
 
     def draw(self):
         self.state_machine.draw()
-        if self.mob_type == 'Green':
-            self.font.draw(self.x - 35, self.y + 40, f'hp: {self.hp:02d}', (0, 255, 0))
-        elif self.mob_type == 'Blue':
-            self.font.draw(self.x - 35, self.y + 40, f'hp: {self.hp:02d}', (0, 0, 255))
-        elif self.mob_type == 'Yellow':
-            self.font.draw(self.x - 35, self.y + 40, f'hp: {self.hp:02d}', (255, 255, 0))
-        draw_rectangle(*self.get_bb())
+
+        if self.is_alive or self.hp > 0:
+            if self.mob_type == 'Green':
+                self.font.draw(self.x - 35, self.y + 40, f'hp: {self.hp:02d}', (0, 255, 0))
+            elif self.mob_type == 'Blue':
+                self.font.draw(self.x - 35, self.y + 40, f'hp: {self.hp:02d}', (0, 0, 255))
+            elif self.mob_type == 'Yellow':
+                self.font.draw(self.x - 35, self.y + 40, f'hp: {self.hp:02d}', (255, 255, 0))
+
+            draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         frame = int(self.frame)  # frame을 정수로 변환
+
+        if not self.is_alive or self.hp <= 0:
+            return None
 
         if frame == 0:
             return self.x - 45, self.y - 30, self.x + 30, self.y + 15
