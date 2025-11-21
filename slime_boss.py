@@ -318,11 +318,11 @@ class Slime_Boss:
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
                 if player_weapon_id == 'normalsword':
-                    self.hp -= 10
-                elif player_weapon_id == 'silversword':
                     self.hp -= 20
+                elif player_weapon_id == 'silversword':
+                    self.hp -= 50
                 elif player_weapon_id == 'goldsword':
-                    self.hp -= 30
+                    self.hp -= 100
                 self.last_damage_time = current_time
 
                 if self.hp <= 0:
@@ -340,11 +340,11 @@ class Slime_Boss:
 
             if current_time - self.last_damage_time >= self.damage_cooldown:
                 if player_weapon_id == 'normalbow':
-                    self.hp -= 10
-                elif player_weapon_id == 'silverbow':
                     self.hp -= 20
+                elif player_weapon_id == 'silverbow':
+                    self.hp -= 50
                 elif player_weapon_id == 'goldbow':
-                    self.hp -= 30
+                    self.hp -= 100
                 self.last_damage_time = current_time
 
                 if self.hp <= 0:
