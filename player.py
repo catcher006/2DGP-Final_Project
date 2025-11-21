@@ -313,9 +313,15 @@ class Player:
         self.is_attacking = False  # 공격 상태
         self.attack_start_time = 0  # 공격 시작 시간
 
-        # 데미지 관련 추가
+        # 데미지 관련
         self.last_damage_time = 0
         self.damage_cooldown = TIME_PER_ACTION * 3
+
+        # 넉백 관련
+        self.is_knocked_back = False
+        self.knockback_distance = 0
+        self.knockback_dx = 0
+        self.knockback_dy = 0
 
         # 상태들 생성
         self.IDLE = Idle(self)
@@ -351,6 +357,23 @@ class Player:
             return self.x - 18, self.y - 47, self.x + 15, self.y + 25
 
     def update(self):
+        # 넉백 중이면 넉백 처리
+        if self.is_knocked_back:
+            if self.knockback_distance > 0:
+                # 이동 가능한 위치인지 확인
+                new_x = self.x + self.knockback_dx
+                new_y = self.y + self.knockback_dy
+
+                if self.can_move_to(new_x, new_y):
+                    self.x = new_x
+                    self.y = new_y
+
+                self.knockback_distance -= 1
+            else:
+                self.is_knocked_back = False
+                self.knockback_dx = 0
+                self.knockback_dy = 0
+
         self.state_machine.update()
 
     def handle_event(self, event):
@@ -399,6 +422,22 @@ class Player:
                 player_hp -= 10
                 self.last_damage_time = current_time
 
+                # 넉백 방향 계산 (플레이어 -> 슬라임의 반대 방향)
+                dx = self.x - other.x
+                dy = self.y - other.y
+                distance = (dx ** 2 + dy ** 2) ** 0.5
+
+                if distance > 0:
+                    # 정규화된 방향 벡터
+                    nx = dx / distance
+                    ny = dy / distance
+
+                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
+                    self.is_knocked_back = True
+                    self.knockback_distance = 20
+                    self.knockback_dx = nx * 3.0
+                    self.knockback_dy = ny * 3.0
+
                 if player_hp <= 0:
                     player_is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
@@ -417,6 +456,21 @@ class Player:
             if current_time - self.last_damage_time >= self.damage_cooldown:
                 player_hp -= 20
                 self.last_damage_time = current_time
+
+                # 보스와 충돌 시 넉백 (더 강한 넉백)
+                dx = self.x - other.x
+                dy = self.y - other.y
+                distance = (dx ** 2 + dy ** 2) ** 0.5
+
+                if distance > 0:
+                    nx = dx / distance
+                    ny = dy / distance
+
+                    # 보스는 넉백이 더 강함
+                    self.is_knocked_back = True
+                    self.knockback_distance = 30
+                    self.knockback_dx = nx * 6.0
+                    self.knockback_dy = ny * 6.0
 
                 if player_hp <= 0:
                     player_hp = 0
