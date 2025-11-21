@@ -315,7 +315,7 @@ class Player:
 
         # 데미지 관련
         self.last_damage_time = 0
-        self.damage_cooldown = TIME_PER_ACTION * 3
+        self.damage_cooldown = TIME_PER_ACTION * 1
 
         # 넉백 관련
         self.is_knocked_back = False
@@ -367,6 +367,10 @@ class Player:
                 if self.can_move_to(new_x, new_y):
                     self.x = new_x
                     self.y = new_y
+
+                    global player_x, player_y
+                    player_x = self.x
+                    player_y = self.y
 
                 self.knockback_distance -= 1
             else:
@@ -435,8 +439,8 @@ class Player:
                     # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
                     self.is_knocked_back = True
                     self.knockback_distance = 20
-                    self.knockback_dx = nx * 3.0
-                    self.knockback_dy = ny * 3.0
+                    self.knockback_dx = nx * 1.0
+                    self.knockback_dy = ny * 1.0
 
                 if player_hp <= 0:
                     player_is_alive = False
@@ -469,8 +473,8 @@ class Player:
                     # 보스는 넉백이 더 강함
                     self.is_knocked_back = True
                     self.knockback_distance = 30
-                    self.knockback_dx = nx * 6.0
-                    self.knockback_dy = ny * 6.0
+                    self.knockback_dx = nx * 3.0
+                    self.knockback_dy = ny * 3.0
 
                 if player_hp <= 0:
                     player_hp = 0

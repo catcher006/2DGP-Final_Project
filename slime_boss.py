@@ -339,6 +339,6 @@ class Slime_Boss:
 
                 # 넉백 설정
                 self.is_knocked_back = True
-                self.knockback_distance = 15
-                self.knockback_dx = nx * 6.0
-                self.knockback_dy = ny * 6.0
+                self.knockback_distance = 30
+                self.knockback_dx = nx * 1.5
+                self.knockback_dy = ny * 1.5

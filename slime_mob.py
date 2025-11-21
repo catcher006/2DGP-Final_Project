@@ -353,5 +353,5 @@ class Slime_Mob:
                 # 넉백 설정
                 self.is_knocked_back = True
                 self.knockback_distance = 20
-                self.knockback_dx = nx * 3.0
-                self.knockback_dy = ny * 3.0
+                self.knockback_dx = nx * 1.0
+                self.knockback_dy = ny * 1.0
