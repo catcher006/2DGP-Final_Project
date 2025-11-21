@@ -205,7 +205,11 @@ class Slime_Mob:
         self.idle_image = load_image("./image/mobs/slime/" + self.mob_type + "_Slime_Jump.png")
         self.dead_image = load_image("./image/mobs/slime/" + self.mob_type + "_Slime_Dead.png")
 
-        self.font = load_font('ENCR10B.TTF', 16)
+        self.hp_green_image = load_image("./image/ui/mobs/slime/green_slime_hp.png")
+        self.hp_blue_image = load_image("./image/ui/mobs/slime/blue_slime_hp.png")
+        self.hp_yellow_image = load_image("./image/ui/mobs/slime/yellow_slime_hp.png")
+
+        self.font = load_font('ENCR10B.TTF', 10)
 
         self.x = random.randint(105,940)
         self.y = random.randint(85,540)
@@ -257,11 +261,38 @@ class Slime_Mob:
 
         if self.is_alive or self.hp > 0:
             if self.mob_type == 'Green':
-                self.font.draw(self.x - 35, self.y + 40, f'hp: {self.hp:02d}', (0, 255, 0))
+                self.hp_green_image.clip_draw(0, self.hp // 5 * 66, 240, 66, self.x - 5, self.y + 35, 60, 11)
+                if self.hp >= 100:
+                    self.font.draw(self.x - 13, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
+                elif 50 < self.hp < 100:
+                    self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
+                elif self.hp == 50:
+                    self.font.draw(self.x - 11, self.y + 35, '5', (255, 255, 255))
+                    self.font.draw(self.x - 5, self.y + 35, '0', (0, 255, 0))
+                else:
+                    self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (0, 255, 0))
             elif self.mob_type == 'Blue':
-                self.font.draw(self.x - 35, self.y + 40, f'hp: {self.hp:02d}', (0, 0, 255))
+                self.hp_blue_image.clip_draw(0, self.hp // 5 * 66, 240, 66, self.x - 5, self.y + 35, 60, 11)
+                if self.hp >= 100:
+                    self.font.draw(self.x - 13, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
+                elif 50 < self.hp < 100:
+                    self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
+                elif self.hp == 50:
+                    self.font.draw(self.x - 11, self.y + 35, '5', (255, 255, 255))
+                    self.font.draw(self.x - 5, self.y + 35, '0', (0, 0, 255))
+                else:
+                    self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (0, 0, 255))
             elif self.mob_type == 'Yellow':
-                self.font.draw(self.x - 35, self.y + 40, f'hp: {self.hp:02d}', (255, 255, 0))
+                self.hp_yellow_image.clip_draw(0, self.hp // 5 * 66, 240, 66, self.x - 5, self.y + 35, 60, 11)
+                if self.hp >= 100:
+                    self.font.draw(self.x - 13, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
+                elif 50 < self.hp < 100:
+                    self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
+                elif self.hp == 50:
+                    self.font.draw(self.x - 11, self.y + 35, '5', (255, 255, 255))
+                    self.font.draw(self.x - 5, self.y + 35, '0', (255, 255, 0))
+                else:
+                    self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (255, 255, 0))
 
             draw_rectangle(*self.get_bb())
 
