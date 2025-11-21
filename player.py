@@ -287,8 +287,9 @@ class Player:
         elif check_weapon() is 'bow':
             self.load_bow_images()
         self.load_combat_idle_images()
+        self.hp_image = load_image('./image/ui/player_hp.png')
 
-        self.font = load_font('ENCR10B.TTF', 16)
+        self.font = load_font('ENCR10B.TTF', 10)
 
         self.x = 510
         self.y = 160
@@ -343,7 +344,13 @@ class Player:
 
     def draw(self):
         self.state_machine.draw()
-        self.font.draw(self.x - 35, self.y + 40, f'hp: {player_hp:02d}', (255, 0, 255))
+        self.hp_image.clip_draw(0, player_hp // 5 * 66, 240, 66, self.x, self.y + 45, 60, 11)
+        if player_hp >= 100: self.font.draw(self.x - 8, self.y + 45, f'{player_hp:02d}', (255, 255, 255))
+        elif 50 < player_hp < 100: self.font.draw(self.x - 6, self.y + 45, f'{player_hp:02d}', (255, 255, 255))
+        elif player_hp == 50:
+            self.font.draw(self.x - 6, self.y + 45, '5', (255, 255, 255))
+            self.font.draw(self.x, self.y + 45, '0', (255, 0, 255))
+        else: self.font.draw(self.x - 6, self.y + 45, f'{player_hp:02d}', (255, 0, 255))
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
