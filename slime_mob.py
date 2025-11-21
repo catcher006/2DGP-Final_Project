@@ -222,12 +222,18 @@ class Slime_Mob:
         # 이동 검사 콜백: 모드가 주입
         self.move_validator = None
 
-        self.hp = 100  # 체력 추가
-        self.is_alive = True  # 생존 상태 추가
+        self.hp = 100  # 체력
+        self.is_alive = True  # 생존 상태
 
-        # 데미지 관련 추가
+        # 데미지 관련
         self.last_damage_time = 0
         self.damage_cooldown = TIME_PER_ACTION
+
+        # 넉백 관련
+        self.is_knocked_back = False
+        self.knockback_distance = 0
+        self.knockback_dx = 0
+        self.knockback_dy = 0
 
         self.IDLE = Idle(self)
         self.MOVE = Move(self)
@@ -279,6 +285,23 @@ class Slime_Mob:
             return self.x - 48, self.y - 32, self.x + 35, self.y + 12
 
     def update(self):
+        # 넉백 중이면 넉백 처리
+        if self.is_knocked_back:
+            if self.knockback_distance > 0:
+                # 이동 가능한 위치인지 확인
+                new_x = self.x + self.knockback_dx
+                new_y = self.y + self.knockback_dy
+
+                if self.can_move_to(new_x, new_y):
+                    self.x = new_x
+                    self.y = new_y
+
+                self.knockback_distance -= 1
+            else:
+                self.is_knocked_back = False
+                self.knockback_dx = 0
+                self.knockback_dy = 0
+
         self.state_machine.update()
 
     def handle_event(self, event):
@@ -315,3 +338,20 @@ class Slime_Mob:
 
                 # 디버그 출력 (선택사항)
                 print(f"slime_mob damaged! HP: {self.hp}")
+
+        elif group == 'player:slime_mob' and self.is_alive:
+            # 넉백 방향 계산
+            dx = self.x - other.x
+            dy = self.y - other.y
+            distance = (dx ** 2 + dy ** 2) ** 0.5
+
+            if distance > 0:
+                # 정규화된 방향 벡터
+                nx = dx / distance
+                ny = dy / distance
+
+                # 넉백 설정
+                self.is_knocked_back = True
+                self.knockback_distance = 20
+                self.knockback_dx = nx * 3.0
+                self.knockback_dy = ny * 3.0
