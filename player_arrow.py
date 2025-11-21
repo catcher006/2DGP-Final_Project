@@ -32,7 +32,7 @@ class Player_Arrow:
 
         if player.player_weapon_id == 'normalbow':
             self.max_distance = 200
-        elif player.player_weapon_id == 'sliverbow':
+        elif player.player_weapon_id == 'silverbow':
             self.max_distance = 300
         elif player.player_weapon_id == 'goldbow':
             self.max_distance = 600
