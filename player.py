@@ -1,9 +1,15 @@
 import time
 import game_framework
 import game_world
-import stage1_0
-import stage1_0_mode
 from player_sword import Player_Sword
+from stage1_0 import Stage1_0
+from stage1_1 import Stage1_1
+from stage1_2 import Stage1_2
+from stage1_3 import Stage1_3
+from stage1_4 import Stage1_4
+from stage1_5 import Stage1_5
+from stage1_6 import Stage1_6
+from stage1_7 import Stage1_7
 from state_machine import StateMachine
 from pico2d import *
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f, SDLK_SPACE
@@ -192,12 +198,21 @@ class Attack:
         game_world.add_object(self.player_sword, 2)
 
         # 충돌 그룹에 추가
-        game_world.add_collision_pair('player_sword:slime_mob', self.player_sword, None)
-        # 기존 슬라임들과 충돌 페어 추가
-        for layer in game_world.world:
-            for obj in layer:
-                if hasattr(obj, 'handle_collision') and 'slime' in str(type(obj)).lower():
-                    game_world.add_collision_pair('player_sword:slime_mob', None, obj)
+        if Stage1_0.current_mode or Stage1_1.current_mode or Stage1_2.current_mode or Stage1_3.current_mode or Stage1_5.current_mode or Stage1_6.current_mode or Stage1_7.current_mode:
+            game_world.add_collision_pair('player_sword:slime_mob', self.player_sword, None)
+            # 기존 슬라임들과 충돌 페어 추가
+            for layer in game_world.world:
+                for obj in layer:
+                    if hasattr(obj, 'handle_collision') and 'slime' in str(type(obj)).lower():
+                        game_world.add_collision_pair('player_sword:slime_mob', None, obj)
+
+        elif Stage1_4.current_mode:
+            game_world.add_collision_pair('player_sword:slime_boss', self.player_sword, None)
+            # 기존 슬라임 보스와 충돌 페어 추가
+            for layer in game_world.world:
+                for obj in layer:
+                    if hasattr(obj, 'handle_collision') and 'slime_boss' in str(type(obj)).lower():
+                        game_world.add_collision_pair('player_sword:slime_boss', None, obj)
 
     def exit(self, e):
         self.player.is_attacking = False
@@ -361,8 +376,6 @@ class Player:
                 else:  # 움직임
                     self.state_machine.handle_state_event(('RUN', None))
         else:
-            from stage1_0 import Stage1_0
-
             # 공격키일 때 현재 공격 가능 여부 확인
             if space_down(('INPUT', event)) and not Stage1_0.stage1_0_create:
                 return
@@ -395,3 +408,20 @@ class Player:
 
         elif group == 'player:coin':
             pass
+
+        elif group == 'player:slime_boss' and player_is_alive:
+            current_time = time.time()
+
+            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                player_hp -= 20
+                self.last_damage_time = current_time
+
+                if player_hp <= 0:
+                    player_hp = 0
+                    player_is_alive = False
+                    self.state_machine.handle_state_event(('DIE', None))
+                    print("Player is dead!")
+
+                # 디버그 출력 (선택사항)
+                print(f"Player damaged! HP: {player_hp}")

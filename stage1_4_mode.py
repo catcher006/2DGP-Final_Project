@@ -9,7 +9,7 @@ from stage1_4 import Stage1_4
 from stage1_5 import Stage1_5
 from stage1_7 import Stage1_7
 from player import Player
-from slime_mob import Slime_Mob
+from slime_boss import Slime_Boss
 from coin import Coin
 from ui import Ui
 
@@ -39,7 +39,7 @@ def handle_events():
             player.handle_event(event)
 
 def init(player_start_pos=None):
-    global world, slime_mobs, coins
+    global world, slime_boss, coins
     global stage1_4
     global player
 
@@ -52,13 +52,12 @@ def init(player_start_pos=None):
         Stage1_4.stage1_4_create = True
         Stage1_4.current_mode = True
 
-        slime_mobs = [Slime_Mob() for _ in range(random.randint(0, 2))]
-        for slime_mob in slime_mobs:
-            slime_mob.move_validator = stage1_4.is_mob_walkable
+        slime_boss = Slime_Boss()
+        slime_boss.move_validator = stage1_4.is_mob_walkable
 
         coins = []
     else:
-        slime_mobs = []
+        slime_boss = None
         coins = []
 
     game_world.add_object(stage1_4, 0)
@@ -74,11 +73,10 @@ def init(player_start_pos=None):
     game_world.add_collision_pair('player:coin', player, None)
 
     # 첫 방문 시에만 몹 추가
-    if slime_mobs:
-        game_world.add_objects(slime_mobs, 2)
-        game_world.add_collision_pair('player:slime_mob', player, None)
-        for slime_mob in slime_mobs:
-            game_world.add_collision_pair('player:slime_mob', None, slime_mob)
+    if slime_boss:
+        game_world.add_object(slime_boss, 2)
+        game_world.add_collision_pair('player:slime_boss', player, None)
+        game_world.add_collision_pair('player:slime_boss', None, slime_boss)
 
     if coins:
         game_world.add_objects(coins, 2)
@@ -102,21 +100,19 @@ def finish():
     game_world.clear()
 
 def pause():
-    global slime_mobs, stage1_4, coins
+    global slime_boss, stage1_4, coins
 
     Stage1_4.current_mode = False
 
     # 기존 saved_mobs 초기화 후 현재 살아있는 몹만 저장
     stage1_4.saved_mobs = []
-    for slime_mob in slime_mobs:
-        if slime_mob.is_alive:
-            stage1_4.saved_mobs.append({
-                'type': slime_mob.mob_type,
-                'x': slime_mob.x,
-                'y': slime_mob.y,
-                'hp': slime_mob.hp,
-                'frame': slime_mob.frame
-            })
+    if slime_boss.is_alive:
+        stage1_4.saved_mobs.append({
+            'x': slime_boss.x,
+            'y': slime_boss.y,
+            'hp': slime_boss.hp,
+            'frame': slime_boss.frame
+        })
 
     # 코인 저장
     stage1_4.saved_coins = []
@@ -127,14 +123,14 @@ def pause():
             'frame': coin.frame
         })
 
-    print(f"Pause: Saved {len(stage1_4.saved_mobs)} slime mobs, {len(stage1_4.saved_coins)} coins")
+    print(f"Pause: Saved boss (alive: {slime_boss.is_alive if slime_boss else False}), {len(stage1_4.saved_coins)} coins")
 
     game_world.clear()
     game_world.collision_pairs.clear()
 
 
 def resume(player_start_pos=None):
-    global slime_mobs, stage1_4, player, coins
+    global slime_boss, stage1_4, player, coins
 
     Stage1_4.current_mode = True
 
@@ -144,32 +140,24 @@ def resume(player_start_pos=None):
     game_world.add_object(stage1_4, 0)
     game_world.add_object(player, 2)
 
-    # stage1_4 인스턴스에 저장된 몹 복원
+    # 저장된 보스 복원
     if stage1_4.saved_mobs:
-        slime_mobs = []
-        for mob_data in stage1_4.saved_mobs:
-            slime_mob = Slime_Mob()
-            slime_mob.mob_type = mob_data['type']
-            slime_mob.x = mob_data['x']
-            slime_mob.y = mob_data['y']
-            slime_mob.hp = mob_data['hp']
-            slime_mob.frame = mob_data['frame']
-            slime_mob.move_validator = stage1_4.is_mob_walkable
+        mob_data = stage1_4.saved_mobs[0]  # 보스는 1마리만
+        slime_boss = Slime_Boss()
+        slime_boss.x = mob_data['x']
+        slime_boss.y = mob_data['y']
+        slime_boss.hp = mob_data['hp']
+        slime_boss.frame = mob_data['frame']
+        slime_boss.move_validator = stage1_4.is_mob_walkable
 
-            slime_mob.move_image = load_image("./image/mobs/slime/" + slime_mob.mob_type + "_Slime_Jump.png")
-            slime_mob.idle_image = load_image("./image/mobs/slime/" + slime_mob.mob_type + "_Slime_Jump.png")
-            slime_mob.dead_image = load_image("./image/mobs/slime/" + slime_mob.mob_type + "_Slime_Dead.png")
+        game_world.add_object(slime_boss, 2)
+        game_world.add_collision_pair('player:slime_boss', player, None)
+        game_world.add_collision_pair('player:slime_boss', None, slime_boss)
 
-            slime_mobs.append(slime_mob)
-
-        game_world.add_objects(slime_mobs, 2)
-        game_world.add_collision_pair('player:slime_mob', player, None)
-        for slime_mob in slime_mobs:
-            game_world.add_collision_pair('player:slime_mob', None, slime_mob)
-
-        print(f"Resume: Restored {len(slime_mobs)} slime mobs")
+        print(f"Resume: Restored boss")
     else:
-        print("Resume: No saved mobs to restore")
+        slime_boss = None
+        print("Resume: No saved boss to restore")
 
     # 코인 복원
     if stage1_4.saved_coins:
@@ -187,9 +175,9 @@ def resume(player_start_pos=None):
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
 
-        print(f"Resume: Restored {len(slime_mobs)} slime mobs, {len(coins)} coins")
+        print(f"Resume: Restored {len(coins)} coins")
     else:
-        print(f"Resume: Restored {len(slime_mobs)} slime mobs, 0 coins")
+        print(f"Resume: 0 coins")
 
     ui = Ui()
     game_world.add_object(ui, 4)

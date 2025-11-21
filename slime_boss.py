@@ -27,7 +27,7 @@ RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
 # By Action Speed
-TIME_PER_ACTION = 0.5
+TIME_PER_ACTION = 0.75
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 8
 
@@ -115,7 +115,7 @@ class Dead:
             self.boss_mob.frame = new_frame
 
     def draw(self):
-        self.boss_mob.dead_image.clip_draw(int(self.boss_mob.frame) * 30, 0, 30, 26, self.boss_mob.x, self.boss_mob.y, 96, 62)
+        self.boss_mob.dead_image.clip_draw(int(self.boss_mob.frame) * 30, 0, 30, 26, self.boss_mob.x, self.boss_mob.y, 192, 124)
 
 class Idle:
     def __init__(self, boss_mob):
@@ -150,7 +150,7 @@ class Idle:
         self.boss_mob.frame = (self.boss_mob.frame + delta) % 6
 
     def draw(self):
-        self.boss_mob.idle_image.clip_draw(int(self.boss_mob.frame) * 48, 0, 48, 31, self.boss_mob.x, self.boss_mob.y, 96, 62)
+        self.boss_mob.idle_image.clip_draw(int(self.boss_mob.frame) * 48, 0, 48, 31, self.boss_mob.x, self.boss_mob.y, 192, 124)
 
 class Move:
     def __init__(self, boss_mob):
@@ -195,7 +195,7 @@ class Move:
             self.boss_mob.y = new_y
 
     def draw(self):
-        self.boss_mob.move_image.clip_draw(int(self.boss_mob.frame) * 48, 0, 48, 31, self.boss_mob.x, self.boss_mob.y, 96, 62)
+        self.boss_mob.move_image.clip_draw(int(self.boss_mob.frame) * 48, 0, 48, 31, self.boss_mob.x, self.boss_mob.y, 192, 124)
 
 class Slime_Boss:
     def __init__(self):
@@ -259,17 +259,17 @@ class Slime_Boss:
             return None
 
         if frame == 0:
-            return self.x - 45, self.y - 30, self.x + 30, self.y + 15
+            return self.x - 90, self.y - 60, self.x + 60, self.y + 30
         elif frame == 1:
-            return self.x - 45, self.y - 32, self.x + 30, self.y + 12
+            return self.x - 90, self.y - 64, self.x + 60, self.y + 24
         elif frame == 2:
-            return self.x - 38, self.y - 30, self.x + 25, self.y + 24
+            return self.x - 76, self.y - 60, self.x + 50, self.y + 48
         elif frame == 3:
-            return self.x - 38, self.y - 24, self.x + 25, self.y + 30
+            return self.x - 76, self.y - 48, self.x + 50, self.y + 60
         elif frame == 4:
-            return self.x - 38, self.y - 30, self.x + 25, self.y + 24
+            return self.x - 76, self.y - 60, self.x + 50, self.y + 48
         elif frame == 5:
-            return self.x - 48, self.y - 32, self.x + 35, self.y + 12
+            return self.x - 96, self.y - 64, self.x + 70, self.y + 24
 
     def update(self):
         self.state_machine.update()
@@ -287,7 +287,7 @@ class Slime_Boss:
         if not self.is_alive:
             return
 
-        if group == 'player_sword:slime_mob' and self.is_alive:
+        if group == 'player_sword:slime_boss' and self.is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
