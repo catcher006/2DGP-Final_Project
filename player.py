@@ -370,12 +370,12 @@ class Player:
 
     def draw(self):
         self.state_machine.draw()
-        self.hp_image.clip_draw(0, player_hp // 5 * 66, 240, 66, self.x, self.y + 45, 60, 11)
+        self.hp_image.clip_draw(0, int(player_hp) // 5 * 66, 240, 66, self.x, self.y + 45, 60, 11)
         if player_hp >= 100: self.font.draw(self.x - 8, self.y + 45, f'{player_hp:02d}', (255, 255, 255))
-        elif 50 < player_hp < 100: self.font.draw(self.x - 6, self.y + 45, f'{player_hp:02d}', (255, 255, 255))
-        elif player_hp == 50:
-            self.font.draw(self.x - 6, self.y + 45, '5', (255, 255, 255))
-            self.font.draw(self.x, self.y + 45, '0', (255, 0, 255))
+        elif 60 < player_hp < 100: self.font.draw(self.x - 6, self.y + 45, f'{player_hp:02d}', (255, 255, 255))
+        elif 40 <= player_hp <= 60:
+            self.font.draw(self.x - 6, self.y + 45, f'{player_hp // 10}', (255, 255, 255))
+            self.font.draw(self.x, self.y + 45, f'{player_hp % 10}', (255, 0, 255))
         else: self.font.draw(self.x - 6, self.y + 45, f'{player_hp:02d}', (255, 0, 255))
         draw_rectangle(*self.get_bb())
 
@@ -451,12 +451,21 @@ class Player:
     def handle_collision(self, group, other):
         global player_hp, player_is_alive
 
+        # 방어구에 따른 데미지 배율 설정
+        damage_multiplier = 1.0
+        if player_plate_id == 'normalplate':
+            damage_multiplier = 0.9
+        elif player_plate_id == 'silverplate':
+            damage_multiplier = 0.75
+        elif player_plate_id == 'goldplate':
+            damage_multiplier = 0.5
+
         if group == 'player:slime_mob' and player_is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= 10
+                player_hp -= int(10 * damage_multiplier)
                 self.last_damage_time = current_time
 
                 # 넉백 방향 계산 (플레이어 -> 슬라임의 반대 방향)
@@ -476,6 +485,7 @@ class Player:
                     self.knockback_dy = ny * 1.0
 
                 if player_hp <= 0:
+                    player_hp = 0
                     player_is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("Player is dead!")
