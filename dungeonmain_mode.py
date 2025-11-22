@@ -1,12 +1,13 @@
 from pico2d import *
 
 import village_mode
-import stage1_0_mode
+import stage1_0_mode, stage2_0_mode
 import game_world
 import game_framework
 from dungeonmain import Dungeonmain
 from player import Player
 from stage1_0 import Stage1_0
+from stage2_0 import Stage2_0
 from ui import Ui
 
 
@@ -28,7 +29,10 @@ def handle_events():
                 else:
                     game_framework.pop_mode(stage1_0_mode, (525, 600))
             elif 505 <= player.x <= 585 and 380 <= player.y <= 400:  # 2번 스테이지 입구 좌표 범위
-                print("Stage 2 Entered") # 스테이지 2로 이동
+                if not Stage2_0.stage2_0_create:
+                    game_framework.push_mode(stage2_0_mode, (525, 600))
+                else:
+                    game_framework.pop_mode(stage2_0_mode, (525, 600))
             elif 780 <= player.x <= 880 and 380 <= player.y <= 400:  # 3번 스테이지 입구 좌표 범위
                 print("Stage 3 Entered") # 스테이지 3로 이동
             elif 500 <= player.x <= 600 and 60 <= player.y <= 80:  # 마을 입구 좌표 범위
