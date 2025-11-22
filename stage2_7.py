@@ -4,6 +4,7 @@ class Stage2_7:
 
     stage2_7_create = False  # 방 생성 여부 플래그
     current_mode = False # 현재 모드 확인 플래그
+    boss_cleared = False
 
     def __init__(self):
         self.paths = [

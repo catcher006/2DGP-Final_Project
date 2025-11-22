@@ -4,16 +4,19 @@ import random
 import dungeonmain_mode
 import game_world
 import game_framework
-import stage1_1_mode
-import stage1_3_mode
+import stage2_1_mode
 from stage2_0 import Stage2_0
-from stage1_1 import Stage1_1
-from stage1_2 import Stage1_2
-from stage1_3 import Stage1_3
-from stage1_4 import Stage1_4
-from stage1_5 import Stage1_5
-from stage1_6 import Stage1_6
-from stage1_7 import Stage1_7
+from stage2_1 import Stage2_1
+from stage2_2 import Stage2_2
+from stage2_3 import Stage2_3
+from stage2_4 import Stage2_4
+from stage2_5 import Stage2_5
+from stage2_6 import Stage2_6
+from stage2_7 import Stage2_7
+from stage2_8 import Stage2_8
+from stage2_9 import Stage2_9
+from stage2_10 import Stage2_10
+from stage2_11 import Stage2_11
 from player import Player
 from slime_mob import Slime_Mob
 from coin import Coin
@@ -32,30 +35,29 @@ def handle_events():
             continue
         elif event.type == SDL_KEYDOWN and event.key == SDLK_f:
             if 500 <= player.x <=  550 and 580 <= player.y <= 600: # 상단 문 (메인 던전으로 가는 문)
-                if Stage1_4.boss_cleared:
+                if Stage2_7.boss_cleared:
                     Stage2_0.current_mode = False
                     Stage2_0.stage2_0_create = False
-                    Stage1_1.stage1_1_create = False
-                    Stage1_2.stage1_2_create = False
-                    Stage1_3.stage1_3_create = False
-                    Stage1_4.stage1_4_create = False
-                    Stage1_5.stage1_5_create = False
-                    Stage1_6.stage1_6_create = False
-                    Stage1_7.stage1_7_create = False
-                    Stage1_4.boss_cleared = False
+                    Stage2_1.stage2_1_create = False
+                    Stage2_2.stage2_2_create = False
+                    Stage2_3.stage2_3_create = False
+                    Stage2_4.stage2_4_create = False
+                    Stage2_5.stage2_5_create = False
+                    Stage2_6.stage2_6_create = False
+                    Stage2_7.stage2_7_create = False
+                    Stage2_8.stage2_8_create = False
+                    Stage2_9.stage2_9_create = False
+                    Stage2_10.stage2_10_create = False
+                    Stage2_11.stage2_11_create = False
+                    Stage2_7.boss_cleared = False
                     game_framework.clear_stage1_modes((240, 400))
 
                 game_framework.pop_mode(dungeonmain_mode,(240, 400))
             elif 990 <= player.x <=  1010 and 270 <= player.y <= 370: # 우측 문
-                if not Stage1_1.stage1_1_create:
-                    game_framework.push_mode(stage1_1_mode,(50, 320))
+                if not Stage2_1.stage2_1_create:
+                    game_framework.push_mode(stage2_1_mode,(50, 320))
                 else:
-                    game_framework.pop_mode(stage1_1_mode,(50, 320))
-            elif 500 <= player.x <=  550 and 0 <= player.y <= 20: # 하단 문
-                if not Stage1_3.stage1_3_create:
-                    game_framework.push_mode(stage1_3_mode,(525, 600))
-                else:
-                    game_framework.pop_mode(stage1_3_mode,(525, 600))
+                    game_framework.pop_mode(stage2_1_mode,(50, 320))
         else:
             player.handle_event(event)
 
