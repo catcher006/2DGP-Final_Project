@@ -11,6 +11,18 @@ from stage1_4 import Stage1_4
 from stage1_5 import Stage1_5
 from stage1_6 import Stage1_6
 from stage1_7 import Stage1_7
+from stage2_0 import Stage2_0
+from stage2_1 import Stage2_1
+from stage2_2 import Stage2_2
+from stage2_3 import Stage2_3
+from stage2_4 import Stage2_4
+from stage2_5 import Stage2_5
+from stage2_6 import Stage2_6
+from stage2_7 import Stage2_7
+from stage2_8 import Stage2_8
+from stage2_9 import Stage2_9
+from stage2_10 import Stage2_10
+from stage2_11 import Stage2_11
 from state_machine import StateMachine
 from pico2d import *
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f, SDLK_SPACE
@@ -37,8 +49,8 @@ player_face_dir = 0
 player_hp = 100
 player_is_alive = True
 player_is_attacking = False
-player_plate_id = 'normalplate'
-player_weapon_id = 'goldbow'
+player_plate_id = 'none'
+player_weapon_id = 'normalbow'
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -176,7 +188,7 @@ class Walk:
         global player_face_dir
         player_face_dir = self.player.face_dir
 
-        if check_weapon() is 'bow':
+        if check_weapon() == 'bow':
             self.player.walk_image.clip_draw(int(self.player.frame) * 128, 128 * self.player.face_dir, 128, 128, self.player.x, self.player.y, 200, 200)
         else:
             self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
@@ -217,11 +229,17 @@ class Attack:
                         if hasattr(obj, 'handle_collision') and 'slime_boss' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_sword:slime_boss', None, obj)
 
-        elif check_weapon() == 'bow':
-            from player_arrow import Player_Arrow
-            from stage1_0 import Stage1_0
-            from stage1_4 import Stage1_4
+            elif Stage2_0.current_mode or Stage2_1.current_mode or Stage2_2.current_mode or Stage2_3.current_mode or Stage2_4.current_mode or \
+                    Stage2_5.current_mode or Stage2_6.current_mode or Stage2_7.current_mode or Stage2_8.current_mode or Stage2_9.current_mode or \
+                    Stage2_10.current_mode or Stage2_11.current_mode:
+                game_world.add_collision_pair('player_sword:zombie_mob', self.player_sword, None)
+                # 기존 몹들과 충돌 페어 추가
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'zombie' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player_sword:zombie_mob', None, obj)
 
+        elif check_weapon() == 'bow':
             player_arrow = Player_Arrow()
             game_world.add_object(player_arrow, 2)
 
@@ -240,6 +258,15 @@ class Attack:
                         if hasattr(obj, 'handle_collision') and 'slime_boss' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_arrow:slime_boss', None, obj)
 
+            elif Stage2_0.current_mode or Stage2_1.current_mode or Stage2_2.current_mode or Stage2_3.current_mode or Stage2_4.current_mode or \
+                    Stage2_5.current_mode or Stage2_6.current_mode or Stage2_7.current_mode or Stage2_8.current_mode or Stage2_9.current_mode or \
+                    Stage2_10.current_mode or Stage2_11.current_mode:
+                game_world.add_collision_pair('player_arrow:zombie_mob', player_arrow, None)
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'zombie' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player_arrow:zombie_mob', None, obj)
+
     def exit(self, e):
         self.player.is_attacking = False
         self.player.frame = 0
@@ -251,7 +278,7 @@ class Attack:
         self.player_sword = None
 
     def do(self):
-        if check_weapon() is 'none':
+        if check_weapon() == 'none':
             # 무기가 없으면 공격 상태에서 바로 대기 상태로 전환
             self.player.state_machine.handle_state_event(('STOP', None))
             return
@@ -265,9 +292,9 @@ class Attack:
             self.player.state_machine.handle_state_event(('STOP', None))
 
     def draw(self):
-        if check_weapon() is 'sword':
+        if check_weapon() == 'sword':
             self.player.sword_image.clip_draw(int(self.player.frame) * 128, 128 * self.player.face_dir, 128, 128, self.player.x, self.player.y, 200, 200)
-        elif check_weapon() is 'bow':
+        elif check_weapon() == 'bow':
             self.player.bow_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
 
 class Player:
@@ -292,12 +319,12 @@ class Player:
 
     def load_sword_images(self):
         if Player.sword_image is None:
-            if check_weapon() is 'sword':
+            if check_weapon() == 'sword':
                 Player.sword_image = load_image('./image/player/' + player_plate_id + '/' + player_weapon_id + '/' + 'sword_attack.png')
 
     def load_bow_images(self):
-        if Player.sword_image is None:
-            if check_weapon() is 'bow':
+        if Player.bow_image is None:
+            if check_weapon() == 'bow':
                 Player.bow_image = load_image('./image/player/' + player_plate_id + '/' + player_weapon_id + '/' + 'bow_attack.png')
 
     def load_combat_idle_images(self):
@@ -308,9 +335,9 @@ class Player:
         self.load_walk_images()
         self.load_idle_images()
         self.load_dead_images()
-        if check_weapon() is 'sword':
+        if check_weapon() == 'sword':
             self.load_sword_images()
-        elif check_weapon() is 'bow':
+        elif check_weapon() == 'bow':
             self.load_bow_images()
         self.load_combat_idle_images()
         self.hp_image = load_image('./image/ui/player/player_hp.png')
@@ -438,8 +465,9 @@ class Player:
                     self.state_machine.handle_state_event(('RUN', None))
         else:
             # 공격키일 때 현재 공격 가능 여부 확인
-            if space_down(('INPUT', event)) and not Stage1_0.stage1_0_create:
-                return
+            if space_down(('INPUT', event)):
+                if not Stage1_0.stage1_0_create and not Stage2_0.stage2_0_create:
+                    return
             self.state_machine.handle_state_event(('INPUT', event))
 
     def can_move_to(self, x, y):
@@ -518,6 +546,39 @@ class Player:
                     self.knockback_distance = 30
                     self.knockback_dx = nx * 3.0
                     self.knockback_dy = ny * 3.0
+
+                if player_hp <= 0:
+                    player_hp = 0
+                    player_is_alive = False
+                    self.state_machine.handle_state_event(('DIE', None))
+                    print("Player is dead!")
+
+                # 디버그 출력 (선택사항)
+                print(f"Player damaged! HP: {player_hp}")
+
+        elif group == 'player:zombie_mob' and player_is_alive:
+            current_time = time.time()
+
+            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                player_hp -= int(15 * damage_multiplier)
+                self.last_damage_time = current_time
+
+                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
+                dx = self.x - other.x
+                dy = self.y - other.y
+                distance = (dx ** 2 + dy ** 2) ** 0.5
+
+                if distance > 0:
+                    # 정규화된 방향 벡터
+                    nx = dx / distance
+                    ny = dy / distance
+
+                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
+                    self.is_knocked_back = True
+                    self.knockback_distance = 20
+                    self.knockback_dx = nx * 1.0
+                    self.knockback_dy = ny * 1.0
 
                 if player_hp <= 0:
                     player_hp = 0

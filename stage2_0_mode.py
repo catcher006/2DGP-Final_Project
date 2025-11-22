@@ -4,7 +4,7 @@ import random
 import dungeonmain_mode
 import game_world
 import game_framework
-import stage2_1_mode
+#import stage2_1_mode
 from stage2_0 import Stage2_0
 from stage2_1 import Stage2_1
 from stage2_2 import Stage2_2
@@ -18,7 +18,7 @@ from stage2_9 import Stage2_9
 from stage2_10 import Stage2_10
 from stage2_11 import Stage2_11
 from player import Player
-from slime_mob import Slime_Mob
+from zombie_mob import Zombie_Mob
 from coin import Coin
 from ui import Ui
 
@@ -62,7 +62,7 @@ def handle_events():
             player.handle_event(event)
 
 def init(player_start_pos=None):
-    global world, slime_mobs, coins
+    global world, zombie_mobs, coins
     global stage2_0
     global player
 
@@ -75,13 +75,13 @@ def init(player_start_pos=None):
         Stage2_0.stage2_0_create = True
         Stage2_0.current_mode = True
 
-        slime_mobs = [Slime_Mob() for _ in range(random.randint(0, 2))]
-        for slime_mob in slime_mobs:
-            slime_mob.move_validator = stage2_0.is_mob_walkable
+        zombie_mobs = [Zombie_Mob() for _ in range(random.randint(0, 2))]
+        for zombie_mob in zombie_mobs:
+            zombie_mob.move_validator = stage2_0.is_mob_walkable
 
         coins = []
     else:
-        slime_mobs = []
+        zombie_mobs = []
         coins = []
 
     game_world.add_object(stage2_0, 0)
@@ -96,18 +96,18 @@ def init(player_start_pos=None):
     game_world.add_collision_pair('player:coin', player, None)
 
     # 첫 방문 시에만 몹 추가
-    if slime_mobs:
-        game_world.add_objects(slime_mobs, 2)
-        game_world.add_collision_pair('player:slime_mob', player, None)
-        for slime_mob in slime_mobs:
-            game_world.add_collision_pair('player:slime_mob', None, slime_mob)
-            game_world.add_collision_pair('slime_mob:slime_mob', slime_mob, None)
+    if zombie_mobs:
+        game_world.add_objects(zombie_mobs, 2)
+        game_world.add_collision_pair('player:zombie_mob', player, None)
+        for zombie_mob in zombie_mobs:
+            game_world.add_collision_pair('player:zombie_mob', None, zombie_mob)
+            game_world.add_collision_pair('slime_mob:zombie_mob', zombie_mob, None)
 
             # 다른 몹들과의 충돌 페어 추가
-            for slime_mob in slime_mobs:
-                for other_mob in slime_mobs:
-                    if slime_mob != other_mob:
-                        game_world.add_collision_pair('slime_mob:slime_mob', None, other_mob)
+            for zombie_mob in zombie_mobs:
+                for other_mob in zombie_mobs:
+                    if zombie_mob != other_mob:
+                        game_world.add_collision_pair('zombie_mob:zombie_mob', None, other_mob)
 
     if coins:
         game_world.add_objects(coins, 2)
@@ -131,20 +131,20 @@ def finish():
     game_world.clear()
 
 def pause():
-    global slime_mobs, stage2_0, coins
+    global zombie_mobs, stage2_0, coins
 
     Stage2_0.current_mode = False
 
-    # 기존 saved_mobs 초기화 후 현재 살아있는 몹만 저장
+    # 기존 zombie_mobs 초기화 후 현재 살아있는 몹만 저장
     stage2_0.saved_mobs = []
-    for slime_mob in slime_mobs:
-        if slime_mob.is_alive:
+    for zombie_mob in zombie_mobs:
+        if zombie_mob.is_alive:
             stage2_0.saved_mobs.append({
-                'type': slime_mob.mob_type,
-                'x': slime_mob.x,
-                'y': slime_mob.y,
-                'hp': slime_mob.hp,
-                'frame': slime_mob.frame
+                'type': zombie_mob.mob_type,
+                'x': zombie_mob.x,
+                'y': zombie_mob.y,
+                'hp': zombie_mob.hp,
+                'frame': zombie_mob.frame
             })
 
     # 코인 저장
@@ -156,14 +156,14 @@ def pause():
             'frame': coin.frame
         })
 
-    print(f"Pause: Saved {len(stage2_0.saved_mobs)} slime mobs, {len(stage2_0.saved_coins)} coins")
+    print(f"Pause: Saved {len(stage2_0.saved_mobs)} zombie mobs, {len(stage2_0.saved_coins)} coins")
 
     game_world.clear()
     game_world.collision_pairs.clear()
 
 
 def resume(player_start_pos=None):
-    global slime_mobs, stage2_0, player, coins
+    global zombie_mobs, stage2_0, player, coins
 
     Stage2_0.current_mode = True
 
@@ -175,34 +175,34 @@ def resume(player_start_pos=None):
 
     # stage2_0 인스턴스에 저장된 몹 복원
     if stage2_0.saved_mobs:
-        slime_mobs = []
+        zombie_mobs = []
         for mob_data in stage2_0.saved_mobs:
-            slime_mob = Slime_Mob()
-            slime_mob.mob_type = mob_data['type']
-            slime_mob.x = mob_data['x']
-            slime_mob.y = mob_data['y']
-            slime_mob.hp = mob_data['hp']
-            slime_mob.frame = mob_data['frame']
-            slime_mob.move_validator = stage2_0.is_mob_walkable
+            zombie_mob = Zombie_Mob()
+            zombie_mob.mob_type = mob_data['type']
+            zombie_mob.x = mob_data['x']
+            zombie_mob.y = mob_data['y']
+            zombie_mob.hp = mob_data['hp']
+            zombie_mob.frame = mob_data['frame']
+            zombie_mob.move_validator = stage2_0.is_mob_walkable
 
-            slime_mob.move_image = load_image("./image/mobs/slime/" + slime_mob.mob_type + "_Slime_Jump.png")
-            slime_mob.idle_image = load_image("./image/mobs/slime/" + slime_mob.mob_type + "_Slime_Jump.png")
-            slime_mob.dead_image = load_image("./image/mobs/slime/" + slime_mob.mob_type + "_Slime_Dead.png")
+            zombie_mob.move_image = load_image("./image/mobs/zombie/" + zombie_mob.mob_type + "/walk.png")
+            if zombie_mob.mob_type == 'mace': zombie_mob.idle_image = load_image("./image/mobs/zombie/" + zombie_mob.mob_type + "/idle.png")
+            zombie_mob.dead_image = load_image("./image/mobs/zombie/" + zombie_mob.mob_type + "/dead.png")
 
-            slime_mobs.append(slime_mob)
+            zombie_mobs.append(zombie_mob)
 
-        game_world.add_objects(slime_mobs, 2)
-        game_world.add_collision_pair('player:slime_mob', player, None)
-        for slime_mob in slime_mobs:
-            game_world.add_collision_pair('player:slime_mob', None, slime_mob)
-            game_world.add_collision_pair('slime_mob:slime_mob', slime_mob, None)
+        game_world.add_objects(zombie_mobs, 2)
+        game_world.add_collision_pair('player:zombie_mob', player, None)
+        for zombie_mob in zombie_mobs:
+            game_world.add_collision_pair('player:zombie_mob', None, zombie_mob)
+            game_world.add_collision_pair('zombie_mob:zombie_mob', zombie_mob, None)
 
-        for slime_mob in slime_mobs:
-            for other_mob in slime_mobs:
-                if slime_mob != other_mob:
-                    game_world.add_collision_pair('slime_mob:slime_mob', None, other_mob)
+        for zombie_mob in zombie_mobs:
+            for other_mob in zombie_mobs:
+                if zombie_mob != other_mob:
+                    game_world.add_collision_pair('zombie_mob:zombie_mob', None, other_mob)
 
-        print(f"Resume: Restored {len(slime_mobs)} slime mobs")
+        print(f"Resume: Restored {len(zombie_mobs)} zombie mobs")
     else:
         print("Resume: No saved mobs to restore")
 
@@ -222,9 +222,9 @@ def resume(player_start_pos=None):
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
 
-        print(f"Resume: Restored {len(slime_mobs)} slime mobs, {len(coins)} coins")
+        print(f"Resume: Restored {len(zombie_mobs)} slime mobs, {len(coins)} coins")
     else:
-        print(f"Resume: Restored {len(slime_mobs)} slime mobs, 0 coins")
+        print(f"Resume: Restored {len(zombie_mobs)} slime mobs, 0 coins")
 
     ui = Ui()
     game_world.add_object(ui, 4)
