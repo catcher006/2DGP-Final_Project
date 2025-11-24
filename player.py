@@ -407,6 +407,9 @@ class Player:
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
+        if not player_is_alive:
+            return 0, 0, 0, 0
+
         if self.face_dir == 3:
             return self.x - 22, self.y - 47, self.x + 22, self.y + 25
         elif self.face_dir == 2:
