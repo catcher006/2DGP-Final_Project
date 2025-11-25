@@ -161,6 +161,44 @@ class Dead:
     def draw(self):
         self.mob.dead_image.clip_draw(int(self.mob.frame) * 64, 0, 64, 64, self.mob.x, self.mob.y, 100, 100)
 
+class Attack:
+    def __init__(self, mob):
+        self.mob = mob
+        self.lap_count = 0
+        self.prev_frame = 0
+        self.max_frame = 6  # attack 애니메이션 프레임 수
+
+    def enter(self, e):
+        self.mob.frame = 0.0
+        self.mob.dx = 0.0
+        self.mob.dy = 0.0
+        self.lap_count = 0
+        self.prev_frame = 0
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        dt = game_framework.frame_time
+        delta = FRAMES_PER_ACTION * ACTION_PER_TIME * dt
+        new_frame_float = self.mob.frame + delta
+        new_frame = int(new_frame_float) % self.max_frame
+
+        # 프레임 래핑(한 바퀴) 감지
+        if self.prev_frame > new_frame:
+            self.lap_count += 1
+        self.prev_frame = new_frame
+
+        self.mob.frame = new_frame_float % self.max_frame
+
+        # 1바퀴 완료 시 MOVE로 전환
+        if self.lap_count >= 1:
+            self.lap_count = 0
+            self.mob.state_machine.handle_state_event(('TIMEOUT', None))
+
+    def draw(self):
+        self.mob.attack_image.clip_draw(int(self.mob.frame) * 192, 192 * self.mob.face_dir, 192, 192, self.mob.x, self.mob.y, 300, 300)
+
 class Move:
     def __init__(self, mob):
         self.mob = mob
@@ -281,14 +319,28 @@ class Zombie_Mob:
         self.DEAD = Dead(self)
 
         # 상태 머신 생성
-        self.state_machine = StateMachine(
-            self.IDLE,
-            {
-                self.MOVE: {event_die: self.DEAD, event_stop: self.IDLE},
-                self.IDLE: {time_out: self.MOVE, event_die: self.DEAD},
-                self.DEAD: {}
-            }
-        )
+        if self.mob_type == "mace":
+            self.ATTACK = Attack(self)
+            # mace 타입
+            self.state_machine = StateMachine(
+                self.IDLE,
+                {
+                    self.IDLE: {time_out: self.MOVE, event_die: self.DEAD},
+                    self.MOVE: {event_die: self.DEAD, event_stop: self.ATTACK},
+                    self.ATTACK: {time_out: self.MOVE, event_die: self.DEAD},
+                    self.DEAD: {}
+                }
+            )
+        else:
+            # none 타입
+            self.state_machine = StateMachine(
+                self.IDLE,
+                {
+                    self.MOVE: {event_die: self.DEAD, event_stop: self.IDLE},
+                    self.IDLE: {time_out: self.MOVE, event_die: self.DEAD},
+                    self.DEAD: {}
+                }
+            )
 
     def draw(self):
         self.state_machine.draw()
