@@ -50,7 +50,7 @@ player_hp = 100
 player_is_alive = True
 player_is_attacking = False
 player_plate_id = 'none'
-player_weapon_id = 'normalbow'
+player_weapon_id = 'goldsword'
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -134,8 +134,6 @@ class Idle:
 
 
     def draw(self):
-        from stage1_0 import Stage1_0
-
         if not Stage1_0.stage1_0_create or player_weapon_id == 'none':
             self.player.idle_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64, self.player.x, self.player.y, 100, 100)
         else:
@@ -399,8 +397,8 @@ class Player:
         self.state_machine.draw()
         self.hp_image.clip_draw(0, int(player_hp) // 5 * 66, 240, 66, self.x, self.y + 45, 60, 11)
         if player_hp >= 100: self.font.draw(self.x - 8, self.y + 45, f'{player_hp:02d}', (255, 255, 255))
-        elif 60 < player_hp < 100: self.font.draw(self.x - 6, self.y + 45, f'{player_hp:02d}', (255, 255, 255))
-        elif 40 <= player_hp <= 60:
+        elif 50 < player_hp < 100: self.font.draw(self.x - 6, self.y + 45, f'{player_hp:02d}', (255, 255, 255))
+        elif player_hp == 50:
             self.font.draw(self.x - 6, self.y + 45, f'{player_hp // 10}', (255, 255, 255))
             self.font.draw(self.x, self.y + 45, f'{player_hp % 10}', (255, 0, 255))
         else: self.font.draw(self.x - 6, self.y + 45, f'{player_hp:02d}', (255, 0, 255))
@@ -591,3 +589,32 @@ class Player:
 
                 # 디버그 출력 (선택사항)
                 print(f"Player damaged! HP: {player_hp}")
+
+        elif group == 'player:zombie_mace' and player_is_alive:
+            current_time = time.time()
+
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                player_hp -= int(20 * damage_multiplier)
+                self.last_damage_time = current_time
+
+                # 넉백 방향 계산
+                dx = self.x - other.x
+                dy = self.y - other.y
+                distance = (dx ** 2 + dy ** 2) ** 0.5
+
+                if distance > 0:
+                    nx = dx / distance
+                    ny = dy / distance
+
+                    self.is_knocked_back = True
+                    self.knockback_distance = 25
+                    self.knockback_dx = nx * 1.5
+                    self.knockback_dy = ny * 1.5
+
+                if player_hp <= 0:
+                    player_hp = 0
+                    player_is_alive = False
+                    self.state_machine.handle_state_event(('DIE', None))
+                    print("Player is dead!")
+
+                print(f"Player damaged by mace! HP: {player_hp}")

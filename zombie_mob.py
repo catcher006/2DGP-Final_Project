@@ -15,6 +15,7 @@ from stage2_8 import Stage2_8
 from stage2_9 import Stage2_9
 from stage2_10 import Stage2_10
 from stage2_11 import Stage2_11
+from zombie_mace import Zombie_Mace
 from player import player_weapon_id
 from state_machine import StateMachine
 from coin import Coin
@@ -33,6 +34,15 @@ TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 8
 FRAMES_IDLE_PER_ACTION = 2
+
+# 모드 호환을 위한 전역 변수 사용
+zombie_x = 0
+zombie_y = 0
+zombie_frame = 0
+zombie_face_dir = 0
+zombie_hp = 100
+zombie_is_alive = True
+zombie_is_attacking = False
 
 time_out = lambda e: e[0] == 'TIMEOUT'
 event_stop = lambda e: e[0] == 'STOP'
@@ -89,6 +99,10 @@ class Idle:
         if self.lap_count >= 2:
             self.lap_count = 0
             self.mob.state_machine.handle_state_event(('TIMEOUT', None))
+
+        global zombie_x, zombie_y
+        zombie_x = self.mob.x
+        zombie_y = self.mob.y
 
     def draw(self):
         # 현재 방향 기준으로 idle 이미지 그리기
@@ -167,6 +181,7 @@ class Attack:
         self.lap_count = 0
         self.prev_frame = 0
         self.max_frame = 6  # attack 애니메이션 프레임 수
+        self.zombie_mace = None
 
     def enter(self, e):
         self.mob.frame = 0.0
@@ -175,8 +190,34 @@ class Attack:
         self.lap_count = 0
         self.prev_frame = 0
 
+        self.mob.is_attacking = True
+        global zombie_is_attacking
+        zombie_is_attacking = True
+
+        # 좀비 참조를 전달하여 Zombie_Mace 생성
+        self.zombie_mace = Zombie_Mace(self.mob)
+        game_world.add_object(self.zombie_mace, 2)
+
+        # 충돌 그룹에 추가
+        if Stage2_0.current_mode or Stage2_1.current_mode or Stage2_2.current_mode or Stage2_3.current_mode or Stage2_4.current_mode or \
+                Stage2_5.current_mode or Stage2_6.current_mode or Stage2_7.current_mode or Stage2_8.current_mode or Stage2_9.current_mode or \
+                Stage2_10.current_mode or Stage2_11.current_mode:
+            game_world.add_collision_pair('player:zombie_mace', self.zombie_mace, None)
+            # 기존 몹들과 충돌 페어 추가
+            for layer in game_world.world:
+                for obj in layer:
+                    if hasattr(obj, 'handle_collision') and 'zombie' in str(type(obj)).lower():
+                        game_world.add_collision_pair('player:zombie_mace', None, obj)
+
     def exit(self, e):
-        pass
+        self.mob.is_attacking = False
+        self.mob.frame = 0
+
+        global zombie_frame, zombie_is_attacking
+        zombie_frame = 0
+        zombie_is_attacking = False
+
+        self.zombie_mace = None
 
     def do(self):
         dt = game_framework.frame_time
@@ -262,6 +303,10 @@ class Move:
             self.mob.x = new_x
             self.mob.y = new_y
 
+        global zombie_x, zombie_y
+        zombie_x = self.mob.x
+        zombie_y = self.mob.y
+
     def draw(self):
         if self.mob.ud_dir == 1: self.mob.face_dir = 3
         elif self.mob.lr_dir == -1: self.mob.face_dir = 2
@@ -287,6 +332,10 @@ class Zombie_Mob:
         self.x = random.randint(105,940)
         self.y = random.randint(85,540)
 
+        global zombie_x, zombie_y
+        zombie_x = self.x
+        zombie_y = self.y
+
         self.frame = random.randint(0,5)
         self.is_move = True
 
@@ -303,6 +352,7 @@ class Zombie_Mob:
 
         self.hp = 100  # 체력
         self.is_alive = True  # 생존 상태
+        self.is_attacking = False
 
         # 데미지 관련
         self.last_damage_time = 0
@@ -401,10 +451,11 @@ class Zombie_Mob:
         return False
 
     def handle_collision(self, group, other):
+        global zombie_hp, zombie_is_alive
         if not self.is_alive:
             return
 
-        if group == 'player_sword:zombie_mob' and self.is_alive:
+        if group == 'player_sword:zombie_mob' and zombie_is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
@@ -434,13 +485,14 @@ class Zombie_Mob:
                 if self.hp <= 0:
                     self.hp = 0
                     self.is_alive = False
+                    zombie_is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("zombie_mob is dead!")
 
                 # 디버그 출력 (선택사항)
                 print(f"slime_mob damaged! HP: {self.hp}")
 
-        elif group == 'player_arrow:zombie_mob' and self.is_alive:
+        elif group == 'player_arrow:zombie_mob' and zombie_is_alive:
             current_time = time.time()
 
             if current_time - self.last_damage_time >= self.damage_cooldown:
@@ -469,12 +521,13 @@ class Zombie_Mob:
                 if self.hp <= 0:
                     self.hp = 0
                     self.is_alive = False
+                    zombie_is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("zombie_mob is dead!")
 
                 print(f"zombie_mob damaged by arrow! HP: {self.hp}")
 
-        elif group == 'player:zombie_mob' and self.is_alive:
+        elif group == 'player:zombie_mob' and zombie_is_alive:
             # 넉백 방향 계산
             dx = self.x - other.x
             dy = self.y - other.y
@@ -491,7 +544,7 @@ class Zombie_Mob:
                 self.knockback_dx = nx * 1.0
                 self.knockback_dy = ny * 1.0
 
-        elif group == 'zombie_mob:zombie_mob' and self.is_alive:
+        elif group == 'zombie_mob:zombie_mob' and zombie_is_alive:
             # 몹끼리 충돌 시 넉백
             dx = self.x - other.x
             dy = self.y - other.y
