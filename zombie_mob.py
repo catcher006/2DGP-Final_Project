@@ -32,8 +32,10 @@ RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 8
+FRAMES_IDLE_PER_ACTION = 2
 
 time_out = lambda e: e[0] == 'TIMEOUT'
+event_stop = lambda e: e[0] == 'STOP'
 
 def event_die(e):
     return e[0] == 'DIE'
@@ -51,6 +53,46 @@ def point_in_polygon(x, y, polygon):
         j = i
 
     return inside
+
+class Idle:
+    def __init__(self, mob):
+        self.mob = mob
+        self.lap_count = 0
+        self.prev_frame = 0
+
+    def enter(self, e):
+        # 정지 애니메이션 처음부터, 이동 정지
+        self.mob.frame = random.randint(0, 1)
+        self.mob.dx = 0.0
+        self.mob.dy = 0.0
+        self.lap_count = 0
+        self.prev_frame = int(self.mob.frame)
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        dt = game_framework.frame_time
+        # 정지 중에도 가벼운 프레임 애니메이션 업데이트
+        delta = FRAMES_IDLE_PER_ACTION * ACTION_PER_TIME * dt
+        new_frame_float = self.mob.frame + delta
+        new_frame = int(new_frame_float) % 2
+
+        # 프레임 래핑(한 바퀴) 감지
+        if self.prev_frame > new_frame:
+            self.lap_count += 1
+        self.prev_frame = new_frame
+
+        self.mob.frame = new_frame_float % 2
+
+        # 2바퀴 완료 시 MOVE로 전환
+        if self.lap_count >= 2:
+            self.lap_count = 0
+            self.mob.state_machine.handle_state_event(('TIMEOUT', None))
+
+    def draw(self):
+        # 현재 방향 기준으로 idle 이미지 그리기
+        self.mob.idle_image.clip_draw(int(self.mob.frame) * 64, 64 * self.mob.face_dir, 64, 64, self.mob.x, self.mob.y, 100, 100)
 
 class Dead:
     def __init__(self, mob):
@@ -129,6 +171,12 @@ class Move:
         self.lap_count = 0
         self.prev_frame = int(self.mob.frame)
 
+        self.mob.lr_dir = random.randint(-1, 1)
+        if self.mob.lr_dir == 0:
+            self.mob.ud_dir = random.choice([-1, 1])
+        else:
+            self.mob.ud_dir = 0
+
     def exit(self, e):
         pass
 
@@ -147,15 +195,18 @@ class Move:
 
         self.mob.frame = new_frame_float % 6
 
-        # mob_type이 'none'일 때 4바퀴마다 방향 랜덤 변경
-        if self.mob.mob_type == "none" and self.lap_count >= 4:
+        # 4바퀴마다 방향 변경 후 정지 상태로 전환(확률 제거, 항상 STOP)
+        if self.lap_count >= 4:
             self.mob.lr_dir = random.randint(-1, 1)
             if self.mob.lr_dir == 0:
                 self.mob.ud_dir = random.choice([-1, 1])
             else:
                 self.mob.ud_dir = 0
+
             self.lap_count = 0
             self.timer = 0.0
+            self.mob.state_machine.handle_state_event(('STOP', None))
+            return
 
         # 이동 벡터 계산
         dx = self.mob.lr_dir * RUN_SPEED_PPS * dt
@@ -183,11 +234,13 @@ class Move:
 
 class Zombie_Mob:
     def __init__(self):
-        self.mob_type = random.choice(["none"])
+        self.mob_type = random.choice(["none", "mace"])
 
         self.move_image = load_image("./image/mobs/zombie/" + self.mob_type + "/walk.png")
-        if self.mob_type == 'mace': self.idle_image = load_image("./image/mobs/zombie/" + self.mob_type + "/idle.png")
+        self.idle_image = load_image("./image/mobs/zombie/" + self.mob_type + "/idle.png")
         self.dead_image = load_image("./image/mobs/zombie/" + self.mob_type + "/dead.png")
+        if self.mob_type == "mace":
+            self.attack_image = load_image("./image/mobs/zombie/" + self.mob_type + "/attack.png")
 
         self.hp_image = load_image("./image/ui/mobs/zombie/zombie_hp.png")
 
@@ -223,14 +276,16 @@ class Zombie_Mob:
         self.knockback_dx = 0
         self.knockback_dy = 0
 
+        self.IDLE = Idle(self)
         self.MOVE = Move(self)
         self.DEAD = Dead(self)
 
         # 상태 머신 생성
         self.state_machine = StateMachine(
-            self.MOVE,
+            self.IDLE,
             {
-                self.MOVE: {event_die: Dead(self)},
+                self.MOVE: {event_die: self.DEAD, event_stop: self.IDLE},
+                self.IDLE: {time_out: self.MOVE, event_die: self.DEAD},
                 self.DEAD: {}
             }
         )
