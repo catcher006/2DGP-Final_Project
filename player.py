@@ -590,26 +590,30 @@ class Player:
                 # 디버그 출력 (선택사항)
                 print(f"Player damaged! HP: {player_hp}")
 
+
         elif group == 'player:zombie_mace' and player_is_alive:
             current_time = time.time()
 
+            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= int(20 * damage_multiplier)
+                player_hp -= int(15 * damage_multiplier)
                 self.last_damage_time = current_time
 
-                # 넉백 방향 계산
+                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
                 dx = self.x - other.x
                 dy = self.y - other.y
                 distance = (dx ** 2 + dy ** 2) ** 0.5
 
                 if distance > 0:
+                    # 정규화된 방향 벡터
                     nx = dx / distance
                     ny = dy / distance
 
+                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
                     self.is_knocked_back = True
-                    self.knockback_distance = 25
-                    self.knockback_dx = nx * 1.5
-                    self.knockback_dy = ny * 1.5
+                    self.knockback_distance = 20
+                    self.knockback_dx = nx * 1.0
+                    self.knockback_dy = ny * 1.0
 
                 if player_hp <= 0:
                     player_hp = 0
@@ -617,4 +621,5 @@ class Player:
                     self.state_machine.handle_state_event(('DIE', None))
                     print("Player is dead!")
 
-                print(f"Player damaged by mace! HP: {player_hp}")
+                # 디버그 출력 (선택사항)
+                print(f"Player damaged! HP: {player_hp}")

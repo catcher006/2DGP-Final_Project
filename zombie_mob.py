@@ -202,12 +202,12 @@ class Attack:
         if Stage2_0.current_mode or Stage2_1.current_mode or Stage2_2.current_mode or Stage2_3.current_mode or Stage2_4.current_mode or \
                 Stage2_5.current_mode or Stage2_6.current_mode or Stage2_7.current_mode or Stage2_8.current_mode or Stage2_9.current_mode or \
                 Stage2_10.current_mode or Stage2_11.current_mode:
-            game_world.add_collision_pair('player:zombie_mace', self.zombie_mace, None)
-            # 기존 몹들과 충돌 페어 추가
+            game_world.add_collision_pair('player:zombie_mace', None, self.zombie_mace)
+            # 플레이어와 충돌 페어 추가
             for layer in game_world.world:
                 for obj in layer:
-                    if hasattr(obj, 'handle_collision') and 'zombie' in str(type(obj)).lower():
-                        game_world.add_collision_pair('player:zombie_mace', None, obj)
+                    if hasattr(obj, 'handle_collision') and 'player' in str(type(obj)).lower():
+                        game_world.add_collision_pair('player:zombie_mace', obj, None)
 
     def exit(self, e):
         self.mob.is_attacking = False
