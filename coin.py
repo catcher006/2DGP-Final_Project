@@ -3,6 +3,7 @@ import game_framework
 import game_world
 import stage1_0_mode, stage1_1_mode, stage1_2_mode, stage1_3_mode
 import stage1_4_mode, stage1_5_mode, stage1_6_mode, stage1_7_mode
+import stage2_0_mode
 from stage1_0 import Stage1_0
 from stage1_1 import Stage1_1
 from stage1_2 import Stage1_2
@@ -11,6 +12,7 @@ from stage1_4 import Stage1_4
 from stage1_5 import Stage1_5
 from stage1_6 import Stage1_6
 from stage1_7 import Stage1_7
+from stage2_0 import Stage2_0
 from ui import Ui
 
 # By Action Speed
@@ -78,5 +80,7 @@ class Coin:
                 stage1_6_mode.coins.remove(self)
             elif Stage1_7.current_mode:
                 stage1_7_mode.coins.remove(self)
+            elif Stage2_0.current_mode:
+                stage2_0_mode.coins.remove(self)
 
             print(f"After collection: {Ui.coin}")  # 디버그 출력
