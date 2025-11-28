@@ -4,10 +4,11 @@ import random
 import dungeonmain_mode
 import game_world
 import game_framework
-import stage2_0_mode, stage2_2_mode
+import stage2_0_mode, stage2_2_mode, stage2_4_mode
 from stage2_0 import Stage2_0
 from stage2_1 import Stage2_1
 from stage2_2 import Stage2_2
+from stage2_4 import Stage2_4
 from player import Player
 from zombie_mob import Zombie_Mob
 from ui import Ui
@@ -34,6 +35,11 @@ def handle_events():
                     game_framework.push_mode(stage2_0_mode, (1010, 320))
                 else:
                     game_framework.pop_mode(stage2_0_mode, (1010, 320))
+            elif 500 <= player.x <=  550 and 0 <= player.y <= 20: # 하단 문
+                if not Stage2_4.stage2_4_create:
+                    game_framework.push_mode(stage2_4_mode,(525, 600))
+                else:
+                    game_framework.pop_mode(stage2_4_mode,(525, 600))
         else:
             player.handle_event(event)
 
