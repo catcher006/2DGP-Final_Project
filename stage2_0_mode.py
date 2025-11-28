@@ -4,7 +4,7 @@ import random
 import dungeonmain_mode
 import game_world
 import game_framework
-#import stage2_1_mode
+import stage2_1_mode
 from stage2_0 import Stage2_0
 from stage2_1 import Stage2_1
 from stage2_2 import Stage2_2

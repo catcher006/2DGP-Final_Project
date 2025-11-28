@@ -2,7 +2,7 @@ import time
 import game_world
 import game_framework
 import random
-import stage2_0_mode
+import stage2_0_mode, stage2_1_mode
 from stage2_0 import Stage2_0
 from stage2_1 import Stage2_1
 from stage2_2 import Stage2_2
@@ -125,9 +125,9 @@ class Dead:
 
                 if Stage2_0.current_mode:
                     stage2_0_mode.coins.append(coin)
-                '''elif Stage1_1.current_mode:
-                    stage1_1_mode.coins.append(coin)
-                elif Stage1_2.current_mode:
+                elif Stage2_1.current_mode:
+                    stage2_1_mode.coins.append(coin)
+                '''elif Stage1_2.current_mode:
                     stage1_2_mode.coins.append(coin)
                 elif Stage1_3.current_mode:
                     stage1_3_mode.coins.append(coin)
