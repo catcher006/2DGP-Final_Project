@@ -2,6 +2,7 @@ from pico2d import *
 import game_framework
 import game_world
 import goblin_mob
+import math
 
 # Arrow Speed
 PIXEL_PER_METER = (10.0 / 0.3)
@@ -81,11 +82,11 @@ class Goblin_Arrow:
 
         # 방향에 따라 화살 그리기
         if self.face_dir == 0:  # 오른쪽
-            self.image.composite_draw(0, '', self.x, self.y, 31, 5)
+            self.image.composite_draw(0, '', self.x, self.y - 5, 31, 5)
         elif self.face_dir == 1:  # 아래
             self.image.composite_draw(math.radians(270), '', self.x, self.y, 31, 5)
         elif self.face_dir == 2:  # 왼쪽
-            self.image.composite_draw(math.radians(180), '', self.x, self.y, 31, 5)
+            self.image.composite_draw(math.radians(180), '', self.x, self.y - 5, 31, 5)
         elif self.face_dir == 3:  # 위
             self.image.composite_draw(math.radians(90), '', self.x, self.y, 31, 5)
 
@@ -102,11 +103,11 @@ class Goblin_Arrow:
 
         # 방향에 따른 충돌 박스
         if self.face_dir == 0:  # 오른쪽
-            return self.x - 16, self.y - 4, self.x + 16, self.y + 4
+            return self.x - 16, self.y - 9, self.x + 16, self.y - 1
         elif self.face_dir == 1:  # 아래
             return self.x - 4, self.y - 16, self.x + 4, self.y + 16
         elif self.face_dir == 2:  # 왼쪽
-            return self.x - 16, self.y - 4, self.x + 16, self.y + 4
+            return self.x - 16, self.y - 9, self.x + 16, self.y - 1
         elif self.face_dir == 3:  # 위
             return self.x - 4, self.y - 16, self.x + 4, self.y + 16
 

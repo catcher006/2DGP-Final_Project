@@ -179,7 +179,10 @@ class Attack:
         self.mob = mob
         self.lap_count = 0
         self.prev_frame = 0
-        self.max_frame = 6  # attack 애니메이션 프레임 수
+        if self.mob.mob_type == 'bow':
+            self.max_frame = 13
+        else:
+            self.max_frame = 6
         self.goblin_mace = None
         self.goblin_arrow = None
 
@@ -228,6 +231,7 @@ class Attack:
         self.mob.frame = 0
 
         self.goblin_mace = None
+        self.goblin_arrow = None
 
     def do(self):
         dt = game_framework.frame_time
@@ -273,17 +277,16 @@ class Move:
     def do(self):
         dt = game_framework.frame_time
 
-        # 프레임 애니메이션 (0~5), 랩(한바퀴) 감지
         delta = FRAMES_PER_ACTION * ACTION_PER_TIME * dt
         new_frame_float = self.mob.frame + delta
-        new_frame = int(new_frame_float) % 6
+        new_frame = int(new_frame_float) % 9
 
         # 프레임이 래핑되면 한 바퀴 완료로 간주
         if self.prev_frame > new_frame:
             self.lap_count += 1
         self.prev_frame = new_frame
 
-        self.mob.frame = new_frame_float % 6
+        self.mob.frame = new_frame_float % 9
 
         # 4바퀴마다 방향 변경 후 정지 상태로 전환(확률 제거, 항상 STOP)
         if self.lap_count >= 4:
