@@ -3,9 +3,8 @@ import game_world
 import game_framework
 import random
 import stage2_0_mode, stage2_1_mode, stage2_2_mode, stage2_3_mode
-import stage2_4_mode, stage2_5_mode
-'''stage2_6_mode, stage2_7_mode
-import stage2_8_mode, stage2_9_mode, stage2_10_mode, stage2_11_mode'''
+import stage2_4_mode, stage2_5_mode, stage2_6_mode, stage2_7_mode
+import stage2_8_mode, stage2_9_mode, stage2_10_mode, stage2_11_mode
 from stage2_0 import Stage2_0
 from stage2_1 import Stage2_1
 from stage2_2 import Stage2_2
@@ -138,7 +137,7 @@ class Dead:
                     stage2_4_mode.coins.append(coin)
                 elif Stage2_5.current_mode:
                     stage2_5_mode.coins.append(coin)
-                '''elif Stage2_6.current_mode:
+                elif Stage2_6.current_mode:
                     stage2_6_mode.coins.append(coin)
                 elif Stage2_7.current_mode:
                     stage2_7_mode.coins.append(coin)
@@ -149,7 +148,7 @@ class Dead:
                 elif Stage2_10.current_mode:
                     stage2_10_mode.coins.append(coin)
                 elif Stage2_11.current_mode:
-                    stage2_11_mode.coins.append(coin)'''
+                    stage2_11_mode.coins.append(coin)
 
                 game_world.add_object(coin, 2)
                 game_world.add_collision_pair('player:coin', None, coin)
