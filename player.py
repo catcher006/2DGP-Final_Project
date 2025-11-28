@@ -23,6 +23,7 @@ from stage2_8 import Stage2_8
 from stage2_9 import Stage2_9
 from stage2_10 import Stage2_10
 from stage2_11 import Stage2_11
+from stage3_0 import Stage3_0
 from state_machine import StateMachine
 from pico2d import *
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f, SDLK_SPACE
@@ -245,6 +246,14 @@ class Attack:
                         if hasattr(obj, 'handle_collision') and 'zombie_boss' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_sword:zombie_boss', None, obj)
 
+            elif Stage3_0.current_mode: # 임시 충돌 판정
+                game_world.add_collision_pair('player_sword:goblin_mob', self.player_sword, None)
+                # 기존 좀비 보스와 충돌 페어 추가
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'goblin_mob' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player_sword:goblin_mob', None, obj)
+
         elif check_weapon() == 'bow':
             player_arrow = Player_Arrow()
             game_world.add_object(player_arrow, 2)
@@ -280,6 +289,14 @@ class Attack:
                     for obj in layer:
                         if hasattr(obj, 'handle_collision') and 'zombie_boss' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_arrow:zombie_boss', None, obj)
+
+            elif Stage3_0.current_mode:
+                game_world.add_collision_pair('player_arrow:goblin_mob', player_arrow, None)
+                # 기존 좀비 보스와 충돌 페어 추가
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'goblin_mob' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player_arrow:goblin_mob', None, obj)
 
     def exit(self, e):
         self.player.is_attacking = False
@@ -483,7 +500,7 @@ class Player:
         else:
             # 공격키일 때 현재 공격 가능 여부 확인
             if space_down(('INPUT', event)):
-                if not Stage1_0.stage1_0_create and not Stage2_0.stage2_0_create:
+                if not Stage1_0.stage1_0_create and not Stage2_0.stage2_0_create and not Stage3_0.stage3_0_create:
                     return
             self.state_machine.handle_state_event(('INPUT', event))
 
