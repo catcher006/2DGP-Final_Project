@@ -3,7 +3,8 @@ import game_framework
 import game_world
 import stage1_0_mode, stage1_1_mode, stage1_2_mode, stage1_3_mode
 import stage1_4_mode, stage1_5_mode, stage1_6_mode, stage1_7_mode
-import stage2_0_mode, stage2_1_mode, stage2_2_mode''', stage2_3_mode
+import stage2_0_mode, stage2_1_mode, stage2_2_mode
+''', stage2_3_mode
 import stage2_4_mode, stage2_5_mode, stage2_6_mode, stage2_7_mode
 import stage2_8_mode, stage2_9_mode, stage2_10_mode, stage2_11_mode'''
 from stage1_0 import Stage1_0
