@@ -19,16 +19,16 @@ class Attack:
         pass
 
     def draw(self):
-        self.mob.move_image.clip_draw(int(self.mob.frame) * 64, 64 * self.mob.face_dir, 64, 64, self.mob.x, self.mob.y, 200, 200)
+        self.mob.image.clip_draw(int(self.mob.frame) * 192, 192 * self.mob.face_dir, 192, 192, self.mob.x, self.mob.y, 600, 600)
 
 class Slime_Mob:
     def __init__(self):
-        self.move_image = load_image("../image/mobs/zombie_boss/idle.png")
+        self.image = load_image("../image/mobs/zombie_boss/attack.png")
 
         self.x = 600
         self.y = 400
 
-        self.frame = 0
+        self.frame = 5
         self.face_dir = 3
 
         self.dx = 0.0
@@ -68,13 +68,34 @@ class Slime_Mob:
 
     def get_bb(self):
         # face_dir = 0
-        # return self.x - 34, self.y - 94, self.x + 28, self.y + 52
+        # return self.x + 16, self.y - 78, self.x + 68, self.y - 6 # frame : 0
+        # return self.x, self.y - 76, self.x + 58, self.y - 34  # frame : 1
+        # return self.x - 62, self.y - 84, self.x, self.y - 42  # frame : 2
+        # return self.x - 50, self.y - 82, self.x + 124, self.y - 22  # frame : 3
+        # return self.x + 40, self.y - 58, self.x + 138, self.y + 22  # frame : 4
+        # return self.x + 56, self.y - 58, self.x + 138, self.y + 46  # frame : 5
         # face_dir = 1
-        # return self.x - 48, self.y - 94, self.x + 46, self.y + 52
+        # return self.x - 48, self.y - 72, self.x + 24, self.y # frame : 0
+        # return self.x - 72, self.y - 72, self.x - 4, self.y  # frame : 1
+        # return self.x - 94, self.y - 70, self.x - 28, self.y - 26  # frame : 2
+        # return self.x - 92, self.y - 78, self.x - 8, self.y - 30  # frame : 3
+        # return self.x - 68, self.y - 122, self.x + 140, self.y - 20  # frame : 4
+        # return self.x - 42, self.y - 110, self.x + 152, self.y + 8  # frame : 5
         # face_dir = 2
-        # return self.x - 28, self.y - 94, self.x + 34, self.y + 52
+        # return self.x - 70, self.y - 78, self.x - 18, self.y - 6  # frame : 0
+        # return self.x - 60, self.y - 76, self.x, self.y - 34  # frame : 1
+        # return self.x, self.y - 84, self.x + 62, self.y - 42  # frame : 2
+        # return self.x - 126, self.y - 82, self.x + 50, self.y - 22  # frame : 3
+        # return self.x - 138, self.y - 58, self.x - 40, self.y + 22  # frame : 4
+        #return self.x - 138, self.y - 58, self.x - 56, self.y + 46  # frame : 5
         # face_dir = 3
-        return self.x - 48, self.y - 94, self.x + 46, self.y + 50
+        # return self.x - 60, self.y - 70, self.x + 12, self.y + 2  # frame : 0
+        # return self.x - 72, self.y - 44, self.x - 4, self.y - 4  # frame : 1
+        # return self.x - 92, self.y - 42, self.x - 28, self.y + 2  # frame : 2
+        # return self.x - 70, self.y - 42, self.x - 8, self.y  # frame : 3
+        # return self.x - 76, self.y - 66, self.x + 94, self.y + 78  # frame : 4
+        return self.x - 22, self.y - 52, self.x + 150, self.y + 72  # frame : 5
+
 
 
 
