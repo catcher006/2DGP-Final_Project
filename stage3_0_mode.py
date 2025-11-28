@@ -4,7 +4,7 @@ import random
 import dungeonmain_mode
 import game_world
 import game_framework
-import stage3_1_mode#, stage3_3_mode
+import stage3_1_mode, stage3_3_mode
 from stage3_0 import Stage3_0
 from stage3_1 import Stage3_1
 from stage3_2 import Stage3_2
@@ -57,10 +57,11 @@ def handle_events():
                     game_framework.push_mode(stage3_1_mode,(50, 320))
                 else:
                     game_framework.pop_mode(stage3_1_mode,(50, 320))
-            elif 50 <= player.x <= 70 and 270 <= player.y <= 370:  # 좌측 문
-                pass
             elif 500 <= player.x <=  550 and 0 <= player.y <= 20: # 하단 문
-                pass
+                if not Stage3_3.stage3_3_create:
+                    game_framework.push_mode(stage3_3_mode, (525, 600))
+                else:
+                    game_framework.pop_mode(stage3_3_mode, (525, 600))
         else:
             player.handle_event(event)
 
