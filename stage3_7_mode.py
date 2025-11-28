@@ -7,7 +7,7 @@ import stage3_4_mode
 from stage3_7 import Stage3_7
 from stage3_4 import Stage3_4
 from player import Player
-from goblin_mob import Goblin_Mob
+from goblin_boss import Goblin_Boss
 from ui import Ui
 
 
@@ -31,7 +31,7 @@ def handle_events():
             player.handle_event(event)
 
 def init(player_start_pos=None):
-    global world, goblin_mobs, coins
+    global world, goblin_boss, coins
     global stage3_7
     global player
 
@@ -44,13 +44,12 @@ def init(player_start_pos=None):
         Stage3_7.stage3_7_create = True
         Stage3_7.current_mode = True
 
-        goblin_mobs = [Goblin_Mob() for _ in range(random.randint(2, 5))]
-        for goblin_mob in goblin_mobs:
-            goblin_mob.move_validator = stage3_7.is_mob_walkable
+        goblin_boss = Goblin_Boss()
+        goblin_boss.move_validator = stage3_7.is_mob_walkable
 
         coins = []
     else:
-        goblin_mobs = []
+        goblin_boss = []
         coins = []
 
     game_world.add_object(stage3_7, 0)
@@ -65,18 +64,10 @@ def init(player_start_pos=None):
     game_world.add_collision_pair('player:coin', player, None)
 
     # 첫 방문 시에만 몹 추가
-    if goblin_mobs:
-        game_world.add_objects(goblin_mobs, 2)
-        game_world.add_collision_pair('player:goblin_mob', player, None)
-        for goblin_mob in goblin_mobs:
-            game_world.add_collision_pair('player:goblin_mob', None, goblin_mob)
-            game_world.add_collision_pair('goblin_mob:goblin_mob', goblin_mob, None)
-
-            # 다른 몹들과의 충돌 페어 추가
-            for goblin_mob in goblin_mobs:
-                for other_mob in goblin_mobs:
-                    if goblin_mob != other_mob:
-                        game_world.add_collision_pair('goblin_mob:goblin_mob', None, other_mob)
+    if goblin_boss:
+        game_world.add_object(goblin_boss, 2)
+        game_world.add_collision_pair('player:goblin_boss', player, None)
+        game_world.add_collision_pair('player:goblin_boss', None, goblin_boss)
 
     if coins:
         game_world.add_objects(coins, 2)
@@ -100,23 +91,19 @@ def finish():
     game_world.clear()
 
 def pause():
-    global goblin_mobs, stage3_7, coins
+    global goblin_boss, stage3_7, coins
 
     Stage3_7.current_mode = False
 
     # 기존 goblin_mobs 초기화 후 현재 살아있는 몹만 저장
     stage3_7.saved_mobs = []
-    for goblin_mob in goblin_mobs:
-        if goblin_mob.is_alive:
-            mob_data = {
-                'x': goblin_mob.x,
-                'y': goblin_mob.y,
-                'hp': goblin_mob.hp,
-                'face_dir': goblin_mob.face_dir,
-                'type': goblin_mob.mob_type
-            }
-            stage3_7.saved_mobs.append(mob_data)
-            print(f"Pause: Saved mob at ({mob_data['x']}, {mob_data['y']}) with type '{mob_data['type']}', HP: {mob_data['hp']}")
+    if goblin_boss is not None and goblin_boss.is_alive:
+        stage3_7.saved_mobs.append({
+            'x': goblin_boss.x,
+            'y': goblin_boss.y,
+            'hp': goblin_boss.hp,
+            'face_dir': goblin_boss.face_dir,
+        })
 
     # 코인 저장
     stage3_7.saved_coins = []
@@ -134,7 +121,7 @@ def pause():
 
 
 def resume(player_start_pos=None):
-    global goblin_mobs, stage3_7, player, coins
+    global goblin_boss, stage3_7, player, coins
 
     Stage3_7.current_mode = True
 
@@ -146,44 +133,19 @@ def resume(player_start_pos=None):
 
     # 저장된 몹 복원
     if stage3_7.saved_mobs:
-        goblin_mobs = []
-        for mob_data in stage3_7.saved_mobs:
-            print(f"Resume: Restoring mob with type '{mob_data['type']}' at ({mob_data['x']}, {mob_data['y']})")
+        mob_data = stage3_7.saved_mobs[0]
+        goblin_boss = Goblin_Boss()
+        goblin_boss.x = mob_data['x']
+        goblin_boss.y = mob_data['y']
+        goblin_boss.hp = mob_data['hp']
+        goblin_boss.face_dir = mob_data.get('face_dir', 0)
+        goblin_boss.move_validator = stage3_7.is_mob_walkable
 
-            goblin_mob = Goblin_Mob()
-
-            # 저장된 타입으로 설정
-            goblin_mob.mob_type = mob_data['type']
-            print(f"Resume: Set mob_type to '{goblin_mob.mob_type}'")
-
-            # 타입에 맞는 이미지 재로드
-            goblin_mob.move_image = load_image(f"./image/mobs/goblin/{goblin_mob.mob_type}/walk.png")
-            goblin_mob.idle_image = load_image(f"./image/mobs/goblin/{goblin_mob.mob_type}/idle.png")
-            goblin_mob.dead_image = load_image(f"./image/mobs/goblin/{goblin_mob.mob_type}/dead.png")
-            goblin_mob.attack_image = load_image(f"./image/mobs/goblin/{goblin_mob.mob_type}/attack.png")
-
-            # 위치 및 상태 복원
-            goblin_mob.x = mob_data['x']
-            goblin_mob.y = mob_data['y']
-            goblin_mob.hp = mob_data['hp']
-            goblin_mob.face_dir = mob_data.get('face_dir', 0)
-            goblin_mob.move_validator = stage3_7.is_mob_walkable
-
-            goblin_mobs.append(goblin_mob)
-
-        game_world.add_objects(goblin_mobs, 2)
-        game_world.add_collision_pair('player:goblin_mob', player, None)
-        for goblin_mob in goblin_mobs:
-            game_world.add_collision_pair('player:goblin_mob', None, goblin_mob)
-            game_world.add_collision_pair('goblin_mob:goblin_mob', goblin_mob, None)
-
-        for goblin_mob in goblin_mobs:
-            for other_mob in goblin_mobs:
-                if goblin_mob != other_mob:
-                    game_world.add_collision_pair('goblin_mob:goblin_mob', None, other_mob)
-
-        print(f"Resume: Total restored {len(goblin_mobs)} goblin mobs")
+        game_world.add_objects(goblin_boss, 2)
+        game_world.add_collision_pair('player:goblin_boss', player, None)
+        game_world.add_collision_pair('player:goblin_boss', None, goblin_boss)
     else:
+        goblin_boss = None
         print("Resume: No saved mobs to restore")
 
     # 코인 복원
