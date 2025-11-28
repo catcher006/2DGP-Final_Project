@@ -7,7 +7,7 @@ import stage2_8_mode
 from stage2_7 import Stage2_7
 from stage2_8 import Stage2_8
 from player import Player
-from zombie_mob import Zombie_Mob
+from zombie_boss import Zombie_Boss
 from ui import Ui
 
 
@@ -31,7 +31,7 @@ def handle_events():
             player.handle_event(event)
 
 def init(player_start_pos=None):
-    global world, zombie_mobs, coins
+    global world, zombie_boss, coins
     global stage2_7
     global player
 
@@ -44,13 +44,12 @@ def init(player_start_pos=None):
         Stage2_7.stage2_7_create = True
         Stage2_7.current_mode = True
 
-        zombie_mobs = [Zombie_Mob() for _ in range(random.randint(2, 5))]
-        for zombie_mob in zombie_mobs:
-            zombie_mob.move_validator = stage2_7.is_mob_walkable
+        zombie_boss = Zombie_Boss()
+        zombie_boss.move_validator = stage2_7.is_mob_walkable
 
         coins = []
     else:
-        zombie_mobs = []
+        zombie_boss = []
         coins = []
 
     game_world.add_object(stage2_7, 0)
@@ -65,18 +64,10 @@ def init(player_start_pos=None):
     game_world.add_collision_pair('player:coin', player, None)
 
     # 첫 방문 시에만 몹 추가
-    if zombie_mobs:
-        game_world.add_objects(zombie_mobs, 2)
-        game_world.add_collision_pair('player:zombie_mob', player, None)
-        for zombie_mob in zombie_mobs:
-            game_world.add_collision_pair('player:zombie_mob', None, zombie_mob)
-            game_world.add_collision_pair('zombie_mob:zombie_mob', zombie_mob, None)
-
-            # 다른 몹들과의 충돌 페어 추가
-            for zombie_mob in zombie_mobs:
-                for other_mob in zombie_mobs:
-                    if zombie_mob != other_mob:
-                        game_world.add_collision_pair('zombie_mob:zombie_mob', None, other_mob)
+    if zombie_boss:
+        game_world.add_object(zombie_boss, 2)
+        game_world.add_collision_pair('player:zombie_boss', player, None)
+        game_world.add_collision_pair('player:zombie_boss', None, zombie_boss)
 
     if coins:
         game_world.add_objects(coins, 2)
@@ -100,23 +91,19 @@ def finish():
     game_world.clear()
 
 def pause():
-    global zombie_mobs, stage2_7, coins
+    global zombie_boss, stage2_7, coins
 
     Stage2_7.current_mode = False
 
     # 기존 zombie_mobs 초기화 후 현재 살아있는 몹만 저장
     stage2_7.saved_mobs = []
-    for zombie_mob in zombie_mobs:
-        if zombie_mob.is_alive:
-            mob_data = {
-                'x': zombie_mob.x,
-                'y': zombie_mob.y,
-                'hp': zombie_mob.hp,
-                'face_dir': zombie_mob.face_dir,
-                'type': zombie_mob.mob_type
-            }
-            stage2_7.saved_mobs.append(mob_data)
-            print(f"Pause: Saved mob at ({mob_data['x']}, {mob_data['y']}) with type '{mob_data['type']}', HP: {mob_data['hp']}")
+    if zombie_boss is not None and zombie_boss.is_alive:
+            stage2_7.saved_mobs.append({
+                'x': zombie_boss.x,
+                'y': zombie_boss.y,
+                'hp': zombie_boss.hp,
+                'face_dir': zombie_boss.face_dir,
+            })
 
     # 코인 저장
     stage2_7.saved_coins = []
@@ -134,7 +121,7 @@ def pause():
 
 
 def resume(player_start_pos=None):
-    global zombie_mobs, stage2_7, player, coins
+    global zombie_boss, stage2_7, player, coins
 
     Stage2_7.current_mode = True
 
@@ -146,81 +133,19 @@ def resume(player_start_pos=None):
 
     # 저장된 몹 복원
     if stage2_7.saved_mobs:
-        zombie_mobs = []
-        for mob_data in stage2_7.saved_mobs:
-            print(f"Resume: Restoring mob with type '{mob_data['type']}' at ({mob_data['x']}, {mob_data['y']})")
+        mob_data = stage2_7.saved_mobs[0]
+        zombie_boss = Zombie_Boss()
+        zombie_boss.x = mob_data['x']
+        zombie_boss.y = mob_data['y']
+        zombie_boss.hp = mob_data['hp']
+        zombie_boss.face_dir = mob_data.get('face_dir', 0)
+        zombie_boss.move_validator = stage2_7.is_mob_walkable
 
-            zombie_mob = Zombie_Mob()
-
-            # 저장된 타입으로 설정
-            zombie_mob.mob_type = mob_data['type']
-            print(f"Resume: Set mob_type to '{zombie_mob.mob_type}'")
-
-            # 타입에 맞는 이미지 재로드
-            zombie_mob.move_image = load_image("./image/mobs/zombie/" + zombie_mob.mob_type + "/walk.png")
-            zombie_mob.idle_image = load_image("./image/mobs/zombie/" + zombie_mob.mob_type + "/idle.png")
-            zombie_mob.dead_image = load_image("./image/mobs/zombie/" + zombie_mob.mob_type + "/dead.png")
-            if zombie_mob.mob_type == 'mace':
-                zombie_mob.attack_image = load_image("./image/mobs/zombie/" + zombie_mob.mob_type + "/attack.png")
-
-            # 위치 및 상태 복원
-            zombie_mob.x = mob_data['x']
-            zombie_mob.y = mob_data['y']
-            zombie_mob.hp = mob_data['hp']
-            zombie_mob.face_dir = mob_data.get('face_dir', 0)
-            zombie_mob.move_validator = stage2_7.is_mob_walkable
-
-            # 타입에 맞는 state_machine 재구성
-            from state_machine import StateMachine
-            from zombie_mob import Idle, Move, Dead, Attack, time_out, event_stop, event_die
-
-            zombie_mob.IDLE = Idle(zombie_mob)
-            zombie_mob.MOVE = Move(zombie_mob)
-            zombie_mob.DEAD = Dead(zombie_mob)
-
-            if zombie_mob.mob_type == "mace":
-                zombie_mob.ATTACK = Attack(zombie_mob)
-                zombie_mob.state_machine = StateMachine(
-                    zombie_mob.IDLE,
-                    {
-                        zombie_mob.IDLE: {time_out: zombie_mob.MOVE, event_die: zombie_mob.DEAD},
-                        zombie_mob.MOVE: {event_die: zombie_mob.DEAD, event_stop: zombie_mob.ATTACK},
-                        zombie_mob.ATTACK: {time_out: zombie_mob.MOVE, event_die: zombie_mob.DEAD},
-                        zombie_mob.DEAD: {}
-                    }
-                )
-                print(f"Resume: Created state_machine with ATTACK state for mace type")
-            else:
-                zombie_mob.state_machine = StateMachine(
-                    zombie_mob.IDLE,
-                    {
-                        zombie_mob.MOVE: {event_die: zombie_mob.DEAD, event_stop: zombie_mob.IDLE},
-                        zombie_mob.IDLE: {time_out: zombie_mob.MOVE, event_die: zombie_mob.DEAD},
-                        zombie_mob.DEAD: {}
-                    }
-                )
-                print(f"Resume: Created state_machine without ATTACK state for none type")
-
-            # IDLE 상태로 명시적 전환
-            zombie_mob.state_machine.cur_state = zombie_mob.IDLE
-            zombie_mob.IDLE.enter(None)
-
-            print(f"Resume: Mob restored - Type: '{zombie_mob.mob_type}', Position: ({zombie_mob.x}, {zombie_mob.y}), HP: {zombie_mob.hp}")
-            zombie_mobs.append(zombie_mob)
-
-        game_world.add_objects(zombie_mobs, 2)
-        game_world.add_collision_pair('player:zombie_mob', player, None)
-        for zombie_mob in zombie_mobs:
-            game_world.add_collision_pair('player:zombie_mob', None, zombie_mob)
-            game_world.add_collision_pair('zombie_mob:zombie_mob', zombie_mob, None)
-
-        for zombie_mob in zombie_mobs:
-            for other_mob in zombie_mobs:
-                if zombie_mob != other_mob:
-                    game_world.add_collision_pair('zombie_mob:zombie_mob', None, other_mob)
-
-        print(f"Resume: Total restored {len(zombie_mobs)} zombie mobs")
+        game_world.add_objects(zombie_boss, 2)
+        game_world.add_collision_pair('player:zombie_boss', player, None)
+        game_world.add_collision_pair('player:zombie_boss', None, zombie_boss)
     else:
+        zombie_boss = None
         print("Resume: No saved mobs to restore")
 
     # 코인 복원
