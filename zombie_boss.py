@@ -455,6 +455,7 @@ class Zombie_Boss:
                 if self.hp <= 0:
                     self.hp = 0
                     self.is_alive = False
+                    Stage2_7.boss_cleared = True
                     self.state_machine.handle_state_event(('DIE', None))
                     print("zombie_mob is dead!")
 
@@ -490,6 +491,7 @@ class Zombie_Boss:
                 if self.hp <= 0:
                     self.hp = 0
                     self.is_alive = False
+                    Stage2_7.boss_cleared = True
                     self.state_machine.handle_state_event(('DIE', None))
                     print("zombie_mob is dead!")
 
