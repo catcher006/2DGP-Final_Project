@@ -381,13 +381,13 @@ class Zombie_Boss:
             return None
 
         if self.face_dir == 3:
-            return self.x - 22, self.y - 47, self.x + 22, self.y + 25
+            return self.x - 48, self.y - 94, self.x + 46, self.y + 50
         elif self.face_dir == 2:
-            return self.x - 15, self.y - 47, self.x + 15, self.y + 25
+            return self.x - 28, self.y - 94, self.x + 34, self.y + 52
         elif self.face_dir == 1:
-            return self.x - 22, self.y - 47, self.x + 22, self.y + 25
+            return self.x - 48, self.y - 94, self.x + 46, self.y + 52
         elif self.face_dir == 0:
-            return self.x - 18, self.y - 47, self.x + 15, self.y + 25
+            return self.x - 34, self.y - 94, self.x + 28, self.y + 52
 
     def update(self):
         # 넉백 중이면 넉백 처리
