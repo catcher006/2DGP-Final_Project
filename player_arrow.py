@@ -132,3 +132,8 @@ class Player_Arrow:
             if self.is_fired and not self.is_removed:
                 self.is_removed = True
                 game_world.remove_object(self)
+
+        elif group == 'player_arrow:goblin_mob' or group == 'player_arrow:goblin_boss':
+            if self.is_fired and not self.is_removed:
+                self.is_removed = True
+                game_world.remove_object(self)
