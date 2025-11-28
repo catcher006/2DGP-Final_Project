@@ -176,7 +176,7 @@ def resume(player_start_pos=None):
 
     # 저장된 몹 복원
     if stage3_0.saved_mobs:
-        zombie_mobs = []
+        goblin_mobs = []
         for mob_data in stage3_0.saved_mobs:
             print(f"Resume: Restoring mob with type '{mob_data['type']}' at ({mob_data['x']}, {mob_data['y']})")
 

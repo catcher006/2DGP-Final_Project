@@ -197,6 +197,7 @@ class Attack:
 
         # 좀비 참조를 전달하여 Zombie_Mace 생성
         if self.mob.mob_type == 'mace':
+            self.max_frame = 6
             self.goblin_mace = Goblin_Mace(self.mob)
             game_world.add_object(self.goblin_mace, 2)
 
@@ -212,6 +213,7 @@ class Attack:
                             game_world.add_collision_pair('player:goblin_mace', obj, None)
 
         elif self.mob.mob_type == 'bow':
+            self.max_frame = 13
             self.goblin_arrow = Goblin_Arrow(self.mob)
             game_world.add_object(self.goblin_arrow, 2)
 
