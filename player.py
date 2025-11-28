@@ -62,7 +62,7 @@ player_hp = 100
 player_is_alive = True
 player_is_attacking = False
 player_plate_id = 'none'
-player_weapon_id = 'goldbow'
+player_weapon_id = 'normalbow'
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -443,13 +443,16 @@ class Player:
 
     def draw(self):
         self.state_machine.draw()
-        self.hp_image.clip_draw(0, int(player_hp) // 5 * 66, 240, 66, self.x, self.y + 45, 60, 11)
-        if player_hp >= 100: self.font.draw(self.x - 8, self.y + 45, f'{player_hp:02d}', (255, 255, 255))
-        elif 50 < player_hp < 100: self.font.draw(self.x - 6, self.y + 45, f'{player_hp:02d}', (255, 255, 255))
+        self.hp_image.clip_draw(0, int(player_hp) * 54, 400, 54, self.x, self.y + 35, 60, 11)
+        if player_hp >= 100:
+            self.font.draw(self.x - 8, self.y + 35, f'{player_hp:02d}', (255, 255, 255))
+        elif 50 < player_hp < 100:
+            self.font.draw(self.x - 6, self.y + 35, f'{player_hp:02d}', (255, 255, 255))
         elif player_hp == 50:
-            self.font.draw(self.x - 6, self.y + 45, f'{player_hp // 10}', (255, 255, 255))
-            self.font.draw(self.x, self.y + 45, f'{player_hp % 10}', (255, 0, 255))
-        else: self.font.draw(self.x - 6, self.y + 45, f'{player_hp:02d}', (255, 0, 255))
+            self.font.draw(self.x - 6, self.y + 35, f'{((player_hp % 100) // 10):d}', (255, 255, 255))
+            self.font.draw(self.x, self.y + 35, f'{player_hp % 10:d}', (255, 0, 255))
+        else:
+            self.font.draw(self.x - 6, self.y + 35, f'{player_hp:02d}', (255, 0, 255))
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
