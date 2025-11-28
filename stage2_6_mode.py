@@ -3,10 +3,10 @@ from pico2d import *
 import random
 import game_world
 import game_framework
-import stage2_4_mode, stage2_6_mode
-from stage2_3 import Stage2_3
-from stage2_4 import Stage2_4
+import stage2_3_mode, stage2_9_mode
 from stage2_6 import Stage2_6
+from stage2_3 import Stage2_3
+from stage2_9 import Stage2_9
 from player import Player
 from zombie_mob import Zombie_Mob
 from ui import Ui
@@ -23,46 +23,46 @@ def handle_events():
         elif event.type in (SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP):
             continue
         elif event.type == SDL_KEYDOWN and event.key == SDLK_f:
-            if 990 <= player.x <= 1010 and 270 <= player.y <= 370:  # 우측 문
-                if not Stage2_4.stage2_4_create:
-                    game_framework.push_mode(stage2_4_mode, (50, 320))
+            if 500 <= player.x <= 550 and 580 <= player.y <= 600:  # 상단 문
+                if not Stage2_3.stage2_3_create:
+                    game_framework.push_mode(stage2_3_mode, (525, 0))
                 else:
-                    game_framework.pop_mode(stage2_4_mode, (50, 320))
+                    game_framework.pop_mode(stage2_3_mode, (525, 0))
             elif 500 <= player.x <=  550 and 0 <= player.y <= 20: # 하단 문
-                if not Stage2_6.stage2_6_create:
-                    game_framework.push_mode(stage2_6_mode,(525, 600))
+                if not Stage2_9.stage2_9_create:
+                    game_framework.push_mode(stage2_9_mode,(525, 600))
                 else:
-                    game_framework.pop_mode(stage2_6_mode,(525, 600))
+                    game_framework.pop_mode(stage2_9_mode,(525, 600))
         else:
             player.handle_event(event)
 
 def init(player_start_pos=None):
     global world, zombie_mobs, coins
-    global stage2_3
+    global stage2_6
     global player
 
     # 기존 충돌 페어 초기화
     game_world.collision_pairs.clear()
 
-    stage2_3 = Stage2_3()
+    stage2_6 = Stage2_6()
 
-    if not Stage2_3.stage2_3_create:
-        Stage2_3.stage2_3_create = True
-        Stage2_3.current_mode = True
+    if not Stage2_6.stage2_6_create:
+        Stage2_6.stage2_6_create = True
+        Stage2_6.current_mode = True
 
         zombie_mobs = [Zombie_Mob() for _ in range(random.randint(2, 5))]
         for zombie_mob in zombie_mobs:
-            zombie_mob.move_validator = stage2_3.is_mob_walkable
+            zombie_mob.move_validator = stage2_6.is_mob_walkable
 
         coins = []
     else:
         zombie_mobs = []
         coins = []
 
-    game_world.add_object(stage2_3, 0)
+    game_world.add_object(stage2_6, 0)
 
     player = Player()
-    player.move_validator = stage2_3.is_walkable
+    player.move_validator = stage2_6.is_walkable
     if player_start_pos:
         player.x, player.y = player_start_pos
 
@@ -106,12 +106,12 @@ def finish():
     game_world.clear()
 
 def pause():
-    global zombie_mobs, stage2_3, coins
+    global zombie_mobs, stage2_6, coins
 
-    Stage2_3.current_mode = False
+    Stage2_6.current_mode = False
 
     # 기존 zombie_mobs 초기화 후 현재 살아있는 몹만 저장
-    stage2_3.saved_mobs = []
+    stage2_6.saved_mobs = []
     for zombie_mob in zombie_mobs:
         if zombie_mob.is_alive:
             mob_data = {
@@ -121,39 +121,39 @@ def pause():
                 'face_dir': zombie_mob.face_dir,
                 'type': zombie_mob.mob_type
             }
-            stage2_3.saved_mobs.append(mob_data)
+            stage2_6.saved_mobs.append(mob_data)
             print(f"Pause: Saved mob at ({mob_data['x']}, {mob_data['y']}) with type '{mob_data['type']}', HP: {mob_data['hp']}")
 
     # 코인 저장
-    stage2_3.saved_coins = []
+    stage2_6.saved_coins = []
     for coin in coins:
-        stage2_3.saved_coins.append({
+        stage2_6.saved_coins.append({
             'x': coin.x,
             'y': coin.y,
             'frame': coin.frame
         })
 
-    print(f"Pause: Saved {len(stage2_3.saved_mobs)} zombie mobs, {len(stage2_3.saved_coins)} coins")
+    print(f"Pause: Saved {len(stage2_6.saved_mobs)} zombie mobs, {len(stage2_6.saved_coins)} coins")
 
     game_world.clear()
     game_world.collision_pairs.clear()
 
 
 def resume(player_start_pos=None):
-    global zombie_mobs, stage2_3, player, coins
+    global zombie_mobs, stage2_6, player, coins
 
-    Stage2_3.current_mode = True
+    Stage2_6.current_mode = True
 
     if player_start_pos:
         player.x, player.y = player_start_pos
 
-    game_world.add_object(stage2_3, 0)
+    game_world.add_object(stage2_6, 0)
     game_world.add_object(player, 2)
 
     # 저장된 몹 복원
-    if stage2_3.saved_mobs:
+    if stage2_6.saved_mobs:
         zombie_mobs = []
-        for mob_data in stage2_3.saved_mobs:
+        for mob_data in stage2_6.saved_mobs:
             print(f"Resume: Restoring mob with type '{mob_data['type']}' at ({mob_data['x']}, {mob_data['y']})")
 
             zombie_mob = Zombie_Mob()
@@ -174,7 +174,7 @@ def resume(player_start_pos=None):
             zombie_mob.y = mob_data['y']
             zombie_mob.hp = mob_data['hp']
             zombie_mob.face_dir = mob_data.get('face_dir', 0)
-            zombie_mob.move_validator = stage2_3.is_mob_walkable
+            zombie_mob.move_validator = stage2_6.is_mob_walkable
 
             # 타입에 맞는 state_machine 재구성
             from state_machine import StateMachine
@@ -230,9 +230,9 @@ def resume(player_start_pos=None):
         print("Resume: No saved mobs to restore")
 
     # 코인 복원
-    if stage2_3.saved_coins:
+    if stage2_6.saved_coins:
         coins = []
-        for coin_data in stage2_3.saved_coins:
+        for coin_data in stage2_6.saved_coins:
             from coin import Coin
             coin = Coin()
             coin.x = coin_data['x']
