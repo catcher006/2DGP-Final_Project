@@ -3,6 +3,7 @@ import game_world
 import game_framework
 import random
 import stage3_0_mode#, stage3_1_mode, stage3_2_mode, stage3_3_mode
+from goblin_arrow import Goblin_Arrow
 # import stage3_4_mode, stage3_5_mode, stage3_6_mode, stage3_7_mode
 # import stage3_8_mode, stage3_9_mode, stage3_10_mode, stage3_11_mode
 from stage3_0 import Stage3_0
@@ -17,6 +18,7 @@ from stage3_8 import Stage3_8
 from stage3_9 import Stage3_9
 from stage3_10 import Stage3_10
 from stage3_11 import Stage3_11
+from goblin_mace import Goblin_Mace
 from player import player_weapon_id
 from state_machine import StateMachine
 from pico2d import load_image, load_font, get_time, draw_rectangle
@@ -178,7 +180,8 @@ class Attack:
         self.lap_count = 0
         self.prev_frame = 0
         self.max_frame = 6  # attack 애니메이션 프레임 수
-        self.zombie_mace = None
+        self.goblin_mace = None
+        self.goblin_arrow = None
 
     def enter(self, e):
         self.mob.frame = 0.0
@@ -189,26 +192,42 @@ class Attack:
 
         self.mob.is_attacking = True
 
-        '''# 좀비 참조를 전달하여 Zombie_Mace 생성
-        self.zombie_mace = Zombie_Mace(self.mob)
-        game_world.add_object(self.zombie_mace, 2)
+        # 좀비 참조를 전달하여 Zombie_Mace 생성
+        if self.mob.mob_type == 'mace':
+            self.goblin_mace = Goblin_Mace(self.mob)
+            game_world.add_object(self.goblin_mace, 2)
 
-        # 충돌 그룹에 추가
-        if Stage2_0.current_mode or Stage2_1.current_mode or Stage2_2.current_mode or Stage2_3.current_mode or Stage2_4.current_mode or \
-                Stage2_5.current_mode or Stage2_6.current_mode or Stage2_7.current_mode or Stage2_8.current_mode or Stage2_9.current_mode or \
-                Stage2_10.current_mode or Stage2_11.current_mode:
-            game_world.add_collision_pair('player:zombie_mace', None, self.zombie_mace)
-            # 플레이어와 충돌 페어 추가
-            for layer in game_world.world:
-                for obj in layer:
-                    if hasattr(obj, 'handle_collision') and 'player' in str(type(obj)).lower():
-                        game_world.add_collision_pair('player:zombie_mace', obj, None)'''
+            # 충돌 그룹에 추가
+            if Stage3_0.current_mode or Stage3_1.current_mode or Stage3_2.current_mode or Stage3_3.current_mode or Stage3_4.current_mode or \
+                    Stage3_5.current_mode or Stage3_6.current_mode or Stage3_7.current_mode or Stage3_8.current_mode or Stage3_9.current_mode or \
+                    Stage3_10.current_mode or Stage3_11.current_mode:
+                game_world.add_collision_pair('player:goblin_mace', None, self.goblin_mace)
+                # 플레이어와 충돌 페어 추가
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'player' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player:goblin_mace', obj, None)
+
+        elif self.mob.mob_type == 'bow':
+            self.goblin_arrow = Goblin_Arrow(self.mob)
+            game_world.add_object(self.goblin_arrow, 2)
+
+            # 충돌 그룹에 추가
+            if Stage3_0.current_mode or Stage3_1.current_mode or Stage3_2.current_mode or Stage3_3.current_mode or Stage3_4.current_mode or \
+                    Stage3_5.current_mode or Stage3_6.current_mode or Stage3_7.current_mode or Stage3_8.current_mode or Stage3_9.current_mode or \
+                    Stage3_10.current_mode or Stage3_11.current_mode:
+                game_world.add_collision_pair('player:goblin_arrow', None, self.goblin_arrow)
+                # 플레이어와 충돌 페어 추가
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'player' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player:goblin_arrow', obj, None)
 
     def exit(self, e):
         self.mob.is_attacking = False
         self.mob.frame = 0
 
-        self.zombie_mace = None
+        self.goblin_mace = None
 
     def do(self):
         dt = game_framework.frame_time
