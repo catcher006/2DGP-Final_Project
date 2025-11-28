@@ -24,6 +24,17 @@ from stage2_9 import Stage2_9
 from stage2_10 import Stage2_10
 from stage2_11 import Stage2_11
 from stage3_0 import Stage3_0
+from stage3_1 import Stage3_1
+from stage3_2 import Stage3_2
+from stage3_3 import Stage3_3
+from stage3_4 import Stage3_4
+from stage3_5 import Stage3_5
+from stage3_6 import Stage3_6
+from stage3_7 import Stage3_7
+from stage3_8 import Stage3_8
+from stage3_9 import Stage3_9
+from stage3_10 import Stage3_10
+from stage3_11 import Stage3_11
 from state_machine import StateMachine
 from pico2d import *
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f, SDLK_SPACE
@@ -246,7 +257,9 @@ class Attack:
                         if hasattr(obj, 'handle_collision') and 'zombie_boss' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_sword:zombie_boss', None, obj)
 
-            elif Stage3_0.current_mode: # 임시 충돌 판정
+            elif Stage3_0.current_mode or Stage3_1.current_mode or Stage3_2.current_mode or Stage3_3.current_mode or Stage3_4.current_mode or \
+                    Stage3_5.current_mode or Stage3_6.current_mode or Stage3_7.current_mode or Stage3_8.current_mode or \
+                    Stage3_9.current_mode or Stage3_10.current_mode or Stage3_11.current_mode:
                 game_world.add_collision_pair('player_sword:goblin_mob', self.player_sword, None)
                 # 기존 좀비 보스와 충돌 페어 추가
                 for layer in game_world.world:
@@ -290,7 +303,9 @@ class Attack:
                         if hasattr(obj, 'handle_collision') and 'zombie_boss' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_arrow:zombie_boss', None, obj)
 
-            elif Stage3_0.current_mode:
+            elif Stage3_0.current_mode or Stage3_1.current_mode or Stage3_2.current_mode or Stage3_3.current_mode or Stage3_4.current_mode or \
+                    Stage3_5.current_mode or Stage3_6.current_mode or Stage3_7.current_mode or Stage3_8.current_mode or \
+                    Stage3_9.current_mode or Stage3_10.current_mode or Stage3_11.current_mode:
                 game_world.add_collision_pair('player_arrow:goblin_mob', player_arrow, None)
                 # 기존 좀비 보스와 충돌 페어 추가
                 for layer in game_world.world:
