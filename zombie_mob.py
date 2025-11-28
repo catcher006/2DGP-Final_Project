@@ -380,16 +380,16 @@ class Zombie_Mob:
         self.state_machine.draw()
 
         if self.is_alive or self.hp > 0:
-            self.hp_image.clip_draw(0, int(self.hp) // 5 * 2 * 66, 240, 66, self.x - 5, self.y + 35, 60, 11)
+            self.hp_image.clip_draw(0, int(self.hp) // 5 * 2 * 66, 240, 66, self.x - 3, self.y + 35, 60, 11)
             if self.hp >= 100:
-                self.font.draw(self.x - 13, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
+                self.font.draw(self.x - 9, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
             elif 50 < self.hp < 100:
-                self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
+                self.font.draw(self.x - 9, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
             elif self.hp == 50:
-                self.font.draw(self.x - 11, self.y + 35, '5', (255, 255, 255))
-                self.font.draw(self.x - 5, self.y + 35, '0', (168, 190, 208))
+                self.font.draw(self.x - 9, self.y + 35, '5', (255, 255, 255))
+                self.font.draw(self.x - 4, self.y + 35, '0', (168, 190, 208))
             else:
-                self.font.draw(self.x - 11, self.y + 35, f'{self.hp:02d}', (168, 190, 208))
+                self.font.draw(self.x - 9, self.y + 35, f'{self.hp:02d}', (168, 190, 208))
             draw_rectangle(*self.get_bb())
 
     def get_bb(self):
