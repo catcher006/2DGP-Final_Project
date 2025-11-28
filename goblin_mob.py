@@ -2,22 +2,7 @@ import time
 import game_world
 import game_framework
 import random
-import stage3_0_mode#, stage3_1_mode, stage3_2_mode, stage3_3_mode
 from goblin_arrow import Goblin_Arrow
-# import stage3_4_mode, stage3_5_mode, stage3_6_mode, stage3_7_mode
-# import stage3_8_mode, stage3_9_mode, stage3_10_mode, stage3_11_mode
-from stage3_0 import Stage3_0
-from stage3_1 import Stage3_1
-from stage3_2 import Stage3_2
-from stage3_3 import Stage3_3
-from stage3_4 import Stage3_4
-from stage3_5 import Stage3_5
-from stage3_6 import Stage3_6
-from stage3_7 import Stage3_7
-from stage3_8 import Stage3_8
-from stage3_9 import Stage3_9
-from stage3_10 import Stage3_10
-from stage3_11 import Stage3_11
 from goblin_mace import Goblin_Mace
 from player import player_weapon_id
 from state_machine import StateMachine
@@ -126,9 +111,25 @@ class Dead:
                 coin.x = self.mob.x
                 coin.y = self.mob.y
 
+                from stage3_0 import Stage3_0
+                from stage3_1 import Stage3_1
+                from stage3_2 import Stage3_2
+                from stage3_3 import Stage3_3
+                from stage3_4 import Stage3_4
+                from stage3_5 import Stage3_5
+                from stage3_6 import Stage3_6
+                from stage3_7 import Stage3_7
+                from stage3_8 import Stage3_8
+                from stage3_9 import Stage3_9
+                from stage3_10 import Stage3_10
+                from stage3_11 import Stage3_11
+                import stage3_0_mode, stage3_1_mode, stage3_2_mode, stage3_3_mode
+                import stage3_4_mode, stage3_5_mode, stage3_6_mode, stage3_7_mode
+                import stage3_8_mode, stage3_9_mode, stage3_10_mode, stage3_11_mode
+
                 if Stage3_0.current_mode:
                     stage3_0_mode.coins.append(coin)
-                '''elif Stage3_1.current_mode:
+                elif Stage3_1.current_mode:
                     stage3_1_mode.coins.append(coin)
                 elif Stage3_2.current_mode:
                     stage3_2_mode.coins.append(coin)
@@ -138,7 +139,7 @@ class Dead:
                     stage3_4_mode.coins.append(coin)
                 elif Stage3_5.current_mode:
                     stage3_5_mode.coins.append(coin)
-                elif Stage3_6.current_mode:
+                '''elif Stage3_6.current_mode:
                     stage3_6_mode.coins.append(coin)
                 elif Stage3_7.current_mode:
                     stage3_7_mode.coins.append(coin)
@@ -194,6 +195,19 @@ class Attack:
         self.prev_frame = 0
 
         self.mob.is_attacking = True
+
+        from stage3_0 import Stage3_0
+        from stage3_1 import Stage3_1
+        from stage3_2 import Stage3_2
+        from stage3_3 import Stage3_3
+        from stage3_4 import Stage3_4
+        from stage3_5 import Stage3_5
+        from stage3_6 import Stage3_6
+        from stage3_7 import Stage3_7
+        from stage3_8 import Stage3_8
+        from stage3_9 import Stage3_9
+        from stage3_10 import Stage3_10
+        from stage3_11 import Stage3_11
 
         # 좀비 참조를 전달하여 Zombie_Mace 생성
         if self.mob.mob_type == 'mace':
