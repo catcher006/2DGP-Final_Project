@@ -228,7 +228,7 @@ class Attack:
                             game_world.add_collision_pair('player_sword:slime_boss', None, obj)
 
             elif Stage2_0.current_mode or Stage2_1.current_mode or Stage2_2.current_mode or Stage2_3.current_mode or Stage2_4.current_mode or \
-                    Stage2_5.current_mode or Stage2_6.current_mode or Stage2_7.current_mode or Stage2_8.current_mode or Stage2_9.current_mode or \
+                    Stage2_5.current_mode or Stage2_6.current_mode or Stage2_8.current_mode or Stage2_9.current_mode or \
                     Stage2_10.current_mode or Stage2_11.current_mode:
                 game_world.add_collision_pair('player_sword:zombie_mob', self.player_sword, None)
                 # 기존 몹들과 충돌 페어 추가
@@ -236,6 +236,14 @@ class Attack:
                     for obj in layer:
                         if hasattr(obj, 'handle_collision') and 'zombie' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_sword:zombie_mob', None, obj)
+
+            elif Stage2_7.current_mode:
+                game_world.add_collision_pair('player_sword:zombie_boss', self.player_sword, None)
+                # 기존 좀비 보스와 충돌 페어 추가
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'zombie_boss' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player_sword:zombie_boss', None, obj)
 
         elif check_weapon() == 'bow':
             player_arrow = Player_Arrow()
@@ -257,13 +265,21 @@ class Attack:
                             game_world.add_collision_pair('player_arrow:slime_boss', None, obj)
 
             elif Stage2_0.current_mode or Stage2_1.current_mode or Stage2_2.current_mode or Stage2_3.current_mode or Stage2_4.current_mode or \
-                    Stage2_5.current_mode or Stage2_6.current_mode or Stage2_7.current_mode or Stage2_8.current_mode or Stage2_9.current_mode or \
+                    Stage2_5.current_mode or Stage2_6.current_mode or Stage2_8.current_mode or Stage2_9.current_mode or \
                     Stage2_10.current_mode or Stage2_11.current_mode:
                 game_world.add_collision_pair('player_arrow:zombie_mob', player_arrow, None)
                 for layer in game_world.world:
                     for obj in layer:
                         if hasattr(obj, 'handle_collision') and 'zombie' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_arrow:zombie_mob', None, obj)
+
+            elif Stage2_7.current_mode:
+                game_world.add_collision_pair('player_arrow:zombie_boss', self.player_sword, None)
+                # 기존 좀비 보스와 충돌 페어 추가
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'zombie_boss' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player_arrow:zombie_boss', None, obj)
 
     def exit(self, e):
         self.player.is_attacking = False
@@ -562,7 +578,7 @@ class Player:
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= int(15 * damage_multiplier)
+                player_hp -= int(10 * damage_multiplier)
                 self.last_damage_time = current_time
 
                 # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
@@ -597,6 +613,72 @@ class Player:
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
                 player_hp -= int(15 * damage_multiplier)
+                self.last_damage_time = current_time
+
+                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
+                dx = self.x - other.x
+                dy = self.y - other.y
+                distance = (dx ** 2 + dy ** 2) ** 0.5
+
+                if distance > 0:
+                    # 정규화된 방향 벡터
+                    nx = dx / distance
+                    ny = dy / distance
+
+                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
+                    self.is_knocked_back = True
+                    self.knockback_distance = 20
+                    self.knockback_dx = nx * 1.0
+                    self.knockback_dy = ny * 1.0
+
+                if player_hp <= 0:
+                    player_hp = 0
+                    player_is_alive = False
+                    self.state_machine.handle_state_event(('DIE', None))
+                    print("Player is dead!")
+
+                # 디버그 출력 (선택사항)
+                print(f"Player damaged! HP: {player_hp}")
+
+        elif group == 'player:zombie_boss' and player_is_alive:
+            current_time = time.time()
+
+            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                player_hp -= int(15 * damage_multiplier)
+                self.last_damage_time = current_time
+
+                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
+                dx = self.x - other.x
+                dy = self.y - other.y
+                distance = (dx ** 2 + dy ** 2) ** 0.5
+
+                if distance > 0:
+                    # 정규화된 방향 벡터
+                    nx = dx / distance
+                    ny = dy / distance
+
+                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
+                    self.is_knocked_back = True
+                    self.knockback_distance = 20
+                    self.knockback_dx = nx * 1.0
+                    self.knockback_dy = ny * 1.0
+
+                if player_hp <= 0:
+                    player_hp = 0
+                    player_is_alive = False
+                    self.state_machine.handle_state_event(('DIE', None))
+                    print("Player is dead!")
+
+                # 디버그 출력 (선택사항)
+                print(f"Player damaged! HP: {player_hp}")
+
+        elif group == 'player:zombie_boss_waraxe' and player_is_alive:
+            current_time = time.time()
+
+            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                player_hp -= int(25 * damage_multiplier)
                 self.last_damage_time = current_time
 
                 # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)

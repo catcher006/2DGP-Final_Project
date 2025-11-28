@@ -18,9 +18,9 @@ from stage2_9 import Stage2_9
 from stage2_10 import Stage2_10
 from stage2_11 import Stage2_11
 from player import player_weapon_id
+from zombie_boss_waraxe import Zombie_Boss_Waraxe
 from state_machine import StateMachine
 from pico2d import load_image, load_font, get_time, draw_rectangle
-
 
 # mob Run Speed
 PIXEL_PER_METER = (10.0 / 0.3) # 10 pixel 30 cm
@@ -178,7 +178,7 @@ class Attack:
         self.lap_count = 0
         self.prev_frame = 0
         self.max_frame = 6  # attack 애니메이션 프레임 수
-        self.zombie_mace = None
+        self.zombie_boss_waraxe = None
 
     def enter(self, e):
         self.mob.frame = 0.0
@@ -189,26 +189,26 @@ class Attack:
 
         self.mob.is_attacking = True
 
-        """# 좀비 참조를 전달하여 Zombie_Mace 생성
-        self.zombie_mace = Zombie_Mace(self.mob)
-        game_world.add_object(self.zombie_mace, 2)
+        # 좀비 참조를 전달하여 Zombie_Mace 생성
+        self.zombie_boss_waraxe = Zombie_Boss_Waraxe(self.mob)
+        game_world.add_object(self.zombie_boss_waraxe, 2)
 
         # 충돌 그룹에 추가
         if Stage2_0.current_mode or Stage2_1.current_mode or Stage2_2.current_mode or Stage2_3.current_mode or Stage2_4.current_mode or \
                 Stage2_5.current_mode or Stage2_6.current_mode or Stage2_7.current_mode or Stage2_8.current_mode or Stage2_9.current_mode or \
                 Stage2_10.current_mode or Stage2_11.current_mode:
-            game_world.add_collision_pair('player:zombie_mace', None, self.zombie_mace)
+            game_world.add_collision_pair('player:zombie_boss_waraxe', None, self.zombie_boss_waraxe)
             # 플레이어와 충돌 페어 추가
             for layer in game_world.world:
                 for obj in layer:
                     if hasattr(obj, 'handle_collision') and 'player' in str(type(obj)).lower():
-                        game_world.add_collision_pair('player:zombie_mace', obj, None)"""
+                        game_world.add_collision_pair('player:zombie_boss_waraxe', obj, None)
 
     def exit(self, e):
         self.mob.is_attacking = False
         self.mob.frame = 0
 
-        self.zombie_mace = None
+        self.zombie_boss_waraxe = None
 
     def do(self):
         dt = game_framework.frame_time
