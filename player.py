@@ -50,7 +50,7 @@ player_hp = 100
 player_is_alive = True
 player_is_attacking = False
 player_plate_id = 'none'
-player_weapon_id = 'goldsword'
+player_weapon_id = 'goldbow'
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -274,7 +274,7 @@ class Attack:
                             game_world.add_collision_pair('player_arrow:zombie_mob', None, obj)
 
             elif Stage2_7.current_mode:
-                game_world.add_collision_pair('player_arrow:zombie_boss', self.player_sword, None)
+                game_world.add_collision_pair('player_arrow:zombie_boss', player_arrow, None)
                 # 기존 좀비 보스와 충돌 페어 추가
                 for layer in game_world.world:
                     for obj in layer:
