@@ -6,6 +6,9 @@ import stage1_4_mode, stage1_5_mode, stage1_6_mode, stage1_7_mode
 import stage2_0_mode, stage2_1_mode, stage2_2_mode, stage2_3_mode
 import stage2_4_mode, stage2_5_mode, stage2_6_mode, stage2_7_mode
 import stage2_8_mode, stage2_9_mode, stage2_10_mode, stage2_11_mode
+import stage3_0_mode, stage3_1_mode, stage3_2_mode, stage3_3_mode
+import stage3_4_mode, stage3_5_mode, stage3_6_mode, stage3_7_mode
+import stage3_8_mode, stage3_9_mode, stage3_10_mode, stage3_11_mode
 from stage1_0 import Stage1_0
 from stage1_1 import Stage1_1
 from stage1_2 import Stage1_2
@@ -26,6 +29,18 @@ from stage2_8 import Stage2_8
 from stage2_9 import Stage2_9
 from stage2_10 import Stage2_10
 from stage2_11 import Stage2_11
+from stage3_0 import Stage3_0
+from stage3_1 import Stage3_1
+from stage3_2 import Stage3_2
+from stage3_3 import Stage3_3
+from stage3_4 import Stage3_4
+from stage3_5 import Stage3_5
+from stage3_6 import Stage3_6
+from stage3_7 import Stage3_7
+from stage3_8 import Stage3_8
+from stage3_9 import Stage3_9
+from stage3_10 import Stage3_10
+from stage3_11 import Stage3_11
 from ui import Ui
 
 # By Action Speed
@@ -117,5 +132,29 @@ class Coin:
                 stage2_10_mode.coins.remove(self)
             elif Stage2_11.current_mode:
                 stage2_11_mode.coins.remove(self)
+            elif Stage3_0.current_mode:
+                stage3_0_mode.coins.remove(self)
+            elif Stage3_1.current_mode:
+                stage3_1_mode.coins.remove(self)
+            elif Stage3_2.current_mode:
+                stage3_2_mode.coins.remove(self)
+            elif Stage3_3.current_mode:
+                stage3_3_mode.coins.remove(self)
+            elif Stage3_4.current_mode:
+                stage3_4_mode.coins.remove(self)
+            elif Stage3_5.current_mode:
+                stage3_5_mode.coins.remove(self)
+            elif Stage3_6.current_mode:
+                stage3_6_mode.coins.remove(self)
+            elif Stage3_7.current_mode:
+                stage3_7_mode.coins.remove(self)
+            elif Stage3_8.current_mode:
+                stage3_8_mode.coins.remove(self)
+            elif Stage3_9.current_mode:
+                stage3_9_mode.coins.remove(self)
+            elif Stage3_10.current_mode:
+                stage3_10_mode.coins.remove(self)
+            elif Stage3_11.current_mode:
+                stage3_11_mode.coins.remove(self)
 
             print(f"After collection: {Ui.coin}")  # 디버그 출력

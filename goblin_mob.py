@@ -139,7 +139,7 @@ class Dead:
                     stage3_4_mode.coins.append(coin)
                 elif Stage3_5.current_mode:
                     stage3_5_mode.coins.append(coin)
-                '''elif Stage3_6.current_mode:
+                elif Stage3_6.current_mode:
                     stage3_6_mode.coins.append(coin)
                 elif Stage3_7.current_mode:
                     stage3_7_mode.coins.append(coin)
@@ -150,7 +150,7 @@ class Dead:
                 elif Stage3_10.current_mode:
                     stage3_10_mode.coins.append(coin)
                 elif Stage3_11.current_mode:
-                    stage3_11_mode.coins.append(coin)'''
+                    stage3_11_mode.coins.append(coin)
 
                 game_world.add_object(coin, 2)
                 game_world.add_collision_pair('player:coin', None, coin)
