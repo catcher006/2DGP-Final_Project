@@ -378,6 +378,7 @@ class Slime_Boss:
                 if self.hp <= 0:
                     self.hp = 0
                     self.is_alive = False
+                    Stage1_4.boss_cleared = True
                     self.state_machine.handle_state_event(('DIE', None))
                     print("slime_mob is dead!")
 
