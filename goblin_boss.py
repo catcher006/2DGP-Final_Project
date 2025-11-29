@@ -17,6 +17,7 @@ from stage3_8 import Stage3_8
 from stage3_9 import Stage3_9
 from stage3_10 import Stage3_10
 from stage3_11 import Stage3_11
+from goblin_boss_sword import Goblin_Boss_Sword
 from player import player_weapon_id
 from state_machine import StateMachine
 from pico2d import load_image, load_font, get_time, draw_rectangle
@@ -188,7 +189,7 @@ class Attack:
 
         self.mob.is_attacking = True
 
-        '''self.goblin_boss_sword = Goblin_Boss_Sword(self.mob)
+        self.goblin_boss_sword = Goblin_Boss_Sword(self.mob)
         game_world.add_object(self.goblin_boss_sword, 2)
 
         # 충돌 그룹에 추가
@@ -198,7 +199,7 @@ class Attack:
             for layer in game_world.world:
                 for obj in layer:
                     if hasattr(obj, 'handle_collision') and 'player' in str(type(obj)).lower():
-                        game_world.add_collision_pair('player:goblin_boss_sword', obj, None)'''
+                        game_world.add_collision_pair('player:goblin_boss_sword', obj, None)
 
     def exit(self, e):
         self.mob.is_attacking = False
@@ -448,7 +449,7 @@ class Goblin_Boss:
                 if self.hp <= 0:
                     self.hp = 0
                     self.is_alive = False
-                    Stage2_7.boss_cleared = True
+                    Stage3_7.boss_cleared = True
                     self.state_machine.handle_state_event(('DIE', None))
                     print("goblin_boss is dead!")
 
@@ -484,7 +485,7 @@ class Goblin_Boss:
                 if self.hp <= 0:
                     self.hp = 0
                     self.is_alive = False
-                    Stage2_7.boss_cleared = True
+                    Stage3_7.boss_cleared = True
                     self.state_machine.handle_state_event(('DIE', None))
                     print("goblin_boss is dead!")
 
