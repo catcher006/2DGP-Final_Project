@@ -62,7 +62,7 @@ player_hp = 100
 player_is_alive = True
 player_is_attacking = False
 player_plate_id = 'none'
-player_weapon_id = 'normalbow'
+player_weapon_id = 'goldsword'
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -258,7 +258,7 @@ class Attack:
                             game_world.add_collision_pair('player_sword:zombie_boss', None, obj)
 
             elif Stage3_0.current_mode or Stage3_1.current_mode or Stage3_2.current_mode or Stage3_3.current_mode or Stage3_4.current_mode or \
-                    Stage3_5.current_mode or Stage3_6.current_mode or Stage3_7.current_mode or Stage3_8.current_mode or \
+                    Stage3_5.current_mode or Stage3_6.current_mode or Stage3_8.current_mode or \
                     Stage3_9.current_mode or Stage3_10.current_mode or Stage3_11.current_mode:
                 game_world.add_collision_pair('player_sword:goblin_mob', self.player_sword, None)
                 # 기존 좀비 보스와 충돌 페어 추가
@@ -266,6 +266,13 @@ class Attack:
                     for obj in layer:
                         if hasattr(obj, 'handle_collision') and 'goblin_mob' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_sword:goblin_mob', None, obj)
+
+            elif Stage3_7.current_mode:
+                game_world.add_collision_pair('player_sword:goblin_boss', self.player_sword, None)
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'goblin_boss' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player_sword:goblin_boss', None, obj)
 
         elif check_weapon() == 'bow':
             player_arrow = Player_Arrow()
@@ -304,7 +311,7 @@ class Attack:
                             game_world.add_collision_pair('player_arrow:zombie_boss', None, obj)
 
             elif Stage3_0.current_mode or Stage3_1.current_mode or Stage3_2.current_mode or Stage3_3.current_mode or Stage3_4.current_mode or \
-                    Stage3_5.current_mode or Stage3_6.current_mode or Stage3_7.current_mode or Stage3_8.current_mode or \
+                    Stage3_5.current_mode or Stage3_6.current_mode or Stage3_8.current_mode or \
                     Stage3_9.current_mode or Stage3_10.current_mode or Stage3_11.current_mode:
                 game_world.add_collision_pair('player_arrow:goblin_mob', player_arrow, None)
                 # 기존 좀비 보스와 충돌 페어 추가
@@ -312,6 +319,13 @@ class Attack:
                     for obj in layer:
                         if hasattr(obj, 'handle_collision') and 'goblin_mob' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_arrow:goblin_mob', None, obj)
+
+            elif Stage3_7.current_mode:
+                game_world.add_collision_pair('player_arrow:goblin_boss', player_arrow, None)
+                for layer in game_world.world:
+                    for obj in layer:
+                        if hasattr(obj, 'handle_collision') and 'goblin_boss' in str(type(obj)).lower():
+                            game_world.add_collision_pair('player_arrow:goblin_boss', None, obj)
 
     def exit(self, e):
         self.player.is_attacking = False
@@ -813,6 +827,72 @@ class Player:
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
                 player_hp -= int(25 * damage_multiplier)
+                self.last_damage_time = current_time
+
+                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
+                dx = self.x - other.x
+                dy = self.y - other.y
+                distance = (dx ** 2 + dy ** 2) ** 0.5
+
+                if distance > 0:
+                    # 정규화된 방향 벡터
+                    nx = dx / distance
+                    ny = dy / distance
+
+                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
+                    self.is_knocked_back = True
+                    self.knockback_distance = 20
+                    self.knockback_dx = nx * 1.0
+                    self.knockback_dy = ny * 1.0
+
+                if player_hp <= 0:
+                    player_hp = 0
+                    player_is_alive = False
+                    self.state_machine.handle_state_event(('DIE', None))
+                    print("Player is dead!")
+
+                # 디버그 출력 (선택사항)
+                print(f"Player damaged! HP: {player_hp}")
+
+        elif group == 'player:goblin_boss' and player_is_alive:
+            current_time = time.time()
+
+            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                player_hp -= int(15 * damage_multiplier)
+                self.last_damage_time = current_time
+
+                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
+                dx = self.x - other.x
+                dy = self.y - other.y
+                distance = (dx ** 2 + dy ** 2) ** 0.5
+
+                if distance > 0:
+                    # 정규화된 방향 벡터
+                    nx = dx / distance
+                    ny = dy / distance
+
+                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
+                    self.is_knocked_back = True
+                    self.knockback_distance = 20
+                    self.knockback_dx = nx * 1.0
+                    self.knockback_dy = ny * 1.0
+
+                if player_hp <= 0:
+                    player_hp = 0
+                    player_is_alive = False
+                    self.state_machine.handle_state_event(('DIE', None))
+                    print("Player is dead!")
+
+                # 디버그 출력 (선택사항)
+                print(f"Player damaged! HP: {player_hp}")
+
+        elif group == 'player:goblin_boss_sword' and player_is_alive:
+            current_time = time.time()
+
+            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                player_hp -= int(40 * damage_multiplier)
                 self.last_damage_time = current_time
 
                 # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)

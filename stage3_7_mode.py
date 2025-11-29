@@ -141,7 +141,7 @@ def resume(player_start_pos=None):
         goblin_boss.face_dir = mob_data.get('face_dir', 0)
         goblin_boss.move_validator = stage3_7.is_mob_walkable
 
-        game_world.add_objects(goblin_boss, 2)
+        game_world.add_object(goblin_boss, 2)
         game_world.add_collision_pair('player:goblin_boss', player, None)
         game_world.add_collision_pair('player:goblin_boss', None, goblin_boss)
     else:
