@@ -62,7 +62,7 @@ player_hp = 100
 player_is_alive = True
 player_is_attacking = False
 player_plate_id = 'none'
-player_weapon_id = 'goldsword'
+player_weapon_id = 'goldbow'
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -208,6 +208,7 @@ class Attack:
     def __init__(self, player):
         self.player = player
         self.player_sword = None # 검 객체 참조 저장
+        self.player_arrow = None # 화살 객체 참조 저장
 
     def enter(self, e):
         self.player.is_attacking = True
@@ -261,7 +262,6 @@ class Attack:
                     Stage3_5.current_mode or Stage3_6.current_mode or Stage3_8.current_mode or \
                     Stage3_9.current_mode or Stage3_10.current_mode or Stage3_11.current_mode:
                 game_world.add_collision_pair('player_sword:goblin_mob', self.player_sword, None)
-                # 기존 좀비 보스와 충돌 페어 추가
                 for layer in game_world.world:
                     for obj in layer:
                         if hasattr(obj, 'handle_collision') and 'goblin_mob' in str(type(obj)).lower():
@@ -275,19 +275,19 @@ class Attack:
                             game_world.add_collision_pair('player_sword:goblin_boss', None, obj)
 
         elif check_weapon() == 'bow':
-            player_arrow = Player_Arrow()
-            game_world.add_object(player_arrow, 2)
+            self.player_arrow = Player_Arrow()
+            game_world.add_object(self.player_arrow, 2)
 
             # 충돌 페어 추가
             if Stage1_0.current_mode or Stage1_1.current_mode or Stage1_2.current_mode or Stage1_3.current_mode or Stage1_5.current_mode or Stage1_6.current_mode or Stage1_7.current_mode:
-                game_world.add_collision_pair('player_arrow:slime_mob', player_arrow, None)
+                game_world.add_collision_pair('player_arrow:slime_mob', self.player_arrow, None)
                 for layer in game_world.world:
                     for obj in layer:
                         if hasattr(obj, 'handle_collision') and 'slime' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_arrow:slime_mob', None, obj)
 
             elif Stage1_4.current_mode:
-                game_world.add_collision_pair('player_arrow:slime_boss', player_arrow, None)
+                game_world.add_collision_pair('player_arrow:slime_boss', self.player_arrow, None)
                 for layer in game_world.world:
                     for obj in layer:
                         if hasattr(obj, 'handle_collision') and 'slime_boss' in str(type(obj)).lower():
@@ -296,14 +296,14 @@ class Attack:
             elif Stage2_0.current_mode or Stage2_1.current_mode or Stage2_2.current_mode or Stage2_3.current_mode or Stage2_4.current_mode or \
                     Stage2_5.current_mode or Stage2_6.current_mode or Stage2_8.current_mode or Stage2_9.current_mode or \
                     Stage2_10.current_mode or Stage2_11.current_mode:
-                game_world.add_collision_pair('player_arrow:zombie_mob', player_arrow, None)
+                game_world.add_collision_pair('player_arrow:zombie_mob', self.player_arrow, None)
                 for layer in game_world.world:
                     for obj in layer:
                         if hasattr(obj, 'handle_collision') and 'zombie' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_arrow:zombie_mob', None, obj)
 
             elif Stage2_7.current_mode:
-                game_world.add_collision_pair('player_arrow:zombie_boss', player_arrow, None)
+                game_world.add_collision_pair('player_arrow:zombie_boss', self.player_arrow, None)
                 # 기존 좀비 보스와 충돌 페어 추가
                 for layer in game_world.world:
                     for obj in layer:
@@ -313,7 +313,7 @@ class Attack:
             elif Stage3_0.current_mode or Stage3_1.current_mode or Stage3_2.current_mode or Stage3_3.current_mode or Stage3_4.current_mode or \
                     Stage3_5.current_mode or Stage3_6.current_mode or Stage3_8.current_mode or \
                     Stage3_9.current_mode or Stage3_10.current_mode or Stage3_11.current_mode:
-                game_world.add_collision_pair('player_arrow:goblin_mob', player_arrow, None)
+                game_world.add_collision_pair('player_arrow:goblin_mob', self.player_arrow, None)
                 # 기존 좀비 보스와 충돌 페어 추가
                 for layer in game_world.world:
                     for obj in layer:
@@ -321,7 +321,7 @@ class Attack:
                             game_world.add_collision_pair('player_arrow:goblin_mob', None, obj)
 
             elif Stage3_7.current_mode:
-                game_world.add_collision_pair('player_arrow:goblin_boss', player_arrow, None)
+                game_world.add_collision_pair('player_arrow:goblin_boss', self.player_arrow, None)
                 for layer in game_world.world:
                     for obj in layer:
                         if hasattr(obj, 'handle_collision') and 'goblin_boss' in str(type(obj)).lower():
@@ -336,6 +336,7 @@ class Attack:
         player_is_attacking = False
 
         self.player_sword = None
+        self.player_arrow = None
 
     def do(self):
         if check_weapon() == 'none':
