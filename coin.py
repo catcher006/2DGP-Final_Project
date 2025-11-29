@@ -91,70 +91,83 @@ class Coin:
             print(f"Coin collected! Current coins: {Ui.coin}")  # 디버그 출력
 
             Ui.coin += 50
-            game_world.remove_object(self)
+            try:
+                game_world.remove_object(self)
+            except Exception as e:
+                print(f"game_world.remove_object error: {e}")
+            # 현재 활성화된 모드의 coins와 saved_coins에서 제거
+            def remove_from_mode(mode, mode_module):
+                if self in mode_module.coins:
+                    mode_module.coins.remove(self)
+                # saved_coins에서 좌표가 같은 코인 정보 제거
+                if hasattr(mode, 'saved_coins'):
+                    mode.saved_coins = [
+                        c for c in mode.saved_coins
+                        if not (c['x'] == self.x and c['y'] == self.y)
+                    ]
             if Stage1_0.current_mode:
-                stage1_0_mode.coins.remove(self)
+                remove_from_mode(Stage1_0, stage1_0_mode)
             elif Stage1_1.current_mode:
-                stage1_1_mode.coins.remove(self)
+                remove_from_mode(Stage1_1, stage1_1_mode)
             elif Stage1_2.current_mode:
-                stage1_2_mode.coins.remove(self)
+                remove_from_mode(Stage1_2, stage1_2_mode)
             elif Stage1_3.current_mode:
-                stage1_3_mode.coins.remove(self)
+                remove_from_mode(Stage1_3, stage1_3_mode)
             elif Stage1_4.current_mode:
-                stage1_4_mode.coins.remove(self)
+                remove_from_mode(Stage1_4, stage1_4_mode)
             elif Stage1_5.current_mode:
-                stage1_5_mode.coins.remove(self)
+                remove_from_mode(Stage1_5, stage1_5_mode)
             elif Stage1_6.current_mode:
-                stage1_6_mode.coins.remove(self)
+                remove_from_mode(Stage1_6, stage1_6_mode)
             elif Stage1_7.current_mode:
-                stage1_7_mode.coins.remove(self)
+                remove_from_mode(Stage1_7, stage1_7_mode)
             elif Stage2_0.current_mode:
-                stage2_0_mode.coins.remove(self)
+                remove_from_mode(Stage2_0, stage2_0_mode)
             elif Stage2_1.current_mode:
-                stage2_1_mode.coins.remove(self)
+                remove_from_mode(Stage2_1, stage2_1_mode)
             elif Stage2_2.current_mode:
-                stage2_2_mode.coins.remove(self)
+                remove_from_mode(Stage2_2, stage2_2_mode)
             elif Stage2_3.current_mode:
-                stage2_3_mode.coins.remove(self)
+                remove_from_mode(Stage2_3, stage2_3_mode)
             elif Stage2_4.current_mode:
-                stage2_4_mode.coins.remove(self)
+                remove_from_mode(Stage2_4, stage2_4_mode)
             elif Stage2_5.current_mode:
-                stage2_5_mode.coins.remove(self)
+                remove_from_mode(Stage2_5, stage2_5_mode)
             elif Stage2_6.current_mode:
-                stage2_6_mode.coins.remove(self)
+                remove_from_mode(Stage2_6, stage2_6_mode)
             elif Stage2_7.current_mode:
-                stage2_7_mode.coins.remove(self)
+                remove_from_mode(Stage2_7, stage2_7_mode)
             elif Stage2_8.current_mode:
-                stage2_8_mode.coins.remove(self)
+                remove_from_mode(Stage2_8, stage2_8_mode)
             elif Stage2_9.current_mode:
-                stage2_9_mode.coins.remove(self)
+                remove_from_mode(Stage2_9, stage2_9_mode)
             elif Stage2_10.current_mode:
-                stage2_10_mode.coins.remove(self)
+                remove_from_mode(Stage2_10, stage2_10_mode)
             elif Stage2_11.current_mode:
-                stage2_11_mode.coins.remove(self)
+                remove_from_mode(Stage2_11, stage2_11_mode)
             elif Stage3_0.current_mode:
-                stage3_0_mode.coins.remove(self)
+                remove_from_mode(Stage3_0, stage3_0_mode)
             elif Stage3_1.current_mode:
-                stage3_1_mode.coins.remove(self)
+                remove_from_mode(Stage3_1, stage3_1_mode)
             elif Stage3_2.current_mode:
-                stage3_2_mode.coins.remove(self)
+                remove_from_mode(Stage3_2, stage3_2_mode)
             elif Stage3_3.current_mode:
-                stage3_3_mode.coins.remove(self)
+                remove_from_mode(Stage3_3, stage3_3_mode)
             elif Stage3_4.current_mode:
-                stage3_4_mode.coins.remove(self)
+                remove_from_mode(Stage3_4, stage3_4_mode)
             elif Stage3_5.current_mode:
-                stage3_5_mode.coins.remove(self)
+                remove_from_mode(Stage3_5, stage3_5_mode)
             elif Stage3_6.current_mode:
-                stage3_6_mode.coins.remove(self)
+                remove_from_mode(Stage3_6, stage3_6_mode)
             elif Stage3_7.current_mode:
-                stage3_7_mode.coins.remove(self)
+                remove_from_mode(Stage3_7, stage3_7_mode)
             elif Stage3_8.current_mode:
-                stage3_8_mode.coins.remove(self)
+                remove_from_mode(Stage3_8, stage3_8_mode)
             elif Stage3_9.current_mode:
-                stage3_9_mode.coins.remove(self)
+                remove_from_mode(Stage3_9, stage3_9_mode)
             elif Stage3_10.current_mode:
-                stage3_10_mode.coins.remove(self)
+                remove_from_mode(Stage3_10, stage3_10_mode)
             elif Stage3_11.current_mode:
-                stage3_11_mode.coins.remove(self)
+                remove_from_mode(Stage3_11, stage3_11_mode)
 
             print(f"After collection: {Ui.coin}")  # 디버그 출력
