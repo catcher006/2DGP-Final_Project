@@ -380,7 +380,7 @@ class Zombie_Mob:
         self.state_machine.draw()
 
         if self.is_alive or self.hp > 0:
-            self.hp_image.clip_draw(0, int(self.hp) // 5 * 2 * 66, 240, 66, self.x - 3, self.y + 35, 60, 11)
+            self.hp_image.clip_draw(0, int(self.hp) * 54, 400, 54, self.x, self.y + 35, 60, 11)
             if self.hp >= 100:
                 self.font.draw(self.x - 9, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
             elif 50 < self.hp < 100:

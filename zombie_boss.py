@@ -350,7 +350,7 @@ class Zombie_Boss:
         self.state_machine.draw()
 
         if self.is_alive or self.hp > 0:
-            self.hp_image.clip_draw(0, int(self.hp) // 5 * 66, 240, 66, self.x - 2, self.y + 60, 60, 11)
+            self.hp_image.clip_draw(0, int(self.hp * 2) * 54, 400, 54, self.x, self.y + 35, 60, 11)
             if self.hp >= 130:
                 self.font.draw(self.x - 8, self.y + 60, f'{self.hp:02d}', (255, 255, 255))
             elif 110 <= self.hp < 130:
