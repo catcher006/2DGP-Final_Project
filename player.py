@@ -267,7 +267,7 @@ class Attack:
                         if hasattr(obj, 'handle_collision') and 'goblin_mob' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_sword:goblin_mob', None, obj)
 
-            elif Stage3_7.current_mode:
+            if Stage3_7.current_mode:
                 game_world.add_collision_pair('player_sword:goblin_boss', self.player_sword, None)
                 for layer in game_world.world:
                     for obj in layer:
@@ -320,7 +320,7 @@ class Attack:
                         if hasattr(obj, 'handle_collision') and 'goblin_mob' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_arrow:goblin_mob', None, obj)
 
-            elif Stage3_7.current_mode:
+            if Stage3_7.current_mode:
                 game_world.add_collision_pair('player_arrow:goblin_boss', self.player_arrow, None)
                 for layer in game_world.world:
                     for obj in layer:
@@ -401,9 +401,6 @@ class Player:
         elif check_weapon() == 'bow':
             self.load_bow_images()
         self.load_combat_idle_images()
-        self.hp_image = load_image('./image/ui/player/player_hp.png')
-
-        self.font = load_font('ENCR10B.TTF', 10)
 
         self.x = 510
         self.y = 160
@@ -458,16 +455,6 @@ class Player:
 
     def draw(self):
         self.state_machine.draw()
-        self.hp_image.clip_draw(0, int(player_hp) * 54, 400, 54, self.x, self.y + 35, 60, 11)
-        if player_hp >= 100:
-            self.font.draw(self.x - 8, self.y + 35, f'{player_hp:02d}', (255, 255, 255))
-        elif 50 < player_hp < 100:
-            self.font.draw(self.x - 6, self.y + 35, f'{player_hp:02d}', (255, 255, 255))
-        elif player_hp == 50:
-            self.font.draw(self.x - 6, self.y + 35, f'{((player_hp % 100) // 10):d}', (255, 255, 255))
-            self.font.draw(self.x, self.y + 35, f'{player_hp % 10:d}', (255, 0, 255))
-        else:
-            self.font.draw(self.x - 6, self.y + 35, f'{player_hp:02d}', (255, 0, 255))
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
