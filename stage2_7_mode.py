@@ -141,7 +141,7 @@ def resume(player_start_pos=None):
         zombie_boss.face_dir = mob_data.get('face_dir', 0)
         zombie_boss.move_validator = stage2_7.is_mob_walkable
 
-        game_world.add_objects(zombie_boss, 2)
+        game_world.add_object(zombie_boss, 2)
         game_world.add_collision_pair('player:zombie_boss', player, None)
         game_world.add_collision_pair('player:zombie_boss', None, zombie_boss)
     else:
