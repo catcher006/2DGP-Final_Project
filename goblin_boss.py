@@ -334,19 +334,19 @@ class Goblin_Boss:
         self.state_machine.draw()
 
         if self.is_alive or self.hp > 0:
-            self.hp_image.clip_draw(0, int(self.hp) // 5 * 66, 240, 66, self.x - 2, self.y + 60, 60, 11)
-            if self.hp >= 130:
+            self.hp_image.clip_draw(0, int(self.hp // 3) * 54, 400, 54, self.x - 2, self.y + 60, 60, 11)
+            if self.hp >= 197:
                 self.font.draw(self.x - 8, self.y + 60, f'{self.hp:02d}', (255, 255, 255))
-            elif 110 <= self.hp < 130:
+            elif 150 <= self.hp < 170:
                 self.font.draw(self.x - 8, self.y + 60, f'{self.hp // 100:d}', (255, 255, 255))
                 self.font.draw(self.x - 3, self.y + 60, f'{((self.hp % 100) // 10):d}', (255, 255, 255))
-                self.font.draw(self.x + 2, self.y + 60, f'{self.hp % 10:d}', (168, 190, 208))
-            elif 100 <= self.hp < 110:
+                self.font.draw(self.x + 2, self.y + 60, f'{self.hp % 10:d}', (60, 180, 50))
+            elif 130 < self.hp < 150:
                 self.font.draw(self.x - 8, self.y + 60, f'{self.hp // 100:d}', (255, 255, 255))
-                self.font.draw(self.x - 3, self.y + 60, f'{((self.hp % 100) // 10):d}', (168, 190, 208))
-                self.font.draw(self.x + 2, self.y + 60, f'{self.hp % 10:d}', (168, 190, 208))
+                self.font.draw(self.x - 3, self.y + 60, f'{((self.hp % 100) // 10):d}', (60, 180, 50))
+                self.font.draw(self.x + 2, self.y + 60, f'{self.hp % 10:d}', (60, 180, 50))
             else:
-                self.font.draw(self.x - 5, self.y + 60, f'{self.hp:02d}', (168, 190, 208))
+                self.font.draw(self.x - 5, self.y + 60, f'{self.hp:02d}', (60, 180, 50))
             draw_rectangle(*self.get_bb())
 
     def get_bb(self):
