@@ -141,8 +141,6 @@ class Dead:
                     stage3_5_mode.coins.append(coin)
                 elif Stage3_6.current_mode:
                     stage3_6_mode.coins.append(coin)
-                elif Stage3_7.current_mode:
-                    stage3_7_mode.coins.append(coin)
                 elif Stage3_8.current_mode:
                     stage3_8_mode.coins.append(coin)
                 elif Stage3_9.current_mode:

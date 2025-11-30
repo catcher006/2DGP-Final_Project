@@ -3,6 +3,8 @@ import game_world
 import game_framework
 import random
 from goblin_boss_sword import Goblin_Boss_Sword
+from stage3_7 import Stage3_7
+import stage3_7_mode
 from player import player_weapon_id
 from state_machine import StateMachine
 from pico2d import load_image, load_font, get_time, draw_rectangle
@@ -109,9 +111,6 @@ class Dead:
                 coin.x = self.mob.x
                 coin.y = self.mob.y
 
-                import stage3_7_mode
-                from stage3_7 import Stage3_7
-
                 if Stage3_7.current_mode:
                     stage3_7_mode.coins.append(coin)
 
@@ -157,8 +156,6 @@ class Attack:
 
         self.goblin_boss_sword = Goblin_Boss_Sword(self.mob)
         game_world.add_object(self.goblin_boss_sword, 2)
-
-        from stage3_7 import Stage3_7
 
         # 충돌 그룹에 추가
         if Stage3_7.current_mode:
@@ -329,17 +326,19 @@ class Goblin_Boss:
         self.state_machine.draw()
 
         if self.is_alive or self.hp > 0:
-            hp_frame_index = int(self.hp // 3)
-            self.hp_image.clip_draw(0, hp_frame_index * 54, 400, 54, self.x, self.y + 35, 60, 11)
-            if self.hp >= 100:
-                self.font.draw(self.x - 8, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
-            elif 50 < self.hp < 100:
-                self.font.draw(self.x - 6, self.y + 35, f'{self.hp:02d}', (255, 255, 255))
-            elif self.hp == 50:
-                self.font.draw(self.x - 6, self.y + 35, f'{((self.hp % 100) // 10):d}', (255, 255, 255))
-                self.font.draw(self.x, self.y + 35, f'{self.hp % 10:d}', (60, 180, 50))
+            self.hp_image.clip_draw(0, int(self.hp) // 5 * 66, 240, 66, self.x - 2, self.y + 60, 60, 11)
+            if self.hp >= 130:
+                self.font.draw(self.x - 8, self.y + 60, f'{self.hp:02d}', (255, 255, 255))
+            elif 110 <= self.hp < 130:
+                self.font.draw(self.x - 8, self.y + 60, f'{self.hp // 100:d}', (255, 255, 255))
+                self.font.draw(self.x - 3, self.y + 60, f'{((self.hp % 100) // 10):d}', (255, 255, 255))
+                self.font.draw(self.x + 2, self.y + 60, f'{self.hp % 10:d}', (168, 190, 208))
+            elif 100 <= self.hp < 110:
+                self.font.draw(self.x - 8, self.y + 60, f'{self.hp // 100:d}', (255, 255, 255))
+                self.font.draw(self.x - 3, self.y + 60, f'{((self.hp % 100) // 10):d}', (168, 190, 208))
+                self.font.draw(self.x + 2, self.y + 60, f'{self.hp % 10:d}', (168, 190, 208))
             else:
-                self.font.draw(self.x - 6, self.y + 35, f'{self.hp:02d}', (60, 180, 50))
+                self.font.draw(self.x - 5, self.y + 60, f'{self.hp:02d}', (168, 190, 208))
             draw_rectangle(*self.get_bb())
 
     def get_bb(self):
@@ -390,6 +389,8 @@ class Goblin_Boss:
 
         if group == 'player_sword:goblin_boss' and self.is_alive:
             current_time = time.time()
+
+            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
                 if player_weapon_id == 'normalsword':
                     self.hp -= 20
@@ -399,14 +400,15 @@ class Goblin_Boss:
                     self.hp -= 100
                 self.last_damage_time = current_time
 
-                # 넉백 계산 (플레이어/검 위치 기준)
-                dx = self.x - getattr(other, 'x', self.x)
-                dy = self.y - getattr(other, 'y', self.y)
+                # 칼에 맞았을 때 넉백 (플레이어 반대 방향)
+                dx = self.x - other.x
+                dy = self.y - other.y
                 distance = (dx ** 2 + dy ** 2) ** 0.5
 
                 if distance > 0:
                     nx = dx / distance
                     ny = dy / distance
+
                     self.is_knocked_back = True
                     self.knockback_distance = 15
                     self.knockback_dx = nx * 1.5
@@ -415,13 +417,16 @@ class Goblin_Boss:
                 if self.hp <= 0:
                     self.hp = 0
                     self.is_alive = False
+                    Stage3_7.boss_cleared = True
                     self.state_machine.handle_state_event(('DIE', None))
-                    print("goblin_boss is dead!")
+                    print("zombie_mob is dead!")
 
-                print(f"goblin_boss damaged by sword! HP: {self.hp}")
+                # 디버그 출력 (선택사항)
+                print(f"slime_mob damaged! HP: {self.hp}")
 
         elif group == 'player_arrow:goblin_boss' and self.is_alive:
             current_time = time.time()
+
             if current_time - self.last_damage_time >= self.damage_cooldown:
                 if player_weapon_id == 'normalbow':
                     self.hp -= 20
@@ -431,13 +436,15 @@ class Goblin_Boss:
                     self.hp -= 100
                 self.last_damage_time = current_time
 
-                dx = self.x - getattr(other, 'x', self.x)
-                dy = self.y - getattr(other, 'y', self.y)
+                # 화살에 맞았을 때 넉백 (화살 방향으로)
+                dx = self.x - other.x
+                dy = self.y - other.y
                 distance = (dx ** 2 + dy ** 2) ** 0.5
 
                 if distance > 0:
                     nx = dx / distance
                     ny = dy / distance
+
                     self.is_knocked_back = True
                     self.knockback_distance = 20
                     self.knockback_dx = nx * 2.0
@@ -446,7 +453,25 @@ class Goblin_Boss:
                 if self.hp <= 0:
                     self.hp = 0
                     self.is_alive = False
+                    Stage3_7.boss_cleared = True
                     self.state_machine.handle_state_event(('DIE', None))
-                    print("goblin_boss is dead!")
+                    print("zombie_mob is dead!")
 
-                print(f"goblin_boss damaged by arrow! HP: {self.hp}")
+                print(f"zombie_mob damaged by arrow! HP: {self.hp}")
+
+        elif group == 'player:goblin_boss' and self.is_alive:
+            # 넉백 방향 계산
+            dx = self.x - other.x
+            dy = self.y - other.y
+            distance = (dx ** 2 + dy ** 2) ** 0.5
+
+            if distance > 0:
+                # 정규화된 방향 벡터
+                nx = dx / distance
+                ny = dy / distance
+
+                # 넉백 설정
+                self.is_knocked_back = True
+                self.knockback_distance = 20
+                self.knockback_dx = nx * 1.0
+                self.knockback_dy = ny * 1.0

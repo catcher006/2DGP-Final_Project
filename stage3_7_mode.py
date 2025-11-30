@@ -95,15 +95,27 @@ def pause():
 
     Stage3_7.current_mode = False
 
-    # 기존 goblin_mobs 초기화 후 현재 살아있는 몹만 저장
+    # 기존 goblin_boss 초기화 후 현재 살아있는 몹만 저장
     stage3_7.saved_mobs = []
     if goblin_boss is not None and goblin_boss.is_alive:
-        stage3_7.saved_mobs.append({
-            'x': goblin_boss.x,
-            'y': goblin_boss.y,
-            'hp': goblin_boss.hp,
-            'face_dir': goblin_boss.face_dir,
-        })
+            stage3_7.saved_mobs.append({
+                'x': goblin_boss.x,
+                'y': goblin_boss.y,
+                'hp': goblin_boss.hp,
+                'face_dir': goblin_boss.face_dir,
+            })
+
+    # 코인 복사 버그 부분을 찾지 못해서 임시 방편으로 월드에서 코인 객체를 다시 수집
+    from coin import Coin
+
+    present_coins = []
+    for layer in game_world.world:
+        for obj in layer:
+            if isinstance(obj, Coin):
+                present_coins.append(obj)
+
+    # 모듈 변수 coins를 실제 월드 상태와 동기화
+    coins = present_coins
 
     # 코인 저장
     stage3_7.saved_coins = []
