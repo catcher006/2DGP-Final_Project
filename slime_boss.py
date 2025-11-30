@@ -249,7 +249,7 @@ class Slime_Boss:
         self.state_machine.draw()
 
         if self.is_alive or self.hp > 0:
-            self.hp_image.clip_draw(0, self.hp // 5 * 66, 240, 66, self.x - 15, self.y + 65, 60, 11)
+            self.hp_image.clip_draw(0, int(self.hp // 2) * 54, 400, 54, self.x - 15, self.y + 65, 60, 11)
             if self.hp > 100:
                 self.font.draw(self.x - 23, self.y + 65, f'{self.hp:02d}', (255, 255, 255))
             elif self.hp == 100:
