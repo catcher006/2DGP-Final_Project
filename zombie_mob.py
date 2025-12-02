@@ -18,7 +18,7 @@ from stage2_9 import Stage2_9
 from stage2_10 import Stage2_10
 from stage2_11 import Stage2_11
 from zombie_mace import Zombie_Mace
-from player import player_weapon_id
+from player import current_weapon_id
 from state_machine import StateMachine
 from pico2d import load_image, load_font, get_time, draw_rectangle
 
@@ -438,16 +438,16 @@ class Zombie_Mob:
         if not self.is_alive:
             return
 
-        if group == 'player_sword:zombie_mob' and self.is_alive:
+        if (group == 'player_sword:zombie_mob' and self.is_alive) or (group == 'player_arrow:zombie_mob' and self.is_alive):
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                if player_weapon_id == 'normalsword':
+                if current_weapon_id == 'normal_sword' or current_weapon_id == 'normal_bow':
                     self.hp -= 20
-                elif player_weapon_id == 'silversword':
+                elif current_weapon_id == 'silver_sword' or current_weapon_id == 'silver_bow':
                     self.hp -= 50
-                elif player_weapon_id == 'goldsword':
+                elif current_weapon_id == 'gold_sword' or current_weapon_id == 'gold_bow':
                     self.hp -= 100
                 self.last_damage_time = current_time
 

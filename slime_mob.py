@@ -12,7 +12,7 @@ from stage1_4 import Stage1_4
 from stage1_5 import Stage1_5
 from stage1_6 import Stage1_6
 from stage1_7 import Stage1_7
-from player import player_weapon_id
+from player import current_weapon_id
 from state_machine import StateMachine
 from coin import Coin
 from pico2d import load_image, load_font, get_time, draw_rectangle
@@ -340,16 +340,16 @@ class Slime_Mob:
         if not self.is_alive:
             return
 
-        if group == 'player_sword:slime_mob' and self.is_alive:
+        if (group == 'player_sword:slime_mob' and self.is_alive) or (group == 'player_arrow:slime_mob' and self.is_alive):
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                if player_weapon_id == 'normalsword':
+                if current_weapon_id == 'normal_sword' or current_weapon_id == 'normal_bow':
                     self.hp -= 20
-                elif player_weapon_id == 'silversword':
+                elif current_weapon_id == 'silver_sword' or current_weapon_id == 'silver_bow':
                     self.hp -= 50
-                elif player_weapon_id == 'goldsword':
+                elif current_weapon_id == 'gold_sword' or current_weapon_id == 'gold_bow':
                     self.hp -= 100
                 self.last_damage_time = current_time
 
@@ -380,11 +380,11 @@ class Slime_Mob:
             current_time = time.time()
 
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                if player_weapon_id == 'normalbow':
+                if current_weapon_id == 'normalbow':
                     self.hp -= 20
-                elif player_weapon_id == 'silverbow':
+                elif current_weapon_id == 'silverbow':
                     self.hp -= 50
-                elif player_weapon_id == 'goldbow':
+                elif current_weapon_id == 'goldbow':
                     self.hp -= 100
                 self.last_damage_time = current_time
 

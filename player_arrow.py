@@ -30,11 +30,11 @@ class Player_Arrow:
 
         self.is_removed = False  # 제거 플래그
 
-        if player.player_weapon_id == 'normalbow':
+        if player.current_weapon_id == 'normal_bow':
             self.max_distance = 200
-        elif player.player_weapon_id == 'silverbow':
+        elif player.current_weapon_id == 'silver_bow':
             self.max_distance = 300
-        elif player.player_weapon_id == 'goldbow':
+        elif player.current_weapon_id == 'gold_bow':
             self.max_distance = 600
 
         # 방향별 이동 벡터

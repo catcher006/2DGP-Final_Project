@@ -5,7 +5,7 @@ import random
 from goblin_boss_sword import Goblin_Boss_Sword
 from stage3_7 import Stage3_7
 import stage3_7_mode
-from player import player_weapon_id
+from player import current_weapon_id
 from state_machine import StateMachine
 from pico2d import load_image, load_font, get_time, draw_rectangle
 
@@ -395,16 +395,16 @@ class Goblin_Boss:
         if not self.is_alive:
             return
 
-        if group == 'player_sword:goblin_boss' and self.is_alive:
+        if (group == 'player_sword:goblin_boss' and self.is_alive) or (group == 'player_arrow:goblin_boss' and self.is_alive):
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                if player_weapon_id == 'normalsword':
+                if current_weapon_id == 'normal_sword' or current_weapon_id == 'normal_bow':
                     self.hp -= 20
-                elif player_weapon_id == 'silversword':
+                elif current_weapon_id == 'silver_sword' or current_weapon_id == 'silver_bow':
                     self.hp -= 50
-                elif player_weapon_id == 'goldsword':
+                elif current_weapon_id == 'gold_sword' or current_weapon_id == 'gold_bow':
                     self.hp -= 100
                 self.last_damage_time = current_time
 
@@ -431,41 +431,6 @@ class Goblin_Boss:
 
                 # 디버그 출력 (선택사항)
                 print(f"slime_mob damaged! HP: {self.hp}")
-
-        elif group == 'player_arrow:goblin_boss' and self.is_alive:
-            current_time = time.time()
-
-            if current_time - self.last_damage_time >= self.damage_cooldown:
-                if player_weapon_id == 'normalbow':
-                    self.hp -= 20
-                elif player_weapon_id == 'silverbow':
-                    self.hp -= 50
-                elif player_weapon_id == 'goldbow':
-                    self.hp -= 100
-                self.last_damage_time = current_time
-
-                # 화살에 맞았을 때 넉백 (화살 방향으로)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 2.0
-                    self.knockback_dy = ny * 2.0
-
-                if self.hp <= 0:
-                    self.hp = 0
-                    self.is_alive = False
-                    Stage3_7.boss_cleared = True
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("zombie_mob is dead!")
-
-                print(f"zombie_mob damaged by arrow! HP: {self.hp}")
 
         elif group == 'player:goblin_boss' and self.is_alive:
             # 넉백 방향 계산
