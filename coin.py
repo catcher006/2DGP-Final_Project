@@ -90,7 +90,8 @@ class Coin:
         if group == 'player:coin':
             print(f"Coin collected! Current coins: {Ui.coin}")  # 디버그 출력
 
-            Ui.coin += 50
+            if Ui.coin + 50 <= 99999999:
+                Ui.coin += 50
             try:
                 game_world.remove_object(self)
             except Exception as e:
