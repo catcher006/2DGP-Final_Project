@@ -61,10 +61,6 @@ player_face_dir = 0
 player_hp = 100
 player_is_alive = True
 player_is_attacking = False
-player_plate_id = 'none'
-player_bow_id = 'none'
-player_sword_id = 'normal_sword'
-current_weapon_id = player_sword_id
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -91,14 +87,6 @@ def event_die(e):
 
 def space_down(e):  # e is space down ?
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
-
-def check_weapon():
-    if current_weapon_id in ['normal_sword', 'silver_sword', 'gold_sword']:
-        return 'sword'
-    elif current_weapon_id in ['normal_bow', 'silver_bow', 'gold_bow']:
-        return 'bow'
-    else:
-        return 'none'
 
 
 class Dead:
@@ -148,7 +136,7 @@ class Idle:
 
 
     def draw(self):
-        if not Stage1_0.stage1_0_create or current_weapon_id == 'none':
+        if not Stage1_0.stage1_0_create or self.player.current_weapon_id == 'none':
             self.player.idle_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64, self.player.x, self.player.y, 100, 100)
         else:
             self.player.combat_idle_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64, self.player.x, self.player.y, 100, 100)
@@ -200,7 +188,7 @@ class Walk:
         global player_face_dir
         player_face_dir = self.player.face_dir
 
-        if check_weapon() == 'bow':
+        if self.player.check_weapon() == 'bow':
             self.player.walk_image.clip_draw(int(self.player.frame) * 128, 128 * self.player.face_dir, 128, 128, self.player.x, self.player.y, 200, 200)
         else:
             self.player.walk_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
@@ -219,7 +207,7 @@ class Attack:
         self.player.attack_start_time = time.time()
         self.player.frame = 0
 
-        if check_weapon() == 'sword':
+        if self.player.check_weapon() == 'sword':
 
             # 공격 시작할 때 Player_Sword 객체를 생성하고 게임 월드에 추가
             self.player_sword = Player_Sword()
@@ -276,7 +264,7 @@ class Attack:
                         if hasattr(obj, 'handle_collision') and 'goblin_boss' in str(type(obj)).lower():
                             game_world.add_collision_pair('player_sword:goblin_boss', None, obj)
 
-        elif check_weapon() == 'bow':
+        elif self.player.check_weapon() == 'bow':
             self.player_arrow = Player_Arrow()
             game_world.add_object(self.player_arrow, 2)
 
@@ -341,7 +329,7 @@ class Attack:
         self.player_arrow = None
 
     def do(self):
-        if check_weapon() == 'none':
+        if self.player.check_weapon() == 'none':
             # 무기가 없으면 공격 상태에서 바로 대기 상태로 전환
             self.player.state_machine.handle_state_event(('STOP', None))
             return
@@ -355,9 +343,9 @@ class Attack:
             self.player.state_machine.handle_state_event(('STOP', None))
 
     def draw(self):
-        if check_weapon() == 'sword':
+        if self.player.check_weapon() == 'sword':
             self.player.sword_image.clip_draw(int(self.player.frame) * 128, 128 * self.player.face_dir, 128, 128, self.player.x, self.player.y, 200, 200)
-        elif check_weapon() == 'bow':
+        elif self.player.check_weapon() == 'bow':
             self.player.bow_image.clip_draw(int(self.player.frame) * 64, 64 * self.player.face_dir, 64, 64,self.player.x, self.player.y, 100, 100)
 
 class Player:
@@ -370,37 +358,42 @@ class Player:
 
     def load_walk_images(self):
         if Player.walk_image is None:
-            Player.walk_image = load_image('./image/player/' + player_plate_id + '/' + current_weapon_id + '/' + 'walk.png')
+            Player.walk_image = load_image('./image/player/' + self.player_plate_id + '/' + self.current_weapon_id + '/' + 'walk.png')
 
     def load_idle_images(self):
         if Player.idle_image is None:
-            Player.idle_image = load_image('./image/player/' + player_plate_id + '/' + current_weapon_id + '/' + 'idle.png')
+            Player.idle_image = load_image('./image/player/' + self.player_plate_id + '/' + self.current_weapon_id + '/' + 'idle.png')
 
     def load_dead_images(self):
         if Player.dead_image is None:
-            Player.dead_image = load_image('./image/player/' + player_plate_id + '/' + current_weapon_id + '/' + 'dead.png')
+            Player.dead_image = load_image('./image/player/' + self.player_plate_id + '/' + self.current_weapon_id + '/' + 'dead.png')
 
     def load_sword_images(self):
         if Player.sword_image is None:
-            if check_weapon() == 'sword':
-                Player.sword_image = load_image('./image/player/' + player_plate_id + '/' + current_weapon_id + '/' + 'sword_attack.png')
+            if self.check_weapon() == 'sword':
+                Player.sword_image = load_image('./image/player/' + self.player_plate_id + '/' + self.current_weapon_id + '/' + 'sword_attack.png')
 
     def load_bow_images(self):
         if Player.bow_image is None:
-            if check_weapon() == 'bow':
-                Player.bow_image = load_image('./image/player/' + player_plate_id + '/' + current_weapon_id + '/' + 'bow_attack.png')
+            if self.check_weapon() == 'bow':
+                Player.bow_image = load_image('./image/player/' + self.player_plate_id + '/' + self.current_weapon_id + '/' + 'bow_attack.png')
 
     def load_combat_idle_images(self):
         if Player.combat_idle_image is None:
-            Player.combat_idle_image = load_image('./image/player/' + player_plate_id + '/' + current_weapon_id + '/' + 'combat_idle.png')
+            Player.combat_idle_image = load_image('./image/player/' + self.player_plate_id + '/' + self.current_weapon_id + '/' + 'combat_idle.png')
 
     def __init__(self):
+        self.player_plate_id = 'none'
+        self.player_bow_id = 'none'
+        self.player_sword_id = 'normal_sword'
+        self.current_weapon_id = self.player_sword_id
+
         self.load_walk_images()
         self.load_idle_images()
         self.load_dead_images()
-        if check_weapon() == 'sword':
+        if self.check_weapon() == 'sword':
             self.load_sword_images()
-        elif check_weapon() == 'bow':
+        elif self.check_weapon() == 'bow':
             self.load_bow_images()
         self.load_combat_idle_images()
 
@@ -532,16 +525,24 @@ class Player:
 
         return False
 
+    def check_weapon(self):
+        if self.current_weapon_id in ['normal_sword', 'silver_sword', 'gold_sword']:
+            return 'sword'
+        elif self.current_weapon_id in ['normal_bow', 'silver_bow', 'gold_bow']:
+            return 'bow'
+        else:
+            return 'none'
+
     def handle_collision(self, group, other):
         global player_hp, player_is_alive
 
         # 방어구에 따른 데미지 배율 설정
         damage_multiplier = 1.0
-        if player_plate_id == 'normal_plate':
+        if self.player_plate_id == 'normal_plate':
             damage_multiplier = 0.9
-        elif player_plate_id == 'silver_plate':
+        elif self.player_plate_id == 'silver_plate':
             damage_multiplier = 0.75
-        elif player_plate_id == 'gold_plate':
+        elif self.player_plate_id == 'gold_plate':
             damage_multiplier = 0.5
 
         if group == 'player:slime_mob' and player_is_alive:

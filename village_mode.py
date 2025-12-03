@@ -5,11 +5,11 @@ import game_world
 import game_framework
 import title_mode
 import random
+import common
 from village import Village
 from village_front_object import Village_Front_Object
 from player import Player
 from ui import Ui
-import player as player_module
 
 enhance_active = False # 강화 모드 활성화 플래그
 font = None
@@ -26,9 +26,9 @@ BUTTONS = {
 
 # 버튼 애니메이션 상태
 button_animations = {
-    'sword': {'frame': 0, 'animating': False, 'time': 0},
-    'arrow': {'frame': 0, 'animating': False, 'time': 0},
-    'shield': {'frame': 0, 'animating': False, 'time': 0}
+    'sword': {'frame': 0, 'animating': False, 'time': 0, 'sequence_index': 0},
+    'arrow': {'frame': 0, 'animating': False, 'time': 0, 'sequence_index': 0},
+    'shield': {'frame': 0, 'animating': False, 'time': 0, 'sequence_index': 0}
 }
 
 coin_warning = {
@@ -49,48 +49,63 @@ def point_in_rect(x, y, rect):
 
 
 def get_current_tier(item_name):
+    """현재 아이템 등급 반환 (속성 안전 조회)"""
+    p = getattr(common, 'player', None)
+    if not p:
+        return 'none'
+
     if item_name == 'sword':
-        if 'silver' in player_module.player_sword_id:
-            return 'silver'
-        elif 'gold' in player_module.player_sword_id:
+        sword_id = getattr(p, 'player_sword_id', 'none')
+        if 'gold' in sword_id:
             return 'gold'
-        elif 'normal' in player_module.player_sword_id:
+        elif 'silver' in sword_id:
+            return 'silver'
+        elif 'normal' in sword_id:
             return 'normal'
         return 'none'
     elif item_name == 'arrow':
-        if 'silver' in player_module.player_bow_id:
-            return 'silver'
-        elif 'gold' in player_module.player_bow_id:
+        bow_id = getattr(p, 'player_bow_id', 'none')
+        if 'gold' in bow_id:
             return 'gold'
-        elif 'normal' in player_module.player_bow_id:
+        elif 'silver' in bow_id:
+            return 'silver'
+        elif 'normal' in bow_id:
             return 'normal'
         return 'none'
     elif item_name == 'shield':
-        if 'silver' in player_module.player_plate_id:
-            return 'silver'
-        elif 'gold' in player_module.player_plate_id:
+        plate_id = getattr(p, 'player_plate_id', 'none')
+        if 'gold' in plate_id:
             return 'gold'
-        elif 'normal' in player_module.player_plate_id:
+        elif 'silver' in plate_id:
+            return 'silver'
+        elif 'normal' in plate_id:
             return 'normal'
         return 'none'
 
+    return 'none'
+
 
 def start_button_animation(button_name):
-    """버튼 애니메이션 시작"""
-    button_animations[button_name]['animating'] = True
-    button_animations[button_name]['time'] = 0
-    button_animations[button_name]['sequence_index'] = 0
+    """버튼 애니메이션 시작 (frame/sequence 초기화)"""
+    anim = button_animations.get(button_name)
+    if not anim:
+        return
+    anim['animating'] = True
+    anim['time'] = 0
+    anim['sequence_index'] = 0
+    anim['frame'] = BUTTON_FRAME_SEQUENCE[0] if BUTTON_FRAME_SEQUENCE else 0
 
 
 def update_button_animations():
-    """버튼 애니메이션 업데이트"""
+    """버튼 애니메이션 업데이트 (키 존재 안전 처리)"""
     for name, anim in button_animations.items():
-        if anim['animating']:
+        if anim.get('animating'):
             anim['time'] += game_framework.frame_time
 
             if anim['time'] >= BUTTON_FRAME_TIME:
                 anim['time'] = 0
-                anim['sequence_index'] += 1
+                # 안전하게 sequence_index 증가
+                anim['sequence_index'] = anim.get('sequence_index', 0) + 1
 
                 if anim['sequence_index'] >= len(BUTTON_FRAME_SEQUENCE):
                     anim['animating'] = False
@@ -125,45 +140,104 @@ def update_coin_warning():
 
 
 def enhance_item(item_type):
-    """아이템 강화 시도"""
+    """아이템 강화 시도 (다음 등급 계산 안전화, 이미지 재로드 호출)"""
     current_tier = get_current_tier(item_type)
 
-    # 이미 최대 등급이면 강화 불가
     if current_tier == 'gold':
         print(f"{item_type} is already max tier!")
         return False
 
-    # 강화 확률 설정
     success_rates = {
-        'none': 0.6,  # 60%
-        'normal': 0.3,  # 30%
-        'silver': 0.1  # 10%
+        'none': 0.6,
+        'normal': 0.3,
+        'silver': 0.1
     }
-
     success_rate = success_rates.get(current_tier, 0)
 
-    # 강화 시도
     if random.random() < success_rate:
-        # 성공: 다음 등급으로 업그레이드
-        next_tier_index = TIER_LIST.index(current_tier) + 1 if current_tier != 'none' else 0
-        next_tier = TIER_LIST[next_tier_index]
+        # 다음 등급 안전 계산
+        if current_tier == 'none':
+            next_tier = 'normal'
+        else:
+            try:
+                next_tier = TIER_LIST[TIER_LIST.index(current_tier) + 1]
+            except (ValueError, IndexError):
+                print("Tier calculation error")
+                return False
 
+        if not getattr(common, 'player', None):
+            print("No player to enhance")
+            return False
+
+        # 등급 적용
         if item_type == 'sword':
-            player_module.player_sword_id = f'{next_tier}_sword'
-            player_module.current_weapon_id = player_module.player_sword_id
+            common.player.player_sword_id = f'{next_tier}_sword'
+            # 현재 장착이 검이면 current_weapon_id 갱신
+            if common.player.check_weapon() == 'sword':
+                common.player.current_weapon_id = common.player.player_sword_id
         elif item_type == 'arrow':
-            player_module.player_bow_id = f'{next_tier}_bow'
-            if player_module.current_weapon_id in ['normal_bow', 'silver_bow', 'gold_bow']:
-                player_module.current_weapon_id = player_module.player_bow_id
+            common.player.player_bow_id = f'{next_tier}_bow'
+            if common.player.check_weapon() == 'bow':
+                common.player.current_weapon_id = common.player.player_bow_id
         elif item_type == 'shield':
-            player_module.player_plate_id = f'{next_tier}_plate'
+            common.player.player_plate_id = f'{next_tier}_plate'
+
+        # 플레이어 이미지 재로드 (안전)
+        reload_player_images()
 
         print(f"Enhancement SUCCESS! {item_type} -> {next_tier}")
         return True
     else:
-        # 실패
         print(f"Enhancement FAILED for {item_type}")
         return False
+
+
+def reload_player_images():
+    """플레이어 이미지를 새로 로드 (common.player 존재 및 파일 로드 안전 처리)"""
+    if not getattr(common, 'player', None):
+        print("reload_player_images: common.player is None")
+        return
+
+    # 클래스 변수 해제
+    Player.walk_image = None
+    Player.idle_image = None
+    Player.dead_image = None
+    Player.sword_image = None
+    Player.bow_image = None
+    Player.combat_idle_image = None
+
+    plate = getattr(common.player, 'player_plate_id', None) or 'normal'
+    weapon = getattr(common.player, 'current_weapon_id', None) or 'normal_sword'
+
+    def safe_load(path):
+        try:
+            return load_image(path)
+        except Exception as e:
+            print(f"Failed to load image: {path} -> {e}")
+            return None
+
+    Player.walk_image = safe_load(f'./image/player/{plate}/{weapon}/walk.png')
+    Player.idle_image = safe_load(f'./image/player/{plate}/{weapon}/idle.png')
+    Player.dead_image = safe_load(f'./image/player/{plate}/{weapon}/dead.png')
+    Player.combat_idle_image = safe_load(f'./image/player/{plate}/{weapon}/combat_idle.png')
+
+    weapon_type = common.player.check_weapon()
+    if weapon_type == 'sword':
+        Player.sword_image = safe_load(f'./image/player/{plate}/{weapon}/sword_attack.png')
+    elif weapon_type == 'bow':
+        Player.bow_image = safe_load(f'./image/player/{plate}/{weapon}/bow_attack.png')
+
+    # 인스턴스에 적용
+    common.player.walk_image = Player.walk_image
+    common.player.idle_image = Player.idle_image
+    common.player.dead_image = Player.dead_image
+    common.player.combat_idle_image = Player.combat_idle_image
+    if weapon_type == 'sword':
+        common.player.sword_image = Player.sword_image
+    elif weapon_type == 'bow':
+        common.player.bow_image = Player.bow_image
+
+    print(f"Player images reloaded: plate={plate}, weapon={weapon}")
 
 
 def handle_enhance_click(mx, my):
@@ -208,35 +282,36 @@ def draw_button(name, rect):
     cx = x + w // 2
     cy = y + h // 2
 
-    # 애니메이션 프레임 가져오기
-    frame = button_animations[name]['frame']
-    print(f"Drawing {name} button with frame {frame}")  # 디버그용
+    frame = button_animations.get(name, {}).get('frame', 0)
+    print(f"Drawing {name} button with frame {frame}")
 
-    village.button_start.clip_draw(320 * frame, 0, 320, 115, cx, cy, w, h)
+    # village가 없으면 그리기 시도하지 않음
+    if 'village' in globals() and getattr(village, 'button_start', None):
+        village.button_start.clip_draw(320 * frame, 0, 320, 115, cx, cy, w, h)
 
     if font:
         tier = get_current_tier(name)
         cost = COSTS.get(tier, 'MAX')
 
-        # 현재 장착한 아이템 이름 표시
         item_name = ''
-        if name == 'sword':
-            item_name = player_module.player_sword_id.replace('_', ' ').upper()
-        elif name == 'arrow':
-            item_name = player_module.player_bow_id.replace('_', ' ').upper()
-        elif name == 'shield':
-            item_name = player_module.player_plate_id.replace('_', ' ').upper()
+        p = getattr(common, 'player', None)
+        if p:
+            if name == 'sword':
+                item_name = getattr(p, 'player_sword_id', 'NONE').replace('_', ' ').upper()
+            elif name == 'arrow':
+                item_name = getattr(p, 'player_bow_id', 'NONE').replace('_', ' ').upper()
+            elif name == 'shield':
+                item_name = getattr(p, 'player_plate_id', 'NONE').replace('_', ' ').upper()
+        else:
+            item_name = 'NONE'
 
-        # 버튼 위쪽에 카테고리와 등급 표시
         font.draw(x, y + h + 80, f'{name.upper()} [{tier.upper()}]', (255, 255, 255))
 
-        # 버튼 중앙에 현재 장착한 아이템 이름 표시
         if item_name != 'NONE':
             font.draw(cx - 50, cy, item_name, (255, 200, 0))
         else:
             font.draw(cx - 30, cy, 'EMPTY', (150, 150, 150))
 
-        # 비용과 성공 확률 표시
         if cost != 'MAX':
             success_rates = {'none': '60%', 'normal': '30%', 'silver': '10%'}
             rate = success_rates.get(tier, '0%')
@@ -265,12 +340,12 @@ def handle_events():
                 print(f"Mouse clicked at: ({mx}, {my})")  # 디버그용
                 handle_enhance_click(mx, my)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
-            if 480 <= player.x <= 590 and 370 <= player.y <= 380: # 던전 입구 좌표 범위
+            if 480 <= common.player.x <= 590 and 370 <= common.player.y <= 380: # 던전 입구 좌표 범위
                 game_framework.push_mode(dungeonmain_mode,(535, 60))
-            elif 210 <= player.x <= 260 and 190 <= player.y <= 210:  # 짐 좌표 범위 - 아이템 강화
+            elif 210 <= common.player.x <= 260 and 190 <= common.player.y <= 210:  # 짐 좌표 범위 - 아이템 강화
                 enhance_active = True # 강화 모드 활성화
         else:
-            player.handle_event(event)
+            common.player.handle_event(event)
 
 def draw_enhance_ui():
     # 반투명 배경 (선택사항)
@@ -309,15 +384,15 @@ def init(player_start_pos=None):
     # back_object = Village_Back_Object()
     # game_world.add_object((back_object), 1)
 
-    player = Player()
+    common.player = Player()
     # 마을 모드에서 이동 검사 콜백을 마을 객체에 위임
-    player.move_validator = village.is_walkable
+    common.player.move_validator = village.is_walkable
     # 시작 좌표 설정
     if player_start_pos:
-        player.x, player.y = player_start_pos
+        common.player.x, common.player.y = player_start_pos
     else:
-        player.x, player.y = 510, 160  # 기본 좌표
-    game_world.add_object((player), 2)
+        common.player.x, common.player.y = 510, 160  # 기본 좌표
+    game_world.add_object((common.player), 2)
 
     front_object = Village_Front_Object()
     game_world.add_object((front_object), 3)
@@ -356,10 +431,10 @@ def resume(player_start_pos=None):
     global village, back_object, front_object, player
 
     if player_start_pos:
-        player.x, player.y = player_start_pos
+        common.player.x, common.player.y = player_start_pos
 
     game_world.add_object(village, 0)
-    game_world.add_object(player, 2)
+    game_world.add_object(common.player, 2)
     game_world.add_object(front_object, 3)
 
     ui = Ui()
