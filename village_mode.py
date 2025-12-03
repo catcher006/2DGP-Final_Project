@@ -4,6 +4,7 @@ import dungeonmain_mode
 import game_world
 import game_framework
 import title_mode
+import random
 from village import Village
 from village_front_object import Village_Front_Object
 from player import Player
@@ -123,6 +124,48 @@ def update_coin_warning():
                 coin_warning['frame'] = COIN_WARNING_SEQUENCE[coin_warning['sequence_index']]
 
 
+def enhance_item(item_type):
+    """아이템 강화 시도"""
+    current_tier = get_current_tier(item_type)
+
+    # 이미 최대 등급이면 강화 불가
+    if current_tier == 'gold':
+        print(f"{item_type} is already max tier!")
+        return False
+
+    # 강화 확률 설정
+    success_rates = {
+        'none': 0.6,  # 60%
+        'normal': 0.3,  # 30%
+        'silver': 0.1  # 10%
+    }
+
+    success_rate = success_rates.get(current_tier, 0)
+
+    # 강화 시도
+    if random.random() < success_rate:
+        # 성공: 다음 등급으로 업그레이드
+        next_tier_index = TIER_LIST.index(current_tier) + 1 if current_tier != 'none' else 0
+        next_tier = TIER_LIST[next_tier_index]
+
+        if item_type == 'sword':
+            player_module.player_sword_id = f'{next_tier}_sword'
+            player_module.current_weapon_id = player_module.player_sword_id
+        elif item_type == 'arrow':
+            player_module.player_bow_id = f'{next_tier}_bow'
+            if player_module.current_weapon_id in ['normal_bow', 'silver_bow', 'gold_bow']:
+                player_module.current_weapon_id = player_module.player_bow_id
+        elif item_type == 'shield':
+            player_module.player_plate_id = f'{next_tier}_plate'
+
+        print(f"Enhancement SUCCESS! {item_type} -> {next_tier}")
+        return True
+    else:
+        # 실패
+        print(f"Enhancement FAILED for {item_type}")
+        return False
+
+
 def handle_enhance_click(mx, my):
     """버튼 클릭 처리"""
     print(f"Checking click at ({mx}, {my})")
@@ -138,13 +181,24 @@ def handle_enhance_click(mx, my):
             # 최대 등급이 아니고 돈이 충분한지 확인
             if cost != 'MAX':
                 if Ui.coin >= cost:
-                    # 강화 실행
+                    # 버튼 애니메이션 시작
                     start_button_animation(name)
-                    # TODO: 실제 강화 로직 추가
+
+                    # 강화 시도
+                    if enhance_item(name):
+                        # 성공: 돈 차감
+                        Ui.coin -= cost
+                        print(f"Enhancement successful! Remaining coins: {Ui.coin}")
+                    else:
+                        # 실패: 돈만 차감
+                        Ui.coin -= cost
+                        print(f"Enhancement failed! Remaining coins: {Ui.coin}")
                 else:
                     # 돈이 부족하면 경고 애니메이션 시작
                     print("Not enough coins!")
                     start_coin_warning()
+            else:
+                print(f"{name} is already at max tier!")
             return
     print("  -> No button clicked")
 
@@ -163,9 +217,32 @@ def draw_button(name, rect):
     if font:
         tier = get_current_tier(name)
         cost = COSTS.get(tier, 'MAX')
+
+        # 현재 장착한 아이템 이름 표시
+        item_name = ''
+        if name == 'sword':
+            item_name = player_module.player_sword_id.replace('_', ' ').upper()
+        elif name == 'arrow':
+            item_name = player_module.player_bow_id.replace('_', ' ').upper()
+        elif name == 'shield':
+            item_name = player_module.player_plate_id.replace('_', ' ').upper()
+
+        # 버튼 위쪽에 카테고리와 등급 표시
         font.draw(x, y + h + 80, f'{name.upper()} [{tier.upper()}]', (255, 255, 255))
+
+        # 버튼 중앙에 현재 장착한 아이템 이름 표시
+        if item_name != 'NONE':
+            font.draw(cx - 50, cy, item_name, (255, 200, 0))
+        else:
+            font.draw(cx - 30, cy, 'EMPTY', (150, 150, 150))
+
+        # 비용과 성공 확률 표시
         if cost != 'MAX':
-            font.draw(x + 30, y + h + 15, f'Cost: {cost}', (255, 255, 0))
+            success_rates = {'none': '60%', 'normal': '30%', 'silver': '10%'}
+            rate = success_rates.get(tier, '0%')
+            font.draw(x + 10, y + h + 15, f'Cost: {cost} | Rate: {rate}', (255, 255, 0))
+        else:
+            font.draw(cx - 20, y + h + 15, 'MAX', (0, 255, 0))
 
 def handle_events():
     global running, enhance_active
