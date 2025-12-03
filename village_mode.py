@@ -15,7 +15,7 @@ font = None
 
 # 강화 시스템 설정
 TIER_LIST = ['normal', 'silver', 'gold']
-COSTS = {'normal': 100, 'silver': 500}
+COSTS = {'none': 500, 'normal': 800, 'silver': 1000 }
 
 BUTTONS = {
     'sword': (150, 150, 150, 50),
@@ -30,8 +30,17 @@ button_animations = {
     'shield': {'frame': 0, 'animating': False, 'time': 0}
 }
 
+coin_warning = {
+    'active': False,
+    'frame': 0,
+    'sequence_index': 0,
+    'time': 0
+}
+
 BUTTON_FRAME_SEQUENCE = [0, 1, 2, 1, 0]
 BUTTON_FRAME_TIME = 0.1
+COIN_WARNING_SEQUENCE = [0, 1, 2, 3, 4, 3, 2, 1, 0]
+COIN_WARNING_FRAME_TIME = 0.07
 
 def point_in_rect(x, y, rect):
     rx, ry, rw, rh = rect
@@ -44,20 +53,25 @@ def get_current_tier(item_name):
             return 'silver'
         elif 'gold' in player_module.player_sword_id:
             return 'gold'
-        return 'normal'
+        elif 'normal' in player_module.player_sword_id:
+            return 'normal'
+        return 'none'
     elif item_name == 'arrow':
         if 'silver' in player_module.player_bow_id:
             return 'silver'
         elif 'gold' in player_module.player_bow_id:
             return 'gold'
-        return 'normal'
+        elif 'normal' in player_module.player_bow_id:
+            return 'normal'
+        return 'none'
     elif item_name == 'shield':
         if 'silver' in player_module.player_plate_id:
             return 'silver'
         elif 'gold' in player_module.player_plate_id:
             return 'gold'
-        return 'normal'
-    return 'normal'
+        elif 'normal' in player_module.player_plate_id:
+            return 'normal'
+        return 'none'
 
 
 def start_button_animation(button_name):
@@ -84,13 +98,55 @@ def update_button_animations():
                 else:
                     anim['frame'] = BUTTON_FRAME_SEQUENCE[anim['sequence_index']]
 
+def start_coin_warning():
+    """코인 부족 경고 애니메이션 시작"""
+    coin_warning['active'] = True
+    coin_warning['time'] = 0
+    coin_warning['sequence_index'] = 0
+    coin_warning['frame'] = 0
+
+
+def update_coin_warning():
+    """코인 부족 경고 애니메이션 업데이트"""
+    if coin_warning['active']:
+        coin_warning['time'] += game_framework.frame_time
+
+        if coin_warning['time'] >= COIN_WARNING_FRAME_TIME:
+            coin_warning['time'] = 0
+            coin_warning['sequence_index'] += 1
+
+            if coin_warning['sequence_index'] >= len(COIN_WARNING_SEQUENCE):
+                coin_warning['active'] = False
+                coin_warning['sequence_index'] = 0
+                coin_warning['frame'] = 0
+            else:
+                coin_warning['frame'] = COIN_WARNING_SEQUENCE[coin_warning['sequence_index']]
+
 
 def handle_enhance_click(mx, my):
     """버튼 클릭 처리"""
+    print(f"Checking click at ({mx}, {my})")
     for name, rect in BUTTONS.items():
+        print(f"  Button '{name}': {rect}")
         if point_in_rect(mx, my, rect):
-            print(f"Clicked {name} button!")
-            start_button_animation(name)
+            print(f"  -> Clicked {name} button!")
+
+            # 현재 등급 확인
+            tier = get_current_tier(name)
+            cost = COSTS.get(tier, 'MAX')
+
+            # 최대 등급이 아니고 돈이 충분한지 확인
+            if cost != 'MAX':
+                if Ui.coin >= cost:
+                    # 강화 실행
+                    start_button_animation(name)
+                    # TODO: 실제 강화 로직 추가
+                else:
+                    # 돈이 부족하면 경고 애니메이션 시작
+                    print("Not enough coins!")
+                    start_coin_warning()
+            return
+    print("  -> No button clicked")
 
 
 def draw_button(name, rect):
@@ -153,16 +209,10 @@ def draw_enhance_ui():
         font.draw(120, 120, coins_text, (255, 255, 255))
         font.draw(120, 80, 'ESC to close  -  Click to enhance', (180, 180, 180))
 
-def handle_enhance_click(mx, my):
-    """버튼 클릭 처리"""
-    print(f"Checking click at ({mx}, {my})")
-    for name, rect in BUTTONS.items():
-        print(f"  Button '{name}': {rect}")
-        if point_in_rect(mx, my, rect):
-            print(f"  -> Clicked {name} button!")
-            start_button_animation(name)
-            return
-    print("  -> No button clicked")
+    # 코인 부족 경고 표시
+    if coin_warning['active']:
+        frame = coin_warning['frame']
+        village.info_coin.clip_draw(0, frame * 78, 490, 78, 512, 288)
 
 def init(player_start_pos=None):
     global world
@@ -201,6 +251,7 @@ def init(player_start_pos=None):
 def update():
     if enhance_active:
         update_button_animations()
+        update_coin_warning()
     else:
         game_world.update()
 
