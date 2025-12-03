@@ -17,6 +17,7 @@ font = None
 # 강화 시스템 설정
 TIER_LIST = ['normal', 'silver', 'gold']
 COSTS = {'none': 500, 'normal': 800, 'silver': 1000 }
+ODDS = {'none': 0.6, 'normal': 0.3, 'silver': 0.1 }
 
 BUTTONS = {
     'sword': (150, 150, 150, 50),
@@ -55,7 +56,7 @@ def get_current_tier(item_name):
         return 'none'
 
     if item_name == 'sword':
-        sword_id = getattr(p, 'player_sword_id', 'none')
+        sword_id = common.player.player_sword_id
         if 'gold' in sword_id:
             return 'gold'
         elif 'silver' in sword_id:
@@ -64,7 +65,7 @@ def get_current_tier(item_name):
             return 'normal'
         return 'none'
     elif item_name == 'arrow':
-        bow_id = getattr(p, 'player_bow_id', 'none')
+        bow_id = common.player.player_bow_id
         if 'gold' in bow_id:
             return 'gold'
         elif 'silver' in bow_id:
@@ -73,7 +74,7 @@ def get_current_tier(item_name):
             return 'normal'
         return 'none'
     elif item_name == 'shield':
-        plate_id = getattr(p, 'player_plate_id', 'none')
+        plate_id = common.player.player_plate_id
         if 'gold' in plate_id:
             return 'gold'
         elif 'silver' in plate_id:
@@ -140,7 +141,7 @@ def update_coin_warning():
 
 
 def enhance_item(item_type):
-    """아이템 강화 시도 (다음 등급 계산 안전화, 이미지 재로드 호출)"""
+    """아이템 강화 시도"""
     current_tier = get_current_tier(item_type)
 
     if current_tier == 'gold':
@@ -155,7 +156,6 @@ def enhance_item(item_type):
     success_rate = success_rates.get(current_tier, 0)
 
     if random.random() < success_rate:
-        # 다음 등급 안전 계산
         if current_tier == 'none':
             next_tier = 'normal'
         else:
@@ -171,18 +171,22 @@ def enhance_item(item_type):
 
         # 등급 적용
         if item_type == 'sword':
-            common.player.player_sword_id = f'{next_tier}_sword'
-            # 현재 장착이 검이면 current_weapon_id 갱신
-            if common.player.check_weapon() == 'sword':
-                common.player.current_weapon_id = common.player.player_sword_id
+            new_sword_id = f'{next_tier}_sword'
+            Player.player_sword_id = new_sword_id
+            Player.current_weapon_id = new_sword_id
+            print(f"[DEBUG] Sword enhanced:")
+            print(f"  - player_sword_id: {Player.player_sword_id}")
+            print(f"  - current_weapon_id: {Player.current_weapon_id}")
         elif item_type == 'arrow':
-            common.player.player_bow_id = f'{next_tier}_bow'
-            if common.player.check_weapon() == 'bow':
-                common.player.current_weapon_id = common.player.player_bow_id
+            new_bow_id = f'{next_tier}_bow'
+            Player.player_bow_id = new_bow_id
+            Player.current_weapon_id = new_bow_id
+            print(f"[DEBUG] Bow enhanced:")
+            print(f"  - player_bow_id: {Player.player_bow_id}")
+            print(f"  - current_weapon_id: {Player.current_weapon_id}")
         elif item_type == 'shield':
-            common.player.player_plate_id = f'{next_tier}_plate'
+            Player.player_plate_id = f'{next_tier}_plate'
 
-        # 플레이어 이미지 재로드 (안전)
         reload_player_images()
 
         print(f"Enhancement SUCCESS! {item_type} -> {next_tier}")

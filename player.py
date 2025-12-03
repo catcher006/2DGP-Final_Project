@@ -54,13 +54,7 @@ FRAMES_PER_IDLE_ACTION = 2
 FRAMES_PER_DEAD_ACTION = 6
 
 # 모드 호환을 위한 전역 변수 사용
-player_x = 0
-player_y = 0
-player_frame = 0
-player_face_dir = 0
 player_hp = 100
-player_is_alive = True
-player_is_attacking = False
 
 # 점 (x, y)가 다각형 내부에 있는지 확인하는 함수
 def point_in_polygon(x, y, polygon):
@@ -128,10 +122,6 @@ class Idle:
         elif self.player.xdir == 1:
             self.player.face_dir = 0
 
-        global player_x, player_y
-        player_x = self.player.x
-        player_y = self.player.y
-
         self.player.frame = (self.player.frame + FRAMES_PER_IDLE_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 2
 
 
@@ -175,18 +165,11 @@ class Walk:
             self.player.x = new_x
             self.player.y = new_y
 
-        global player_x, player_y
-        player_x = self.player.x
-        player_y = self.player.y
-
     def draw(self):
         if self.player.ydir == 1: self.player.face_dir = 3
         elif self.player.xdir == -1: self.player.face_dir = 2
         elif self.player.ydir == -1: self.player.face_dir = 1
         elif self.player.xdir == 1: self.player.face_dir = 0
-
-        global player_face_dir
-        player_face_dir = self.player.face_dir
 
         if self.player.check_weapon() == 'bow':
             self.player.walk_image.clip_draw(int(self.player.frame) * 128, 128 * self.player.face_dir, 128, 128, self.player.x, self.player.y, 200, 200)
@@ -201,9 +184,7 @@ class Attack:
         self.player_arrow = None # 화살 객체 참조 저장
 
     def enter(self, e):
-        self.player.is_attacking = True
-        global player_is_attacking
-        player_is_attacking = True
+        Player.is_attacking = True
         self.player.attack_start_time = time.time()
         self.player.frame = 0
 
@@ -318,12 +299,8 @@ class Attack:
                             game_world.add_collision_pair('player_arrow:goblin_boss', None, obj)
 
     def exit(self, e):
-        self.player.is_attacking = False
+        Player.is_attacking = False
         self.player.frame = 0
-
-        global player_frame, player_is_attacking
-        player_frame = 0
-        player_is_attacking = False
 
         self.player_sword = None
         self.player_arrow = None
@@ -356,53 +333,44 @@ class Player:
     combat_idle_image = None
     bow_image = None
 
+    # 클래스 변수로 무기/방어구 ID 관리
+    player_plate_id = 'none'
+    player_bow_id = 'none'
+    player_sword_id = 'normal_sword'
+    current_weapon_id = 'none'
+
+    is_attacking = False
+    is_alive = True
+
     def load_walk_images(self):
         if Player.walk_image is None:
-            Player.walk_image = load_image('./image/player/' + self.player_plate_id + '/' + self.current_weapon_id + '/' + 'walk.png')
+            Player.walk_image = load_image(f'./image/player/{Player.player_plate_id}/{Player.current_weapon_id}/walk.png')
 
     def load_idle_images(self):
         if Player.idle_image is None:
-            Player.idle_image = load_image('./image/player/' + self.player_plate_id + '/' + self.current_weapon_id + '/' + 'idle.png')
+            Player.idle_image = load_image(f'./image/player/{Player.player_plate_id}/{Player.current_weapon_id}/idle.png')
 
     def load_dead_images(self):
         if Player.dead_image is None:
-            Player.dead_image = load_image('./image/player/' + self.player_plate_id + '/' + self.current_weapon_id + '/' + 'dead.png')
+            Player.dead_image = load_image(f'./image/player/{Player.player_plate_id}/{Player.current_weapon_id}/dead.png')
 
     def load_sword_images(self):
         if Player.sword_image is None:
             if self.check_weapon() == 'sword':
-                Player.sword_image = load_image('./image/player/' + self.player_plate_id + '/' + self.current_weapon_id + '/' + 'sword_attack.png')
+                Player.sword_image = load_image(f'./image/player/{Player.player_plate_id}/{Player.current_weapon_id}/sword_attack.png')
 
     def load_bow_images(self):
         if Player.bow_image is None:
             if self.check_weapon() == 'bow':
-                Player.bow_image = load_image('./image/player/' + self.player_plate_id + '/' + self.current_weapon_id + '/' + 'bow_attack.png')
+                Player.bow_image = load_image(f'./image/player/{Player.player_plate_id}/{Player.current_weapon_id}/bow_attack.png')
 
     def load_combat_idle_images(self):
         if Player.combat_idle_image is None:
-            Player.combat_idle_image = load_image('./image/player/' + self.player_plate_id + '/' + self.current_weapon_id + '/' + 'combat_idle.png')
+            Player.combat_idle_image = load_image(f'./image/player/{Player.player_plate_id}/{Player.current_weapon_id}/combat_idle.png')
 
     def __init__(self):
-        self.player_plate_id = 'none'
-        self.player_bow_id = 'none'
-        self.player_sword_id = 'normal_sword'
-        self.current_weapon_id = self.player_sword_id
-
-        self.load_walk_images()
-        self.load_idle_images()
-        self.load_dead_images()
-        if self.check_weapon() == 'sword':
-            self.load_sword_images()
-        elif self.check_weapon() == 'bow':
-            self.load_bow_images()
-        self.load_combat_idle_images()
-
         self.x = 510
         self.y = 160
-
-        global player_x, player_y
-        player_x = self.x
-        player_y = self.y
 
         self.frame = 0
 
@@ -417,9 +385,6 @@ class Player:
         # 이동 검사 콜백: 모드가 주입
         self.move_validator = None
 
-        self.is_attacking = False  # 공격 상태
-        self.attack_start_time = 0  # 공격 시작 시간
-
         # 데미지 관련
         self.last_damage_time = 0
         self.damage_cooldown = TIME_PER_ACTION * 1
@@ -429,6 +394,16 @@ class Player:
         self.knockback_distance = 0
         self.knockback_dx = 0
         self.knockback_dy = 0
+
+        # 이미지 로드
+        self.load_walk_images()
+        self.load_idle_images()
+        self.load_dead_images()
+        if self.check_weapon() == 'sword':
+            self.load_sword_images()
+        elif self.check_weapon() == 'bow':
+            self.load_bow_images()
+        self.load_combat_idle_images()
 
         # 상태들 생성
         self.IDLE = Idle(self)
@@ -453,7 +428,7 @@ class Player:
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
-        if not player_is_alive:
+        if not Player.is_alive:
             return 0, 0, 0, 0
 
         if self.face_dir == 3:
@@ -491,7 +466,7 @@ class Player:
 
     def handle_event(self, event):
         # 죽었으면 입력 무시
-        if not player_is_alive:
+        if not Player.is_alive:
             return
 
         if event.key in (SDLK_a, SDLK_d, SDLK_w, SDLK_s):
@@ -526,26 +501,26 @@ class Player:
         return False
 
     def check_weapon(self):
-        if self.current_weapon_id in ['normal_sword', 'silver_sword', 'gold_sword']:
+        if Player.current_weapon_id in ['normal_sword', 'silver_sword', 'gold_sword']:
             return 'sword'
-        elif self.current_weapon_id in ['normal_bow', 'silver_bow', 'gold_bow']:
+        elif Player.current_weapon_id in ['normal_bow', 'silver_bow', 'gold_bow']:
             return 'bow'
         else:
             return 'none'
 
     def handle_collision(self, group, other):
-        global player_hp, player_is_alive
+        global player_hp
 
         # 방어구에 따른 데미지 배율 설정
         damage_multiplier = 1.0
-        if self.player_plate_id == 'normal_plate':
+        if Player.player_plate_id == 'normal_plate':
             damage_multiplier = 0.9
-        elif self.player_plate_id == 'silver_plate':
+        elif Player.player_plate_id == 'silver_plate':
             damage_multiplier = 0.75
-        elif self.player_plate_id == 'gold_plate':
+        elif Player.player_plate_id == 'gold_plate':
             damage_multiplier = 0.5
 
-        if group == 'player:slime_mob' and player_is_alive:
+        if group == 'player:slime_mob' and Player.is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
@@ -571,7 +546,7 @@ class Player:
 
                 if player_hp <= 0:
                     player_hp = 0
-                    player_is_alive = False
+                    Player.is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("Player is dead!")
 
@@ -581,7 +556,7 @@ class Player:
         elif group == 'player:coin':
             pass
 
-        elif group == 'player:slime_boss' and player_is_alive:
+        elif group == 'player:slime_boss' and Player.is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
@@ -606,14 +581,14 @@ class Player:
 
                 if player_hp <= 0:
                     player_hp = 0
-                    player_is_alive = False
+                    Player.is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("Player is dead!")
 
                 # 디버그 출력 (선택사항)
                 print(f"Player damaged! HP: {player_hp}")
 
-        elif group == 'player:zombie_mob' and player_is_alive:
+        elif group == 'player:zombie_mob' and Player.is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
@@ -637,7 +612,7 @@ class Player:
                     self.knockback_dx = nx * 1.0
                     self.knockback_dy = ny * 1.0
 
-                if player_hp <= 0:
+                if Player.is_alive <= 0:
                     player_hp = 0
                     player_is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
@@ -647,7 +622,7 @@ class Player:
                 print(f"Player damaged! HP: {player_hp}")
 
 
-        elif group == 'player:zombie_mace' and player_is_alive:
+        elif group == 'player:zombie_mace' and Player.is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
@@ -673,14 +648,14 @@ class Player:
 
                 if player_hp <= 0:
                     player_hp = 0
-                    player_is_alive = False
+                    Player.is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("Player is dead!")
 
                 # 디버그 출력 (선택사항)
                 print(f"Player damaged! HP: {player_hp}")
 
-        elif group == 'player:zombie_boss' and player_is_alive:
+        elif group == 'player:zombie_boss' and Player.is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
@@ -706,14 +681,14 @@ class Player:
 
                 if player_hp <= 0:
                     player_hp = 0
-                    player_is_alive = False
+                    Player.is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("Player is dead!")
 
                 # 디버그 출력 (선택사항)
                 print(f"Player damaged! HP: {player_hp}")
 
-        elif group == 'player:zombie_boss_waraxe' and player_is_alive:
+        elif group == 'player:zombie_boss_waraxe' and Player.is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
@@ -739,14 +714,14 @@ class Player:
 
                 if player_hp <= 0:
                     player_hp = 0
-                    player_is_alive = False
+                    Player.is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("Player is dead!")
 
                 # 디버그 출력 (선택사항)
                 print(f"Player damaged! HP: {player_hp}")
 
-        elif group == 'player:goblin_mob' and player_is_alive:
+        elif group == 'player:goblin_mob' and Player.is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
@@ -772,14 +747,14 @@ class Player:
 
                 if player_hp <= 0:
                     player_hp = 0
-                    player_is_alive = False
+                    Player.is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("Player is dead!")
 
                 # 디버그 출력 (선택사항)
                 print(f"Player damaged! HP: {player_hp}")
 
-        elif group == 'player:goblin_mace' and player_is_alive:
+        elif group == 'player:goblin_mace' and Player.is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
@@ -805,14 +780,14 @@ class Player:
 
                 if player_hp <= 0:
                     player_hp = 0
-                    player_is_alive = False
+                    Player.is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("Player is dead!")
 
                 # 디버그 출력 (선택사항)
                 print(f"Player damaged! HP: {player_hp}")
 
-        elif group == 'player:goblin_arrow' and player_is_alive:
+        elif group == 'player:goblin_arrow' and Player.is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
@@ -838,14 +813,14 @@ class Player:
 
                 if player_hp <= 0:
                     player_hp = 0
-                    player_is_alive = False
+                    Player.is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("Player is dead!")
 
                 # 디버그 출력 (선택사항)
                 print(f"Player damaged! HP: {player_hp}")
 
-        elif group == 'player:goblin_boss' and player_is_alive:
+        elif group == 'player:goblin_boss' and Player.is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
@@ -871,14 +846,14 @@ class Player:
 
                 if player_hp <= 0:
                     player_hp = 0
-                    player_is_alive = False
+                    Player.is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("Player is dead!")
 
                 # 디버그 출력 (선택사항)
                 print(f"Player damaged! HP: {player_hp}")
 
-        elif group == 'player:goblin_boss_sword' and player_is_alive:
+        elif group == 'player:goblin_boss_sword' and Player.is_alive:
             current_time = time.time()
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
@@ -904,7 +879,7 @@ class Player:
 
                 if player_hp <= 0:
                     player_hp = 0
-                    player_is_alive = False
+                    Player.is_alive = False
                     self.state_machine.handle_state_event(('DIE', None))
                     print("Player is dead!")
 

@@ -1,13 +1,14 @@
 import player
 import game_world
+import common
 from pico2d import *
 
 class Player_Sword():
     def __init__(self):
-        self.x = getattr(player, 'player_x', 0)
-        self.y = getattr(player, 'player_y', 0)
-        self.frame = int(getattr(player, 'player_frame', 0))
-        self.face_dir = int(getattr(player, 'player_face_dir', 0))
+        self.x = common.player.x
+        self.y = common.player.y
+        self.frame = common.player.frame
+        self.face_dir = common.player.face_dir
 
     def draw(self):
         bb = self.get_bb()
@@ -86,16 +87,12 @@ class Player_Sword():
 
 
     def update(self):
-        self.x = getattr(player, 'player_x', self.x)
-        self.y = getattr(player, 'player_y', self.y)
-        self.frame = int(getattr(player, 'player_frame', self.frame))
-        self.face_dir = int(getattr(player, 'player_face_dir', self.face_dir))
+        self.x = common.player.x
+        self.y = common.player.y
+        self.frame = common.player.frame
+        self.face_dir = common.player.face_dir
 
-        # 공격 프레임이 끝나거나 플레이어가 공격 중이 아니거나 죽었으면 제거
-        is_attacking = getattr(player, 'player_is_attacking', False)
-        is_alive = getattr(player, 'player_is_alive', True)
-
-        if self.frame >= 13 or not is_attacking or not is_alive:
+        if not player.Player.is_attacking:
             game_world.remove_object(self)
 
     def do(self):

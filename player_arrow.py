@@ -2,6 +2,7 @@ from pico2d import *
 import game_framework
 import game_world
 import player
+import common
 
 # Arrow Speed
 PIXEL_PER_METER = (10.0 / 0.3)
@@ -18,10 +19,10 @@ class Player_Arrow:
         if Player_Arrow.image is None:
             Player_Arrow.image = load_image('./image/item/arrow.png')
 
-        self.x = getattr(player, 'player_x', 0)
-        self.y = getattr(player, 'player_y', 0)
-        self.frame = int(getattr(player, 'player_frame', 0))
-        self.face_dir = int(getattr(player, 'player_face_dir', 0))
+        self.x = common.player.x
+        self.y = common.player.y
+        self.frame = common.player.frame
+        self.face_dir = common.player.face_dir
 
         self.is_fired = False  # 발사 여부
         self.speed = ARROW_SPEED_PPS
@@ -30,11 +31,11 @@ class Player_Arrow:
 
         self.is_removed = False  # 제거 플래그
 
-        if player.current_weapon_id == 'normal_bow':
+        if common.player.current_weapon_id == 'normal_bow':
             self.max_distance = 200
-        elif player.current_weapon_id == 'silver_bow':
+        elif common.player.current_weapon_id == 'silver_bow':
             self.max_distance = 300
-        elif player.current_weapon_id == 'gold_bow':
+        elif common.player.current_weapon_id == 'gold_bow':
             self.max_distance = 600
 
         # 방향별 이동 벡터
@@ -46,13 +47,13 @@ class Player_Arrow:
         }
 
     def update(self):
-        self.frame = int(getattr(player, 'player_frame', self.frame))
+        self.frame = common.player.frame
 
         # 발사 전: 플레이어를 따라다님
         if not self.is_fired:
-            self.x = getattr(player, 'player_x', self.x)
-            self.y = getattr(player, 'player_y', self.y)
-            self.face_dir = int(getattr(player, 'player_face_dir', self.face_dir))
+            self.x = common.player.x
+            self.y = common.player.y
+            self.face_dir = common.player.face_dir
 
             # 프레임 7에서 발사
             if self.frame >= 9:
@@ -73,10 +74,7 @@ class Player_Arrow:
                 game_world.remove_object(self)
 
         # 공격이 끝나면 (프레임 13) 아직 발사 안됐으면 제거
-        is_attacking = getattr(player, 'player_is_attacking', False)
-        is_alive = getattr(player, 'player_is_alive', True)
-
-        if self.frame >= 13 or not is_attacking or not is_alive:
+        if self.frame >= 13 or not player.Player.is_attacking or not player.Player.is_alive:
             if not self.is_fired:
                 game_world.remove_object(self)
 
