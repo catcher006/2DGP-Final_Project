@@ -343,30 +343,46 @@ class Player:
     is_alive = True
 
     def load_walk_images(self):
-        if Player.walk_image is None:
-            Player.walk_image = load_image(f'./image/player/{Player.player_plate_id}/{Player.current_weapon_id}/walk.png')
+        plate = Player.player_plate_id
+        weapon = Player.current_weapon_id
+
+        Player.walk_image = load_image(f'./image/player/{plate}/{weapon}/walk.png')
+        self.walk_image = Player.walk_image
 
     def load_idle_images(self):
-        if Player.idle_image is None:
-            Player.idle_image = load_image(f'./image/player/{Player.player_plate_id}/{Player.current_weapon_id}/idle.png')
+        plate = Player.player_plate_id
+        weapon = Player.current_weapon_id
+
+        Player.idle_image = load_image(f'./image/player/{plate}/{weapon}/idle.png')
+        self.idle_image = Player.idle_image
 
     def load_dead_images(self):
-        if Player.dead_image is None:
-            Player.dead_image = load_image(f'./image/player/{Player.player_plate_id}/{Player.current_weapon_id}/dead.png')
+        plate = Player.player_plate_id
+        weapon = Player.current_weapon_id
 
-    def load_sword_images(self):
-        if Player.sword_image is None:
-            if self.check_weapon() == 'sword':
-                Player.sword_image = load_image(f'./image/player/{Player.player_plate_id}/{Player.current_weapon_id}/sword_attack.png')
-
-    def load_bow_images(self):
-        if Player.bow_image is None:
-            if self.check_weapon() == 'bow':
-                Player.bow_image = load_image(f'./image/player/{Player.player_plate_id}/{Player.current_weapon_id}/bow_attack.png')
+        Player.dead_image = load_image(f'./image/player/{plate}/{weapon}/dead.png')
+        self.dead_image = Player.dead_image
 
     def load_combat_idle_images(self):
-        if Player.combat_idle_image is None:
-            Player.combat_idle_image = load_image(f'./image/player/{Player.player_plate_id}/{Player.current_weapon_id}/combat_idle.png')
+        plate = Player.player_plate_id
+        weapon = Player.current_weapon_id
+
+        Player.combat_idle_image = load_image(f'./image/player/{plate}/{weapon}/combat_idle.png')
+        self.combat_idle_image = Player.combat_idle_image
+
+    def load_sword_images(self):
+        plate = Player.player_plate_id
+        weapon = Player.current_weapon_id
+
+        Player.sword_image = load_image(f'./image/player/{plate}/{weapon}/sword_attack.png')
+        self.sword_image = Player.sword_image
+
+    def load_bow_images(self):
+        plate = Player.player_plate_id
+        weapon = Player.current_weapon_id
+
+        Player.bow_image = load_image(f'./image/player/{plate}/{weapon}/bow_attack.png')
+        self.bow_image = Player.bow_image
 
     def __init__(self):
         self.x = 510
@@ -399,11 +415,12 @@ class Player:
         self.load_walk_images()
         self.load_idle_images()
         self.load_dead_images()
+        self.load_combat_idle_images()
+
         if self.check_weapon() == 'sword':
             self.load_sword_images()
         elif self.check_weapon() == 'bow':
             self.load_bow_images()
-        self.load_combat_idle_images()
 
         # 상태들 생성
         self.IDLE = Idle(self)

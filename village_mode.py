@@ -197,51 +197,24 @@ def enhance_item(item_type):
 
 
 def reload_player_images():
-    """플레이어 이미지를 새로 로드 (common.player 존재 및 파일 로드 안전 처리)"""
+    """플레이어 이미지를 새로 로드"""
     if not getattr(common, 'player', None):
         print("reload_player_images: common.player is None")
         return
 
-    # 클래스 변수 해제
-    Player.walk_image = None
-    Player.idle_image = None
-    Player.dead_image = None
-    Player.sword_image = None
-    Player.bow_image = None
-    Player.combat_idle_image = None
-
-    plate = getattr(common.player, 'player_plate_id', None) or 'normal'
-    weapon = getattr(common.player, 'current_weapon_id', None) or 'normal_sword'
-
-    def safe_load(path):
-        try:
-            return load_image(path)
-        except Exception as e:
-            print(f"Failed to load image: {path} -> {e}")
-            return None
-
-    Player.walk_image = safe_load(f'./image/player/{plate}/{weapon}/walk.png')
-    Player.idle_image = safe_load(f'./image/player/{plate}/{weapon}/idle.png')
-    Player.dead_image = safe_load(f'./image/player/{plate}/{weapon}/dead.png')
-    Player.combat_idle_image = safe_load(f'./image/player/{plate}/{weapon}/combat_idle.png')
+    # 이미지 재로드
+    common.player.load_walk_images()
+    common.player.load_idle_images()
+    common.player.load_dead_images()
+    common.player.load_combat_idle_images()
 
     weapon_type = common.player.check_weapon()
     if weapon_type == 'sword':
-        Player.sword_image = safe_load(f'./image/player/{plate}/{weapon}/sword_attack.png')
+        common.player.load_sword_images()
     elif weapon_type == 'bow':
-        Player.bow_image = safe_load(f'./image/player/{plate}/{weapon}/bow_attack.png')
+        common.player.load_bow_images()
 
-    # 인스턴스에 적용
-    common.player.walk_image = Player.walk_image
-    common.player.idle_image = Player.idle_image
-    common.player.dead_image = Player.dead_image
-    common.player.combat_idle_image = Player.combat_idle_image
-    if weapon_type == 'sword':
-        common.player.sword_image = Player.sword_image
-    elif weapon_type == 'bow':
-        common.player.bow_image = Player.bow_image
-
-    print(f"Player images reloaded: plate={plate}, weapon={weapon}")
+    print(f"Player images reloaded: plate={Player.player_plate_id}, weapon={Player.current_weapon_id}")
 
 
 def handle_enhance_click(mx, my):
