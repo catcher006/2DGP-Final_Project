@@ -537,11 +537,11 @@ class Player:
 
         # 방어구에 따른 데미지 배율 설정
         damage_multiplier = 1.0
-        if player_plate_id == 'normalplate':
+        if player_plate_id == 'normal_plate':
             damage_multiplier = 0.9
-        elif player_plate_id == 'silverplate':
+        elif player_plate_id == 'silver_plate':
             damage_multiplier = 0.75
-        elif player_plate_id == 'goldplate':
+        elif player_plate_id == 'gold_plate':
             damage_multiplier = 0.5
 
         if group == 'player:slime_mob' and player_is_alive:

@@ -21,6 +21,8 @@ class Village:
         ]
 
         self.image = load_image('./image/background/village.png')
+        self.black_screen = load_image('./image/background/black_screen.png')
+        self.button_start = load_image('./image/ui/button/start_button.png')
     def enter(self, e): pass
     def exit(self, e): pass
     def do(self): pass
