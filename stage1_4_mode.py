@@ -5,6 +5,7 @@ import game_world
 import game_framework
 import stage1_5_mode
 import stage1_7_mode
+import common
 from stage1_4 import Stage1_4
 from stage1_5 import Stage1_5
 from stage1_7 import Stage1_7
@@ -25,18 +26,18 @@ def handle_events():
         elif event.type in (SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP):
             continue
         elif event.type == SDL_KEYDOWN and event.key == SDLK_f:
-            if 990 <= player.x <=  1010 and 270 <= player.y <= 370: # 우측 문
+            if 990 <= common.player.x <=  1010 and 270 <= common.player.y <= 370: # 우측 문
                 if not Stage1_5.stage1_5_create:
                     game_framework.push_mode(stage1_5_mode,(50, 320))
                 else:
                     game_framework.pop_mode(stage1_5_mode, (50, 320))
-            elif 500 <= player.x <=  550 and 0 <= player.y <= 20: # 하단 문
+            elif 500 <= common.player.x <=  550 and 0 <= common.player.y <= 20: # 하단 문
                 if not Stage1_7.stage1_7_create:
                     game_framework.push_mode(stage1_7_mode, (525, 600))
                 else:
                     game_framework.pop_mode(stage1_7_mode, (525, 600))
         else:
-            player.handle_event(event)
+            common.player.handle_event(event)
 
 def init(player_start_pos=None):
     global world, slime_boss, coins
@@ -62,25 +63,25 @@ def init(player_start_pos=None):
 
     game_world.add_object(stage1_4, 0)
 
-    player = Player()
-    player.move_validator = stage1_4.is_walkable
+    common.player = Player()
+    common.player.move_validator = stage1_4.is_walkable
     # 시작 좌표 설정
     if player_start_pos:
-        player.x, player.y = player_start_pos
+        common.player.x, common.player.y = player_start_pos
 
-    game_world.add_object(player, 2)
+    game_world.add_object(common.player, 2)
 
-    game_world.add_collision_pair('player:coin', player, None)
+    game_world.add_collision_pair('player:coin', common.player, None)
 
     # 첫 방문 시에만 몹 추가
     if slime_boss:
         game_world.add_object(slime_boss, 2)
-        game_world.add_collision_pair('player:slime_boss', player, None)
+        game_world.add_collision_pair('player:slime_boss', common.player, None)
         game_world.add_collision_pair('player:slime_boss', None, slime_boss)
 
     if coins:
         game_world.add_objects(coins, 2)
-        game_world.add_collision_pair('player:coin', player, None)
+        game_world.add_collision_pair('player:coin', common.player, None)
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
 
@@ -138,10 +139,10 @@ def resume(player_start_pos=None):
     Stage1_4.current_mode = True
 
     if player_start_pos:
-        player.x, player.y = player_start_pos
+        common.player.x, common.player.y = player_start_pos
 
     game_world.add_object(stage1_4, 0)
-    game_world.add_object(player, 2)
+    game_world.add_object(common.player, 2)
 
     # 저장된 보스 복원
     if stage1_4.saved_mobs:
@@ -154,7 +155,7 @@ def resume(player_start_pos=None):
         slime_boss.move_validator = stage1_4.is_mob_walkable
 
         game_world.add_object(slime_boss, 2)
-        game_world.add_collision_pair('player:slime_boss', player, None)
+        game_world.add_collision_pair('player:slime_boss', common.player, None)
         game_world.add_collision_pair('player:slime_boss', None, slime_boss)
 
         print(f"Resume: Restored boss")
@@ -174,7 +175,7 @@ def resume(player_start_pos=None):
 
         game_world.add_objects(coins, 2)
 
-        game_world.add_collision_pair('player:coin', player, None)
+        game_world.add_collision_pair('player:coin', common.player, None)
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
 

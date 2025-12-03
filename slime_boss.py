@@ -2,22 +2,12 @@ import time
 import game_world
 import game_framework
 import random
-import stage1_0_mode, stage1_1_mode, stage1_2_mode, stage1_3_mode
-import stage1_4_mode, stage1_5_mode, stage1_6_mode, stage1_7_mode
-from stage1_0 import Stage1_0
-from stage1_1 import Stage1_1
-from stage1_2 import Stage1_2
-from stage1_3 import Stage1_3
+import common
+import stage1_4_mode
 from stage1_4 import Stage1_4
-from stage1_5 import Stage1_5
-from stage1_6 import Stage1_6
-from stage1_7 import Stage1_7
-from player import current_weapon_id
 from state_machine import StateMachine
 from coin import Coin
 from pico2d import load_image, load_font, get_time, draw_rectangle
-from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f
-
 
 # mob Run Speed
 PIXEL_PER_METER = (10.0 / 0.3) # 10 pixel 30 cm
@@ -317,11 +307,11 @@ class Slime_Boss:
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                if current_weapon_id == 'normal_sword' or current_weapon_id == 'normal_bow':
+                if common.player.current_weapon_id == 'normal_sword' or common.player.current_weapon_id == 'normal_bow':
                     self.hp -= 20
-                elif current_weapon_id == 'silver_sword' or current_weapon_id == 'silver_bow':
+                elif common.player.current_weapon_id == 'silver_sword' or common.player.current_weapon_id == 'silver_bow':
                     self.hp -= 50
-                elif current_weapon_id == 'gold_sword' or current_weapon_id == 'gold_bow':
+                elif common.player.current_weapon_id == 'gold_sword' or common.player.current_weapon_id == 'gold_bow':
                     self.hp -= 100
                 self.last_damage_time = current_time
 

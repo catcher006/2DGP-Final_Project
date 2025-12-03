@@ -2,6 +2,7 @@ import time
 import game_world
 import game_framework
 import random
+import common
 import stage1_0_mode, stage1_1_mode, stage1_2_mode, stage1_3_mode
 import stage1_4_mode, stage1_5_mode, stage1_6_mode, stage1_7_mode
 from stage1_0 import Stage1_0
@@ -12,7 +13,6 @@ from stage1_4 import Stage1_4
 from stage1_5 import Stage1_5
 from stage1_6 import Stage1_6
 from stage1_7 import Stage1_7
-from player import current_weapon_id
 from state_machine import StateMachine
 from coin import Coin
 from pico2d import load_image, load_font, get_time, draw_rectangle
@@ -345,11 +345,11 @@ class Slime_Mob:
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                if current_weapon_id == 'normal_sword' or current_weapon_id == 'normal_bow':
+                if common.player.current_weapon_id == 'normal_sword' or common.player.current_weapon_id == 'normal_bow':
                     self.hp -= 20
-                elif current_weapon_id == 'silver_sword' or current_weapon_id == 'silver_bow':
+                elif common.player.current_weapon_id == 'silver_sword' or common.player.current_weapon_id == 'silver_bow':
                     self.hp -= 50
-                elif current_weapon_id == 'gold_sword' or current_weapon_id == 'gold_bow':
+                elif common.player.current_weapon_id == 'gold_sword' or common.player.current_weapon_id == 'gold_bow':
                     self.hp -= 100
                 self.last_damage_time = current_time
 
@@ -375,40 +375,6 @@ class Slime_Mob:
 
                 # 디버그 출력 (선택사항)
                 print(f"slime_mob damaged! HP: {self.hp}")
-
-        elif group == 'player_arrow:slime_mob' and self.is_alive:
-            current_time = time.time()
-
-            if current_time - self.last_damage_time >= self.damage_cooldown:
-                if current_weapon_id == 'normalbow':
-                    self.hp -= 20
-                elif current_weapon_id == 'silverbow':
-                    self.hp -= 50
-                elif current_weapon_id == 'goldbow':
-                    self.hp -= 100
-                self.last_damage_time = current_time
-
-                # 화살에 맞았을 때 넉백 (화살 방향으로)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 2.0
-                    self.knockback_dy = ny * 2.0
-
-                if self.hp <= 0:
-                    self.hp = 0
-                    self.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("slime_mob is dead!")
-
-                print(f"slime_mob damaged by arrow! HP: {self.hp}")
 
         elif group == 'player:slime_mob' and self.is_alive:
             # 넉백 방향 계산
