@@ -4,6 +4,7 @@ import random
 import game_world
 import game_framework
 import stage3_8_mode, stage3_10_mode
+import common
 from stage3_11 import Stage3_11
 from stage3_8 import Stage3_8
 from stage3_10 import Stage3_10
@@ -23,18 +24,18 @@ def handle_events():
         elif event.type in (SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP):
             continue
         elif event.type == SDL_KEYDOWN and event.key == SDLK_f:
-            if 500 <= player.x <=  550 and 580 <= player.y <= 600: # 상단 문 (메인 던전으로 가는 문)
+            if 500 <= common.player.x <=  550 and 580 <= common.player.y <= 600: # 상단 문 (메인 던전으로 가는 문)
                 if not Stage3_8.stage3_8_create:
                     game_framework.push_mode(stage3_8_mode,(525, 0))
                 else:
                     game_framework.pop_mode(stage3_8_mode,(525, 0))
-            elif 50 <= player.x <= 70 and 270 <= player.y <= 370:  # 좌측 문
+            elif 50 <= common.player.x <= 70 and 270 <= common.player.y <= 370:  # 좌측 문
                 if not Stage3_10.stage3_10_create:
                     game_framework.push_mode(stage3_10_mode, (1010, 320))
                 else:
                     game_framework.pop_mode(stage3_10_mode, (1010, 320))
         else:
-            player.handle_event(event)
+            common.player.handle_event(event)
 
 def init(player_start_pos=None):
     global world, goblin_mobs, coins
@@ -61,19 +62,19 @@ def init(player_start_pos=None):
 
     game_world.add_object(stage3_11, 0)
 
-    player = Player()
-    player.move_validator = stage3_11.is_walkable
+    common.player = Player()
+    common.player.move_validator = stage3_11.is_walkable
     if player_start_pos:
-        player.x, player.y = player_start_pos
+        common.player.x, common.player.y = player_start_pos
 
-    game_world.add_object(player, 2)
+    game_world.add_object(common.player, 2)
 
-    game_world.add_collision_pair('player:coin', player, None)
+    game_world.add_collision_pair('player:coin', common.player, None)
 
     # 첫 방문 시에만 몹 추가
     if goblin_mobs:
         game_world.add_objects(goblin_mobs, 2)
-        game_world.add_collision_pair('player:goblin_mob', player, None)
+        game_world.add_collision_pair('player:goblin_mob', common.player, None)
         for goblin_mob in goblin_mobs:
             game_world.add_collision_pair('player:goblin_mob', None, goblin_mob)
             game_world.add_collision_pair('goblin_mob:goblin_mob', goblin_mob, None)
@@ -86,7 +87,7 @@ def init(player_start_pos=None):
 
     if coins:
         game_world.add_objects(coins, 2)
-        game_world.add_collision_pair('player:coin', player, None)
+        game_world.add_collision_pair('player:coin', common.player, None)
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
 
@@ -144,11 +145,12 @@ def resume(player_start_pos=None):
 
     Stage3_11.current_mode = True
 
+    common.player.move_validator = stage3_11.is_walkable
     if player_start_pos:
-        player.x, player.y = player_start_pos
+        common.player.x, common.player.y = player_start_pos
 
     game_world.add_object(stage3_11, 0)
-    game_world.add_object(player, 2)
+    game_world.add_object(common.player, 2)
 
     # 저장된 몹 복원
     if stage3_11.saved_mobs:
@@ -178,7 +180,7 @@ def resume(player_start_pos=None):
             goblin_mobs.append(goblin_mob)
 
         game_world.add_objects(goblin_mobs, 2)
-        game_world.add_collision_pair('player:goblin_mob', player, None)
+        game_world.add_collision_pair('player:goblin_mob', common.player, None)
         for goblin_mob in goblin_mobs:
             game_world.add_collision_pair('player:goblin_mob', None, goblin_mob)
             game_world.add_collision_pair('goblin_mob:goblin_mob', goblin_mob, None)
@@ -204,7 +206,7 @@ def resume(player_start_pos=None):
             coins.append(coin)
 
         game_world.add_objects(coins, 2)
-        game_world.add_collision_pair('player:coin', player, None)
+        game_world.add_collision_pair('player:coin', common.player, None)
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
 

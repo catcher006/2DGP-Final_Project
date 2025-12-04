@@ -2,9 +2,9 @@ import time
 import game_world
 import game_framework
 import random
+import common
 from goblin_arrow import Goblin_Arrow
 from goblin_mace import Goblin_Mace
-from player import current_weapon_id
 from state_machine import StateMachine
 from pico2d import load_image, load_font, get_time, draw_rectangle
 
@@ -466,99 +466,52 @@ class Goblin_Mob:
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                if current_weapon_id == 'normal_sword' or current_weapon_id == 'normal_bow':
-                    self.hp -= 20
-                elif current_weapon_id == 'silver_sword' or current_weapon_id == 'silver_bow':
-                    self.hp -= 50
-                elif current_weapon_id == 'gold_sword' or current_weapon_id == 'gold_bow':
-                    self.hp -= 100
+                self.apply_damage()
                 self.last_damage_time = current_time
 
-                # 칼에 맞았을 때 넉백 (플레이어 반대 방향)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    self.is_knocked_back = True
-                    self.knockback_distance = 15
-                    self.knockback_dx = nx * 1.5
-                    self.knockback_dy = ny * 1.5
-
-                if self.hp <= 0:
-                    self.hp = 0
-                    self.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("goblin_mob is dead!")
-
-                # 디버그 출력 (선택사항)
-                print(f"goblin_mob damaged! HP: {self.hp}")
+                self.apply_knockback(other, 15, 1.5)
 
         elif group == 'player_arrow:goblin_mob' and self.is_alive:
             current_time = time.time()
 
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                if player_weapon_id == 'normalbow':
-                    self.hp -= 20
-                elif player_weapon_id == 'silverbow':
-                    self.hp -= 50
-                elif player_weapon_id == 'goldbow':
-                    self.hp -= 100
+                self.apply_damage()
                 self.last_damage_time = current_time
 
-                # 화살에 맞았을 때 넉백 (화살 방향으로)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 2.0
-                    self.knockback_dy = ny * 2.0
-
-                if self.hp <= 0:
-                    self.hp = 0
-                    self.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("goblin_mob is dead!")
-
-                print(f"goblin_mob damaged by arrow! HP: {self.hp}")
+                self.apply_knockback(other, 20, 2.0)
 
         elif group == 'player:goblin_mob' and self.is_alive:
-            # 넉백 방향 계산
-            dx = self.x - other.x
-            dy = self.y - other.y
-            distance = (dx ** 2 + dy ** 2) ** 0.5
-
-            if distance > 0:
-                # 정규화된 방향 벡터
-                nx = dx / distance
-                ny = dy / distance
-
-                # 넉백 설정
-                self.is_knocked_back = True
-                self.knockback_distance = 20
-                self.knockback_dx = nx * 1.0
-                self.knockback_dy = ny * 1.0
+            self.apply_knockback(other, 20, 1.0)
 
         elif group == 'goblin_mob:goblin_mob' and self.is_alive:
-            # 몹끼리 충돌 시 넉백
-            dx = self.x - other.x
-            dy = self.y - other.y
-            distance = (dx ** 2 + dy ** 2) ** 0.5
+            self.apply_knockback(other, 10, 0.5)
 
-            if distance > 0:
-                nx = dx / distance
-                ny = dy / distance
+    def apply_damage(self):
+        if common.player.current_weapon_id in ['normal_sword', 'normal_bow']:
+            self.hp -= 20
+        elif common.player.current_weapon_id in ['silver_sword', 'silver_bow']:
+            self.hp -= 50
+        elif common.player.current_weapon_id in ['gold_sword', 'gold_bow']:
+            self.hp -= 100
 
-                self.is_knocked_back = True
-                self.knockback_distance = 10
-                self.knockback_dx = nx * 0.5
-                self.knockback_dy = ny * 0.5
+        if self.hp <= 0:
+            self.hp = 0
+            self.is_alive = False
+            self.state_machine.handle_state_event(('DIE', None))
+            print("zombie_mob is dead!")
+        else:
+            print(f"zombie_mob damaged! HP: {self.hp}")
+
+    def apply_knockback(self, other, distance, multiplier):
+        dx = self.x - other.x
+        dy = self.y - other.y
+        dist = (dx ** 2 + dy ** 2) ** 0.5
+
+        if dist > 0:
+            nx = dx / dist
+            ny = dy / dist
+
+            self.is_knocked_back = True
+            self.knockback_distance = distance
+            self.knockback_dx = nx * multiplier
+            self.knockback_dy = ny * multiplier

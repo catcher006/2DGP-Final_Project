@@ -2,10 +2,10 @@ import time
 import game_world
 import game_framework
 import random
+import stage3_7_mode
+import common
 from goblin_boss_sword import Goblin_Boss_Sword
 from stage3_7 import Stage3_7
-import stage3_7_mode
-from player import current_weapon_id
 from state_machine import StateMachine
 from pico2d import load_image, load_font, get_time, draw_rectangle
 
@@ -400,11 +400,11 @@ class Goblin_Boss:
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                if current_weapon_id == 'normal_sword' or current_weapon_id == 'normal_bow':
+                if common.player.current_weapon_id == 'normal_sword' or common.player.current_weapon_id == 'normal_bow':
                     self.hp -= 20
-                elif current_weapon_id == 'silver_sword' or current_weapon_id == 'silver_bow':
+                elif common.player.current_weapon_id == 'silver_sword' or common.player.current_weapon_id == 'silver_bow':
                     self.hp -= 50
-                elif current_weapon_id == 'gold_sword' or current_weapon_id == 'gold_bow':
+                elif common.player.current_weapon_id == 'gold_sword' or common.player.current_weapon_id == 'gold_bow':
                     self.hp -= 100
                 self.last_damage_time = current_time
 
