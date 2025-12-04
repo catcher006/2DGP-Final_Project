@@ -4,6 +4,7 @@ import random
 import game_world
 import game_framework
 import stage2_2_mode, stage2_4_mode, stage2_8_mode
+import common
 from stage2_5 import Stage2_5
 from stage2_2 import Stage2_2
 from stage2_4 import Stage2_4
@@ -24,23 +25,23 @@ def handle_events():
         elif event.type in (SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP):
             continue
         elif event.type == SDL_KEYDOWN and event.key == SDLK_f:
-            if 500 <= player.x <= 550 and 580 <= player.y <= 600:  # 상단 문
+            if 500 <= common.player.x <= 550 and 580 <= common.player.y <= 600:  # 상단 문
                 if not Stage2_2.stage2_2_create:
                     game_framework.push_mode(stage2_2_mode, (525, 0))
                 else:
                     game_framework.pop_mode(stage2_2_mode, (525, 0))
-            elif 500 <= player.x <=  550 and 0 <= player.y <= 20: # 하단 문
+            elif 500 <= common.player.x <=  550 and 0 <= common.player.y <= 20: # 하단 문
                 if not Stage2_8.stage2_8_create:
                     game_framework.push_mode(stage2_8_mode,(525, 600))
                 else:
                     game_framework.pop_mode(stage2_8_mode,(525, 600))
-            elif 50 <= player.x <= 70 and 270 <= player.y <= 370:  # 좌측 문
+            elif 50 <= common.player.x <= 70 and 270 <= common.player.y <= 370:  # 좌측 문
                 if not Stage2_4.stage2_4_create:
                     game_framework.push_mode(stage2_4_mode, (1010, 320))
                 else:
                     game_framework.pop_mode(stage2_4_mode, (1010, 320))
         else:
-            player.handle_event(event)
+            common.player.handle_event(event)
 
 def init(player_start_pos=None):
     global world, zombie_mobs, coins
@@ -67,19 +68,19 @@ def init(player_start_pos=None):
 
     game_world.add_object(stage2_5, 0)
 
-    player = Player()
-    player.move_validator = stage2_5.is_walkable
+    common.player = Player()
+    common.player.move_validator = stage2_5.is_walkable
     if player_start_pos:
-        player.x, player.y = player_start_pos
+        common.player.x, common.player.y = player_start_pos
 
-    game_world.add_object(player, 2)
+    game_world.add_object(common.player, 2)
 
-    game_world.add_collision_pair('player:coin', player, None)
+    game_world.add_collision_pair('player:coin', common.player, None)
 
     # 첫 방문 시에만 몹 추가
     if zombie_mobs:
         game_world.add_objects(zombie_mobs, 2)
-        game_world.add_collision_pair('player:zombie_mob', player, None)
+        game_world.add_collision_pair('player:zombie_mob', common.player, None)
         for zombie_mob in zombie_mobs:
             game_world.add_collision_pair('player:zombie_mob', None, zombie_mob)
             game_world.add_collision_pair('zombie_mob:zombie_mob', zombie_mob, None)
@@ -92,7 +93,7 @@ def init(player_start_pos=None):
 
     if coins:
         game_world.add_objects(coins, 2)
-        game_world.add_collision_pair('player:coin', player, None)
+        game_world.add_collision_pair('player:coin', common.player, None)
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
 
@@ -150,11 +151,12 @@ def resume(player_start_pos=None):
 
     Stage2_5.current_mode = True
 
+    common.player.move_validator = stage2_5.is_walkable
     if player_start_pos:
-        player.x, player.y = player_start_pos
+        common.player.x, common.player.y = player_start_pos
 
     game_world.add_object(stage2_5, 0)
-    game_world.add_object(player, 2)
+    game_world.add_object(common.player, 2)
 
     # 저장된 몹 복원
     if stage2_5.saved_mobs:
@@ -221,7 +223,7 @@ def resume(player_start_pos=None):
             zombie_mobs.append(zombie_mob)
 
         game_world.add_objects(zombie_mobs, 2)
-        game_world.add_collision_pair('player:zombie_mob', player, None)
+        game_world.add_collision_pair('player:zombie_mob', common.player, None)
         for zombie_mob in zombie_mobs:
             game_world.add_collision_pair('player:zombie_mob', None, zombie_mob)
             game_world.add_collision_pair('zombie_mob:zombie_mob', zombie_mob, None)
@@ -247,7 +249,7 @@ def resume(player_start_pos=None):
             coins.append(coin)
 
         game_world.add_objects(coins, 2)
-        game_world.add_collision_pair('player:coin', player, None)
+        game_world.add_collision_pair('player:coin', common.player, None)
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
 
