@@ -166,6 +166,7 @@ def resume(player_start_pos=None):
 
     Stage1_0.current_mode = True
 
+    common.player.move_validator = stage1_0.is_walkable
     if player_start_pos:
         common.player.x, common.player.y = player_start_pos
 
