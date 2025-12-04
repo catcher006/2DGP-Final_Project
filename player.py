@@ -337,7 +337,7 @@ class Player:
     player_plate_id = 'none'
     player_bow_id = 'none'
     player_sword_id = 'normal_sword'
-    current_weapon_id = 'none'
+    current_weapon_id = player_sword_id
 
     is_attacking = False
     is_alive = True
