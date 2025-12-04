@@ -92,6 +92,9 @@ class Coin:
 
             if Ui.coin + 50 <= 99999999:
                 Ui.coin += 50
+            elif Ui.coin > 99999999 - 50:
+                Ui.coin = 99999999
+
             try:
                 game_world.remove_object(self)
             except Exception as e:
