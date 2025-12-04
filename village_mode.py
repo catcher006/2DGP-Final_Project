@@ -407,6 +407,7 @@ def resume(player_start_pos=None):
     # 필요시 village 객체들을 다시 초기화
     global village, back_object, front_object, player
 
+    common.player.move_validator = village.is_walkable
     if player_start_pos:
         common.player.x, common.player.y = player_start_pos
 

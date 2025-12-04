@@ -4,6 +4,7 @@ import village_mode
 import stage1_0_mode, stage2_0_mode, stage3_0_mode
 import game_world
 import game_framework
+import common
 from dungeonmain import Dungeonmain
 from player import Player
 from stage1_0 import Stage1_0
@@ -24,25 +25,25 @@ def handle_events():
         elif event.type in (SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP):
             continue
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
-            if 195 <= player.x <= 290 and 380 <= player.y <= 400:  # 1번 스테이지 입구 좌표 범위
+            if 195 <= common.player.x <= 290 and 380 <= common.player.y <= 400:  # 1번 스테이지 입구 좌표 범위
                 if not Stage1_0.stage1_0_create:
                     game_framework.push_mode(stage1_0_mode, (525, 600))
                 else:
                     game_framework.pop_mode(stage1_0_mode, (525, 600))
-            elif 505 <= player.x <= 585 and 380 <= player.y <= 400:  # 2번 스테이지 입구 좌표 범위
+            elif 505 <= common.player.x <= 585 and 380 <= common.player.y <= 400:  # 2번 스테이지 입구 좌표 범위
                 if not Stage2_0.stage2_0_create:
                     game_framework.push_mode(stage2_0_mode, (525, 600))
                 else:
                     game_framework.pop_mode(stage2_0_mode, (525, 600))
-            elif 780 <= player.x <= 880 and 380 <= player.y <= 400:  # 3번 스테이지 입구 좌표 범위
+            elif 780 <= common.player.x <= 880 and 380 <= common.player.y <= 400:  # 3번 스테이지 입구 좌표 범위
                 if not Stage3_0.stage3_0_create:
                     game_framework.push_mode(stage3_0_mode, (525, 600))
                 else:
                     game_framework.pop_mode(stage3_0_mode, (525, 600))
-            elif 500 <= player.x <= 600 and 60 <= player.y <= 80:  # 마을 입구 좌표 범위
+            elif 500 <= common.player.x <= 600 and 60 <= common.player.y <= 80:  # 마을 입구 좌표 범위
                 game_framework.pop_mode(village_mode,(535, 380))
         else:
-            player.handle_event(event)
+            common.player.handle_event(event)
 
 def init(player_start_pos=None):
     global world
@@ -57,15 +58,15 @@ def init(player_start_pos=None):
     # back_object = Back_Object()
     # game_world.add_object((back_object), 1)
 
-    player = Player()
-    player.move_validator = dungeonmain.is_walkable
+    common.player = Player()
+    common.player.move_validator = dungeonmain.is_walkable
     # 시작 좌표 설정
     if player_start_pos:
-        player.x, player.y = player_start_pos
+        common.player.x, common.player.y = player_start_pos
     else:
-        player.x, player.y = 535, 60  # 기본 좌표
+        common.player.x, common.player.y = 535, 60  # 기본 좌표
 
-    game_world.add_object((player), 2)
+    game_world.add_object(common.player, 2)
 
     # front_object = Front_Object()
     # game_world.add_object((front_object), 3)
@@ -92,11 +93,12 @@ def resume(player_start_pos=None):
     # 필요시 dungeonmain 객체들을 다시 초기화
     global dungeonmain, player
 
+    common.player.move_validator = dungeonmain.is_walkable
     if player_start_pos:
-        player.x, player.y = player_start_pos
+        common.player.x, common.player.y = player_start_pos
 
     game_world.add_object(dungeonmain, 0)
-    game_world.add_object(player, 2)
+    game_world.add_object(common.player, 2)
 
     ui = Ui()
     game_world.add_object(ui, 4)
