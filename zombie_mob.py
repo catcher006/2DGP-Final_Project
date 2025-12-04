@@ -2,6 +2,7 @@ import time
 import game_world
 import game_framework
 import random
+import common
 import stage2_0_mode, stage2_1_mode, stage2_2_mode, stage2_3_mode
 import stage2_4_mode, stage2_5_mode, stage2_6_mode, stage2_7_mode
 import stage2_8_mode, stage2_9_mode, stage2_10_mode, stage2_11_mode
@@ -18,7 +19,6 @@ from stage2_9 import Stage2_9
 from stage2_10 import Stage2_10
 from stage2_11 import Stage2_11
 from zombie_mace import Zombie_Mace
-from player import current_weapon_id
 from state_machine import StateMachine
 from pico2d import load_image, load_font, get_time, draw_rectangle
 
@@ -438,104 +438,52 @@ class Zombie_Mob:
         if not self.is_alive:
             return
 
-        if (group == 'player_sword:zombie_mob' and self.is_alive) or (group == 'player_arrow:zombie_mob' and self.is_alive):
+        if group == 'player_sword:zombie_mob' and self.is_alive:
             current_time = time.time()
-
-            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                if current_weapon_id == 'normal_sword' or current_weapon_id == 'normal_bow':
-                    self.hp -= 20
-                elif current_weapon_id == 'silver_sword' or current_weapon_id == 'silver_bow':
-                    self.hp -= 50
-                elif current_weapon_id == 'gold_sword' or current_weapon_id == 'gold_bow':
-                    self.hp -= 100
+                # 데미지 처리
+                self.apply_damage()
                 self.last_damage_time = current_time
 
-                # 칼에 맞았을 때 넉백 (플레이어 반대 방향)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    self.is_knocked_back = True
-                    self.knockback_distance = 15
-                    self.knockback_dx = nx * 1.5
-                    self.knockback_dy = ny * 1.5
-
-                if self.hp <= 0:
-                    self.hp = 0
-                    self.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("zombie_mob is dead!")
-
-                # 디버그 출력 (선택사항)
-                print(f"slime_mob damaged! HP: {self.hp}")
+                # 칼 넉백 (플레이어 반대 방향)
+                self.apply_knockback(other, 15, 1.5)
 
         elif group == 'player_arrow:zombie_mob' and self.is_alive:
             current_time = time.time()
-
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                if player_weapon_id == 'normalbow':
-                    self.hp -= 20
-                elif player_weapon_id == 'silverbow':
-                    self.hp -= 50
-                elif player_weapon_id == 'goldbow':
-                    self.hp -= 100
+                # 데미지 처리
+                self.apply_damage()
                 self.last_damage_time = current_time
 
-                # 화살에 맞았을 때 넉백 (화살 방향으로)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
+                # 화살 넉백 (화살 방향으로, 더 강함)
+                self.apply_knockback(other, 20, 2.0)
 
-                if distance > 0:
-                    nx = dx / distance
-                    ny = dy / distance
+    def apply_damage(self):
+        if common.player.current_weapon_id in ['normal_sword', 'normal_bow']:
+            self.hp -= 20
+        elif common.player.current_weapon_id in ['silver_sword', 'silver_bow']:
+            self.hp -= 50
+        elif common.player.current_weapon_id in ['gold_sword', 'gold_bow']:
+            self.hp -= 100
 
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 2.0
-                    self.knockback_dy = ny * 2.0
+        if self.hp <= 0:
+            self.hp = 0
+            self.is_alive = False
+            self.state_machine.handle_state_event(('DIE', None))
+            print("zombie_mob is dead!")
+        else:
+            print(f"zombie_mob damaged! HP: {self.hp}")
 
-                if self.hp <= 0:
-                    self.hp = 0
-                    self.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("zombie_mob is dead!")
+    def apply_knockback(self, other, distance, multiplier):
+        dx = self.x - other.x
+        dy = self.y - other.y
+        dist = (dx ** 2 + dy ** 2) ** 0.5
 
-                print(f"zombie_mob damaged by arrow! HP: {self.hp}")
+        if dist > 0:
+            nx = dx / dist
+            ny = dy / dist
 
-        elif group == 'player:zombie_mob' and self.is_alive:
-            # 넉백 방향 계산
-            dx = self.x - other.x
-            dy = self.y - other.y
-            distance = (dx ** 2 + dy ** 2) ** 0.5
-
-            if distance > 0:
-                # 정규화된 방향 벡터
-                nx = dx / distance
-                ny = dy / distance
-
-                # 넉백 설정
-                self.is_knocked_back = True
-                self.knockback_distance = 20
-                self.knockback_dx = nx * 1.0
-                self.knockback_dy = ny * 1.0
-
-        elif group == 'zombie_mob:zombie_mob' and self.is_alive:
-            # 몹끼리 충돌 시 넉백
-            dx = self.x - other.x
-            dy = self.y - other.y
-            distance = (dx ** 2 + dy ** 2) ** 0.5
-
-            if distance > 0:
-                nx = dx / distance
-                ny = dy / distance
-
-                self.is_knocked_back = True
-                self.knockback_distance = 10
-                self.knockback_dx = nx * 0.5
-                self.knockback_dy = ny * 0.5
+            self.is_knocked_back = True
+            self.knockback_distance = distance
+            self.knockback_dx = nx * multiplier
+            self.knockback_dy = ny * multiplier

@@ -2,6 +2,7 @@ import time
 import game_world
 import game_framework
 import random
+import common
 import stage2_0_mode, stage2_1_mode, stage2_2_mode, stage2_3_mode
 import stage2_4_mode, stage2_5_mode, stage2_6_mode, stage2_7_mode
 import stage2_8_mode, stage2_9_mode, stage2_10_mode, stage2_11_mode
@@ -17,7 +18,6 @@ from stage2_8 import Stage2_8
 from stage2_9 import Stage2_9
 from stage2_10 import Stage2_10
 from stage2_11 import Stage2_11
-from player import current_weapon_id
 from zombie_boss_waraxe import Zombie_Boss_Waraxe
 from state_machine import StateMachine
 from pico2d import load_image, load_font, get_time, draw_rectangle
@@ -416,11 +416,11 @@ class Zombie_Boss:
 
             # 마지막 데미지로부터 충분한 시간이 지났는지 확인
             if current_time - self.last_damage_time >= self.damage_cooldown:
-                if current_weapon_id == 'normal_sword' or current_weapon_id == 'normal_bow':
+                if common.player.current_weapon_id == 'normal_sword' or common.player.current_weapon_id == 'normal_bow':
                     self.hp -= 20
-                elif current_weapon_id == 'silver_sword' or current_weapon_id == 'silver_bow':
+                elif common.player.current_weapon_id == 'silver_sword' or common.player.current_weapon_id == 'silver_bow':
                     self.hp -= 50
-                elif current_weapon_id == 'gold_sword' or current_weapon_id == 'gold_bow':
+                elif common.player.current_weapon_id == 'gold_sword' or common.player.current_weapon_id == 'gold_bow':
                     self.hp -= 100
                 self.last_damage_time = current_time
 
