@@ -528,7 +528,79 @@ class Player:
     def handle_collision(self, group, other):
         global player_hp
 
-        # 방어구에 따른 데미지 배율 설정
+        if group == 'player:coin':
+            pass
+
+        if group == 'player:slime_mob' and Player.is_alive:
+            current_time = time.time()
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                self.apply_damage(10)
+                self.apply_knockback(other, 20, 1.0)
+
+        elif group == 'player:slime_boss' and Player.is_alive:
+            current_time = time.time()
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                self.apply_damage(20)
+                self.apply_knockback(other, 30, 3.0)
+
+        elif group == 'player:zombie_mob' and Player.is_alive:
+            current_time = time.time()
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                self.apply_damage(10)
+                self.apply_knockback(other, 20, 1.0)
+
+        elif group == 'player:zombie_mace' and Player.is_alive:
+            current_time = time.time()
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                self.apply_damage(15)
+                self.apply_knockback(other, 20, 1.0)
+
+        elif group == 'player:zombie_boss' and Player.is_alive:
+            current_time = time.time()
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                self.apply_damage(15)
+                self.apply_knockback(other, 20, 1.0)
+
+        elif group == 'player:zombie_boss_waraxe' and Player.is_alive:
+            current_time = time.time()
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                self.apply_damage(25)
+                self.apply_knockback(other, 20, 1.0)
+
+        elif group == 'player:goblin_mob' and Player.is_alive:
+            current_time = time.time()
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                self.apply_damage(15)
+                self.apply_knockback(other, 20, 1.0)
+
+        elif group == 'player:goblin_mace' and Player.is_alive:
+            current_time = time.time()
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                self.apply_damage(20)
+                self.apply_knockback(other, 20, 1.0)
+
+        elif group == 'player:goblin_arrow' and Player.is_alive:
+            current_time = time.time()
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                self.apply_damage(20)
+                self.apply_knockback(other, 20, 1.0)
+
+        elif group == 'player:goblin_boss' and Player.is_alive:
+            current_time = time.time()
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                self.apply_damage(15)
+                self.apply_knockback(other, 20, 1.0)
+
+        elif group == 'player:goblin_boss_sword' and Player.is_alive:
+            current_time = time.time()
+            if current_time - self.last_damage_time >= self.damage_cooldown:
+                self.apply_damage(40)
+                self.apply_knockback(other, 20, 1.0)
+
+    def apply_damage(self, base_damage):
+        global player_hp
+
+        # 방어구에 따른 데미지 배율 계산
         damage_multiplier = 1.0
         if Player.player_plate_id == 'normal_plate':
             damage_multiplier = 0.9
@@ -537,368 +609,30 @@ class Player:
         elif Player.player_plate_id == 'gold_plate':
             damage_multiplier = 0.5
 
-        if group == 'player:slime_mob' and Player.is_alive:
-            current_time = time.time()
-
-            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
-            if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= int(10 * damage_multiplier)
-                self.last_damage_time = current_time
-
-                # 넉백 방향 계산 (플레이어 -> 슬라임의 반대 방향)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    # 정규화된 방향 벡터
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 1.0
-                    self.knockback_dy = ny * 1.0
-
-                if player_hp <= 0:
-                    player_hp = 0
-                    Player.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("Player is dead!")
-
-                # 디버그 출력 (선택사항)
-                print(f"Player damaged! HP: {player_hp}")
-
-        elif group == 'player:coin':
-            pass
-
-        elif group == 'player:slime_boss' and Player.is_alive:
-            current_time = time.time()
-
-            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
-            if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= 20
-                self.last_damage_time = current_time
-
-                # 보스와 충돌 시 넉백 (더 강한 넉백)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    # 보스는 넉백이 더 강함
-                    self.is_knocked_back = True
-                    self.knockback_distance = 30
-                    self.knockback_dx = nx * 3.0
-                    self.knockback_dy = ny * 3.0
-
-                if player_hp <= 0:
-                    player_hp = 0
-                    Player.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("Player is dead!")
-
-                # 디버그 출력 (선택사항)
-                print(f"Player damaged! HP: {player_hp}")
-
-        elif group == 'player:zombie_mob' and Player.is_alive:
-            current_time = time.time()
-
-            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
-            if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= int(10 * damage_multiplier)
-                self.last_damage_time = current_time
-
-                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    # 정규화된 방향 벡터
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 1.0
-                    self.knockback_dy = ny * 1.0
-
-                if Player.is_alive <= 0:
-                    player_hp = 0
-                    player_is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("Player is dead!")
-
-                # 디버그 출력 (선택사항)
-                print(f"Player damaged! HP: {player_hp}")
-
-
-        elif group == 'player:zombie_mace' and Player.is_alive:
-            current_time = time.time()
-
-            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
-            if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= int(15 * damage_multiplier)
-                self.last_damage_time = current_time
-
-                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    # 정규화된 방향 벡터
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 1.0
-                    self.knockback_dy = ny * 1.0
-
-                if player_hp <= 0:
-                    player_hp = 0
-                    Player.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("Player is dead!")
-
-                # 디버그 출력 (선택사항)
-                print(f"Player damaged! HP: {player_hp}")
-
-        elif group == 'player:zombie_boss' and Player.is_alive:
-            current_time = time.time()
-
-            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
-            if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= int(15 * damage_multiplier)
-                self.last_damage_time = current_time
-
-                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    # 정규화된 방향 벡터
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 1.0
-                    self.knockback_dy = ny * 1.0
-
-                if player_hp <= 0:
-                    player_hp = 0
-                    Player.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("Player is dead!")
-
-                # 디버그 출력 (선택사항)
-                print(f"Player damaged! HP: {player_hp}")
-
-        elif group == 'player:zombie_boss_waraxe' and Player.is_alive:
-            current_time = time.time()
-
-            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
-            if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= int(25 * damage_multiplier)
-                self.last_damage_time = current_time
-
-                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    # 정규화된 방향 벡터
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 1.0
-                    self.knockback_dy = ny * 1.0
-
-                if player_hp <= 0:
-                    player_hp = 0
-                    Player.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("Player is dead!")
-
-                # 디버그 출력 (선택사항)
-                print(f"Player damaged! HP: {player_hp}")
-
-        elif group == 'player:goblin_mob' and Player.is_alive:
-            current_time = time.time()
-
-            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
-            if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= int(15 * damage_multiplier)
-                self.last_damage_time = current_time
-
-                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    # 정규화된 방향 벡터
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 1.0
-                    self.knockback_dy = ny * 1.0
-
-                if player_hp <= 0:
-                    player_hp = 0
-                    Player.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("Player is dead!")
-
-                # 디버그 출력 (선택사항)
-                print(f"Player damaged! HP: {player_hp}")
-
-        elif group == 'player:goblin_mace' and Player.is_alive:
-            current_time = time.time()
-
-            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
-            if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= int(20 * damage_multiplier)
-                self.last_damage_time = current_time
-
-                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    # 정규화된 방향 벡터
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 1.0
-                    self.knockback_dy = ny * 1.0
-
-                if player_hp <= 0:
-                    player_hp = 0
-                    Player.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("Player is dead!")
-
-                # 디버그 출력 (선택사항)
-                print(f"Player damaged! HP: {player_hp}")
-
-        elif group == 'player:goblin_arrow' and Player.is_alive:
-            current_time = time.time()
-
-            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
-            if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= int(25 * damage_multiplier)
-                self.last_damage_time = current_time
-
-                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    # 정규화된 방향 벡터
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 1.0
-                    self.knockback_dy = ny * 1.0
-
-                if player_hp <= 0:
-                    player_hp = 0
-                    Player.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("Player is dead!")
-
-                # 디버그 출력 (선택사항)
-                print(f"Player damaged! HP: {player_hp}")
-
-        elif group == 'player:goblin_boss' and Player.is_alive:
-            current_time = time.time()
-
-            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
-            if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= int(15 * damage_multiplier)
-                self.last_damage_time = current_time
-
-                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    # 정규화된 방향 벡터
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 1.0
-                    self.knockback_dy = ny * 1.0
-
-                if player_hp <= 0:
-                    player_hp = 0
-                    Player.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("Player is dead!")
-
-                # 디버그 출력 (선택사항)
-                print(f"Player damaged! HP: {player_hp}")
-
-        elif group == 'player:goblin_boss_sword' and Player.is_alive:
-            current_time = time.time()
-
-            # 마지막 데미지로부터 충분한 시간이 지났는지 확인
-            if current_time - self.last_damage_time >= self.damage_cooldown:
-                player_hp -= int(40 * damage_multiplier)
-                self.last_damage_time = current_time
-
-                # 넉백 방향 계산 (플레이어 -> 좀비의 반대 방향)
-                dx = self.x - other.x
-                dy = self.y - other.y
-                distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                if distance > 0:
-                    # 정규화된 방향 벡터
-                    nx = dx / distance
-                    ny = dy / distance
-
-                    # 넉백 설정 (20픽셀을 20프레임에 걸쳐 이동)
-                    self.is_knocked_back = True
-                    self.knockback_distance = 20
-                    self.knockback_dx = nx * 1.0
-                    self.knockback_dy = ny * 1.0
-
-                if player_hp <= 0:
-                    player_hp = 0
-                    Player.is_alive = False
-                    self.state_machine.handle_state_event(('DIE', None))
-                    print("Player is dead!")
-
-                # 디버그 출력 (선택사항)
-                print(f"Player damaged! HP: {player_hp}")
+        # 실제 데미지 계산 및 적용
+        actual_damage = int(base_damage * damage_multiplier)
+        player_hp -= actual_damage
+        self.last_damage_time = time.time()
+
+        # HP가 0 이하로 떨어지면 사망 처리
+        if player_hp <= 0:
+            player_hp = 0
+            Player.is_alive = False
+            self.state_machine.handle_state_event(('DIE', None))
+            print("Player is dead!")
+        else:
+            print(f"Player damaged! HP: {player_hp} (took {actual_damage} damage)")
+
+    def apply_knockback(self, other, distance, konck_dist):
+        dx = self.x - other.x
+        dy = self.y - other.y
+        dist = (dx ** 2 + dy ** 2) ** 0.5
+
+        if dist > 0:
+            nx = dx / dist
+            ny = dy / dist
+
+            self.is_knocked_back = True
+            self.knockback_distance = distance
+            self.knockback_dx = nx * konck_dist
+            self.knockback_dy = ny * konck_dist
