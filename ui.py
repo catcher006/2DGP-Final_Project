@@ -44,6 +44,13 @@ class Ui:
         self.current_tutorial_page = 1
         self.hovered_bgm = -1
         self.hovered_effect = -1
+
+        # 게임 정보 설정
+        self.game_info_image = load_image('./image/ui/information/game_info_page.png')
+        self.scroll_offset = 0
+        self.max_scroll = 0  # 이미지 높이에 따라 계산
+        self.info_view_height = 350  # 보이는 영역 높이
+        self.info_view_y = 288  # 중심 y 좌표
     def draw(self):
         self.ui_coin_image.draw(60, 560)
         self.pixel_font_25.draw(70, 560, f'{Ui.coin:d}', (255, 255, 0))
@@ -100,6 +107,10 @@ class Ui:
                     self.info_tuturial_page2_image.draw(512, 288)
                 elif self.current_tutorial_page == 3:
                     self.info_tuturial_page3_image.draw(512, 288)
+            elif Ui.information_button:
+                    self.game_info_image.draw(512, 288)
+            else:
+                self.pause_button_image.draw(990, 550, 40, 40)
 
             self.action_button_image.draw(990, 550, 40, 40)
         else:
@@ -116,6 +127,15 @@ class Ui:
             my = get_canvas_height() - event.y
             self.handle_mouse_motion(mx, my)
             return True
+
+        elif event.type == SDL_MOUSEWHEEL:
+            mx = event.x
+            my = get_canvas_height() - event.y
+            # 게임 정보 영역에서만 스크롤 처리
+            if Ui.information_button and 180 <= mx <= 844 and 113 <= my <= 463:
+                self.scroll_offset -= event.y * 20  # 스크롤 속도 조절
+                self.scroll_offset = max(0, min(self.scroll_offset, self.max_scroll))
+                return True
 
         elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
             sounds.normal_click_sound.play()
@@ -173,7 +193,7 @@ class Ui:
             return
 
         # 배경음 사운드 바 영역
-        for i in range(6):
+        for i in range(8):
             bar_x = 315 + 70 * i
             if bar_x - 35 <= mx <= bar_x + 35 and 325 <= my <= 365:
                 self.hovered_bgm = i
@@ -181,7 +201,7 @@ class Ui:
                 return
 
         # 효과음 사운드 바 영역
-        for i in range(6):
+        for i in range(8):
             bar_x = 315 + 70 * i
             if bar_x - 35 <= mx <= bar_x + 35 and 175 <= my <= 215:
                 self.hovered_effect = i
@@ -196,7 +216,7 @@ class Ui:
             return False
 
         # 배경음 사운드 바 클릭
-        for i in range(6):
+        for i in range(8):
             bar_x = 315 + 70 * i
             if bar_x - 35 <= mx <= bar_x + 35 and 325 <= my <= 365:
                 sounds.setting_bgm_sound = i
@@ -205,7 +225,7 @@ class Ui:
                 return True
 
         # 효과음 사운드 바 클릭
-        for i in range(6):
+        for i in range(8):
             bar_x = 315 + 70 * i
             if bar_x - 35 <= mx <= bar_x + 35 and 175 <= my <= 215:
                 sounds.setting_effect_sound = i
@@ -219,6 +239,7 @@ class Ui:
         self.current_tutorial_page = 1
         self.hovered_bgm = -1
         self.hovered_effect = -1
+        self.scroll_offset = 0
         Ui.sound_button = True
         Ui.tutorial_button = False
         Ui.information_button = False
