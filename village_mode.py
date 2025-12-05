@@ -512,46 +512,8 @@ def handle_events():
             else:
                 game_framework.change_mode(title_mode)
         elif Ui.paused:
-            # 일시정지 상태에서 설정 버튼 클릭 처리
-            if event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
-                settings.normal_click_sound.play()
-                mx = event.x
-                my = get_canvas_height() - event.y
-
-                # 일시정지 버튼 클릭 (990, 550 중심, 40x40 크기)
-                if 970 <= mx <= 1010 and 530 <= my <= 570:
-                    Ui.paused = not Ui.paused
-                    continue
-
-                # 사운드 버튼 (220, 488 중심, 80x30 크기)
-                if 180 <= mx <= 260 and 473 <= my <= 503:
-                    Ui.sound_button = True
-                    Ui.tutorial_button = False
-                    Ui.information_button = False
-                    continue
-
-                # 튜토리얼 버튼 (300, 488 중심, 80x30 크기)
-                if 260 <= mx <= 340 and 473 <= my <= 503:
-                    Ui.tutorial_button = True
-                    Ui.sound_button = False
-                    Ui.information_button = False
-                    continue
-
-                # 게임 정보 버튼 (380, 488 중심, 80x30 크기)
-                if 340 <= mx <= 420 and 473 <= my <= 503:
-                    Ui.information_button = True
-                    Ui.sound_button = False
-                    Ui.tutorial_button = False
-                    continue
-
-                if Ui.tutorial_button:
-                    if 595 <= mx <= 617 and 122 <= my <= 160:
-                        if ui.current_tutorial_page < 3:
-                            ui.current_tutorial_page += 1
-                    elif 407 <= mx <= 429 and 122 <= my <= 160:
-                        if ui.current_tutorial_page > 1:
-                            ui.current_tutorial_page -= 1
-            continue
+            if ui.handle_events(event):
+                continue
         elif enhance_active or weapon_select:
             if event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
 

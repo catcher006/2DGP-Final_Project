@@ -31,6 +31,10 @@ class Ui:
         self.sound_track_off_image = load_image('./image/ui/button/sound_track_off.png')
         self.name_bgm_image = load_image('./image/ui/button/bgm_sound_track.png')
         self.name_effect_image = load_image('./image/ui/button/effect_sound_track.png')
+        self.current_bgm_sound = load_image('./image/ui/button/current_bgm_sound.png')
+        self.want_bgm_sound = load_image('./image/ui/button/want_bgm_sound.png')
+        self.current_effect_sound = load_image('./image/ui/button/current_effect_sound.png')
+        self.want_effect_sound = load_image('./image/ui/button/want_effect_sound.png')
 
         # 튜토리얼 설정
         self.info_tuturial_page1_image = load_image('./image/ui/information/tutorial_page1.png')
@@ -38,6 +42,8 @@ class Ui:
         self.info_tuturial_page3_image = load_image('./image/ui/information/tutorial_page3.png')
 
         self.current_tutorial_page = 1
+        self.hovered_bgm = -1
+        self.hovered_effect = -1
     def draw(self):
         self.ui_coin_image.draw(60, 560)
         self.pixel_font_25.draw(70, 560, f'{Ui.coin:d}', (255, 255, 0))
@@ -64,7 +70,10 @@ class Ui:
                 self.sound_bar_image.draw(560, 350)
                 self.name_bgm_image.draw(230, 390)
 
-                draw_rectangle(315 - 10, 340 - 10, 315 + 10, 340 + 10)
+                self.current_bgm_sound.draw(315 + 70 * settings.setting_bgm_sound, 340, 20, 20)
+
+                if self.hovered_bgm >= 0 and self.hovered_bgm != settings.setting_bgm_sound:
+                    self.want_bgm_sound.draw(315 + 70 * self.hovered_bgm, 340, 20, 20)
 
                 if settings.setting_bgm_sound != 0:
                     self.sound_track_on_image.draw(230, 340)
@@ -74,6 +83,11 @@ class Ui:
                 # 효과음
                 self.sound_bar_image.draw(560, 200)
                 self.name_effect_image.draw(230, 245)
+
+                self.current_effect_sound.draw(315 + 70 * settings.setting_effect_sound, 190, 20, 20)
+
+                if self.hovered_effect >= 0 and self.hovered_effect != settings.setting_effect_sound:
+                    self.want_effect_sound.draw(315 + 70 * self.hovered_effect, 190, 20, 20)
 
                 if settings.setting_effect_sound != 0:
                     self.sound_track_on_image.draw(230, 195)
@@ -92,6 +106,111 @@ class Ui:
             self.pause_button_image.draw(990, 550, 40, 40)
     def update(self):
         Ui.hp = player.player_hp
+
+    def handle_events(self, event):
+        if not Ui.paused:
+            return False
+
+        if event.type == SDL_MOUSEMOTION:
+            mx = event.x
+            my = get_canvas_height() - event.y
+            self.handle_mouse_motion(mx, my)
+            return True
+
+        elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
+            settings.normal_click_sound.play()
+            mx = event.x
+            my = get_canvas_height() - event.y
+
+            # 일시정지 버튼
+            if 970 <= mx <= 1010 and 530 <= my <= 570:
+                Ui.paused = False
+                return True
+
+            # 사운드 버튼
+            if 180 <= mx <= 260 and 473 <= my <= 503:
+                Ui.sound_button = True
+                Ui.tutorial_button = False
+                Ui.information_button = False
+                return True
+
+            # 튜토리얼 버튼
+            if 260 <= mx <= 340 and 473 <= my <= 503:
+                Ui.tutorial_button = True
+                Ui.sound_button = False
+                Ui.information_button = False
+                return True
+
+            # 게임 정보 버튼
+            if 340 <= mx <= 420 and 473 <= my <= 503:
+                Ui.information_button = True
+                Ui.sound_button = False
+                Ui.tutorial_button = False
+                return True
+
+            # 사운드 바 클릭
+            if self.handle_mouse_click(mx, my):
+                return True
+
+            # 튜토리얼 페이지 전환
+            if Ui.tutorial_button:
+                if 595 <= mx <= 617 and 122 <= my <= 160:
+                    if self.current_tutorial_page < 3:
+                        self.current_tutorial_page += 1
+                    return True
+                elif 407 <= mx <= 429 and 122 <= my <= 160:
+                    if self.current_tutorial_page > 1:
+                        self.current_tutorial_page -= 1
+                    return True
+
+        return False
+
+    def handle_mouse_motion(self, mx, my):
+        if not Ui.paused or not Ui.sound_button:
+            self.hovered_bgm = -1
+            self.hovered_effect = -1
+            return
+
+        # 배경음 사운드 바 영역
+        for i in range(6):
+            bar_x = 315 + 70 * i
+            if bar_x - 35 <= mx <= bar_x + 35 and 325 <= my <= 365:
+                self.hovered_bgm = i
+                self.hovered_effect = -1
+                return
+
+        # 효과음 사운드 바 영역
+        for i in range(6):
+            bar_x = 315 + 70 * i
+            if bar_x - 35 <= mx <= bar_x + 35 and 175 <= my <= 215:
+                self.hovered_effect = i
+                self.hovered_bgm = -1
+                return
+
+        self.hovered_bgm = -1
+        self.hovered_effect = -1
+
+    def handle_mouse_click(self, mx, my):
+        if not Ui.paused or not Ui.sound_button:
+            return False
+
+        # 배경음 사운드 바 클릭
+        for i in range(6):
+            bar_x = 315 + 70 * i
+            if bar_x - 35 <= mx <= bar_x + 35 and 325 <= my <= 365:
+                settings.setting_bgm_sound = i
+                settings.init_bgm_sounds()
+                return True
+
+        # 효과음 사운드 바 클릭
+        for i in range(6):
+            bar_x = 315 + 70 * i
+            if bar_x - 35 <= mx <= bar_x + 35 and 175 <= my <= 215:
+                settings.setting_effect_sound = i
+                settings.init_effect_sounds()
+                return True
+
+        return False
     def enter(self, e): pass
     def exit(self, e): pass
     def do(self): pass
