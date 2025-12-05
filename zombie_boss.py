@@ -4,9 +4,7 @@ import game_framework
 import random
 import common
 import sounds
-import stage2_0_mode, stage2_1_mode, stage2_2_mode, stage2_3_mode
-import stage2_4_mode, stage2_5_mode, stage2_6_mode, stage2_7_mode
-import stage2_8_mode, stage2_9_mode, stage2_10_mode, stage2_11_mode
+import stage2_7_mode
 from stage2_0 import Stage2_0
 from stage2_1 import Stage2_1
 from stage2_2 import Stage2_2
@@ -139,7 +137,7 @@ class Dead:
                     game_world.add_object(coin, 2)
                     game_world.add_collision_pair('player:coin', None, coin)
 
-                print(f"8 coins created around boss at ({self.mob.x}, {self.mob.y})")
+                # print(f"8 coins created around boss at ({self.mob.x}, {self.mob.y})")
 
                 game_world.remove_object(self.mob)
 
@@ -364,7 +362,7 @@ class Zombie_Boss:
                 self.font.draw(self.x, self.y + 60, f'{self.hp % 10:d}', (168, 190, 208))
             else:
                 self.font.draw(self.x - 3, self.y + 60, f'{self.hp:02d}', (168, 190, 208))
-            draw_rectangle(*self.get_bb())
+            # draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         if not self.is_alive or self.hp <= 0:
@@ -445,11 +443,11 @@ class Zombie_Boss:
                     self.is_alive = False
                     Stage2_7.boss_cleared = True
                     self.state_machine.handle_state_event(('DIE', None))
-                    print("zombie_mob is dead!")
+                    # print("zombie_mob is dead!")
 
                 else:
                     sounds.zombie_hurt_sound.play()
-                    print(f"slime_mob damaged! HP: {self.hp}")
+                    # print(f"slime_mob damaged! HP: {self.hp}")
 
         elif group == 'player:zombie_boss' and self.is_alive:
             # 넉백 방향 계산

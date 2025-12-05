@@ -152,7 +152,7 @@ class Dead:
 
                 game_world.add_object(coin, 2)
                 game_world.add_collision_pair('player:coin', None, coin)
-                print(f"Coin created at ({coin.x}, {coin.y})")
+                # print(f"Coin created at ({coin.x}, {coin.y})")
 
                 game_world.remove_collision_object(self.mob)
                 game_world.remove_object(self.mob)
@@ -390,7 +390,7 @@ class Zombie_Mob:
                 self.font.draw(self.x - 4, self.y + 35, '0', (168, 190, 208))
             else:
                 self.font.draw(self.x - 9, self.y + 35, f'{self.hp:02d}', (168, 190, 208))
-            draw_rectangle(*self.get_bb())
+            # draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         if not self.is_alive or self.hp <= 0:
@@ -458,6 +458,12 @@ class Zombie_Mob:
                 # 화살 넉백 (화살 방향으로, 더 강함)
                 self.apply_knockback(other, 20, 2.0)
 
+        elif group == 'player:zombie_mob' and self.is_alive:
+            self.apply_knockback(other, 20, 1.0)
+
+        elif group == 'zombie_mob:zombie_mob' and self.is_alive:
+            self.apply_knockback(other, 5, 0.5)
+
     def apply_damage(self):
         if common.player.current_weapon_id in ['normal_sword', 'normal_bow']:
             self.hp -= 20
@@ -471,10 +477,10 @@ class Zombie_Mob:
             self.is_alive = False
             sounds.zombie_dead_sound.play()
             self.state_machine.handle_state_event(('DIE', None))
-            print("zombie_mob is dead!")
+            # print("zombie_mob is dead!")
         else:
             sounds.zombie_hurt_sound.play()
-            print(f"zombie_mob damaged! HP: {self.hp}")
+            # print(f"zombie_mob damaged! HP: {self.hp}")
 
     def apply_knockback(self, other, distance, multiplier):
         dx = self.x - other.x

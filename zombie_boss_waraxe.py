@@ -17,9 +17,10 @@ class Zombie_Boss_Waraxe():
             self.sound_played = True
 
     def draw(self):
-        bb = self.get_bb()
-        if bb:
-            draw_rectangle(*bb)
+        # bb = self.get_bb()
+        # if bb:
+        #    draw_rectangle(*bb)
+        pass
 
     def get_bb(self):
         f = int(self.frame)
