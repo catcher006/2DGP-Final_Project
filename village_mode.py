@@ -623,6 +623,8 @@ def init(player_start_pos=None):
     ui = Ui()
     game_world.add_object(ui, 4)
 
+    settings.village_bgm.repeat_play()
+
 def update():
     if enhance_active:
         update_button_animations()
@@ -645,12 +647,14 @@ def draw():
 
 def finish():
     game_world.clear()
+    settings.village_bgm.stop()
 
 def pause():
     # 현재 모드의 모든 객체를 게임 월드에서 제거
     game_world.clear()
     # 충돌 페어도 정리
     game_world.collision_pairs.clear()
+    settings.village_bgm.stop()
 
 def resume(player_start_pos=None):
     # 필요시 village 객체들을 다시 초기화
@@ -666,3 +670,5 @@ def resume(player_start_pos=None):
 
     ui = Ui()
     game_world.add_object(ui, 4)
+
+    settings.village_bgm.repeat_play()
