@@ -1,5 +1,6 @@
 import zombie_boss
 import game_world
+import sounds
 from pico2d import *
 
 class Zombie_Boss_Waraxe():
@@ -9,6 +10,11 @@ class Zombie_Boss_Waraxe():
         self.y = getattr(zombie_boss, 'y')
         self.frame = int(getattr(zombie_boss, 'frame'))
         self.face_dir = int(getattr(zombie_boss, 'face_dir'))
+        self.sound_played = False
+
+        if sounds.waraxe_attack and not self.sound_played:
+            sounds.waraxe_attack.play()
+            self.sound_played = True
 
     def draw(self):
         bb = self.get_bb()

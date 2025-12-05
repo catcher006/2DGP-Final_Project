@@ -1,5 +1,6 @@
 import zombie_mob
 import game_world
+import sounds
 from pico2d import *
 
 class Zombie_Mace():
@@ -9,6 +10,11 @@ class Zombie_Mace():
         self.y = getattr(zombie, 'y')
         self.frame = int(getattr(zombie, 'frame'))
         self.face_dir = int(getattr(zombie, 'face_dir'))
+        self.sound_played = False
+
+        if sounds.mace_attack and not self.sound_played:
+            sounds.mace_attack.play()
+            self.sound_played = True
 
     def draw(self):
         bb = self.get_bb()

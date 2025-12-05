@@ -2,6 +2,7 @@ from pico2d import *
 import game_framework
 import game_world
 import goblin_mob
+import sounds
 import math
 
 # Arrow Speed
@@ -51,6 +52,7 @@ class Goblin_Arrow:
 
             # 프레임 7에서 발사
             if self.frame >= 9:
+                sounds.arrow_sound.play()
                 self.is_fired = True
 
         # 발사 후: 날아감

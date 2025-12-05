@@ -1,6 +1,10 @@
 import goblin_boss
 import game_world
+import sounds
 from pico2d import *
+
+import sounds
+
 
 class Goblin_Boss_Sword():
     def __init__(self, goblin_boss):
@@ -9,6 +13,11 @@ class Goblin_Boss_Sword():
         self.y = getattr(goblin_boss, 'y')
         self.frame = int(getattr(goblin_boss, 'frame'))
         self.face_dir = int(getattr(goblin_boss, 'face_dir'))
+        self.sound_played = False
+
+        if sounds.lazer_sword and not self.sound_played:
+            sounds.lazer_sword.play()
+            self.sound_played = True
 
     def draw(self):
         bb = self.get_bb()

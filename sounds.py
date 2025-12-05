@@ -21,6 +21,9 @@ player_hurt_low_sound = None
 player_dead_sound = None
 sword_attack_sound = None
 arrow_sound = None
+mace_attack = None
+waraxe_attack = None
+lazer_sword = None
 
 setting_bgm_sound = 4
 setting_effect_sound = 4
@@ -56,7 +59,7 @@ def init_effect_sounds():
     global zombie_hurt_sound, zombie_dead_sound
     global goblin_hurt_sound, goblin_dead_sound
     global player_hurt_high_sound, player_hurt_low_sound, player_dead_sound
-    global sword_attack_sound, arrow_sound
+    global sword_attack_sound, arrow_sound, mace_attack, waraxe_attack, lazer_sword
 
     sound = 0 if setting_effect_sound == 0 else 2 ** setting_effect_sound
 
@@ -105,12 +108,24 @@ def init_effect_sounds():
         player_dead_sound.set_volume(sound)
 
     if sword_attack_sound is None:
-        sword_attack_sound = load_wav('./sound/player/sword_attack.wav')
+        sword_attack_sound = load_wav('./sound/effect/sword_attack.wav')
         sword_attack_sound.set_volume(sound)
 
     if arrow_sound is None:
-        arrow_sound = load_wav('./sound/player/arrow_sound.wav')
+        arrow_sound = load_wav('./sound/effect/arrow_sound.wav')
         arrow_sound.set_volume(sound)
+
+    if mace_attack is None:
+        mace_attack = load_wav('./sound/effect/mace_attack.wav')
+        mace_attack.set_volume(sound)
+
+    if waraxe_attack is None:
+        waraxe_attack = load_wav('./sound/effect/waraxe_attack.wav')
+        waraxe_attack.set_volume(sound)
+
+    if lazer_sword is None:
+        lazer_sword = load_wav('./sound/effect/laser_sword.wav')
+        lazer_sword.set_volume(sound)
 
 
 def apply_bgm_volume():
@@ -157,3 +172,9 @@ def apply_effect_volume():
         sword_attack_sound.set_volume(volume)
     if arrow_sound is not None:
         arrow_sound.set_volume(volume)
+    if mace_attack is not None:
+        mace_attack.set_volume(volume)
+    if waraxe_attack is not None:
+        waraxe_attack.set_volume(volume)
+    if lazer_sword is not None:
+        lazer_sword.set_volume(volume)
