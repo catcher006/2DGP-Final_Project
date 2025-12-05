@@ -3,18 +3,44 @@ from pico2d import load_wav, load_music
 normal_click_sound = None
 warning_sound = None
 village_bgm = None
+dungeon_bgm = None
+stage1_bgm = None
+stage2_bgm = None
+stage3_bgm = None
 
-def init_sounds():
-    global normal_click_sound, warning_sound, village_bgm
+setting_bgm_sound = 128
+setting_effect_sound = 128
 
-    if normal_click_sound is None:
-        normal_click_sound = load_wav('./sound/click/normal_click.wav')
-        normal_click_sound.set_volume(32)
-
-    if warning_sound is None:
-        warning_sound = load_wav('./sound/click/warning.wav')
-        warning_sound.set_volume(32)
+def init_bgm_sounds():
+    global village_bgm, dungeon_bgm, stage1_bgm, stage2_bgm, stage3_bgm
 
     if village_bgm is None:
         village_bgm = load_music('./sound/bgm/village_bgm.mp3')
-        village_bgm.set_volume(16)
+        village_bgm.set_volume(setting_bgm_sound)
+
+    if dungeon_bgm is None:
+        dungeon_bgm = load_music('./sound/bgm/dungeon_bgm.mp3')
+        dungeon_bgm.set_volume(setting_bgm_sound)
+
+    if stage1_bgm is None:
+        stage1_bgm = load_music('./sound/bgm/stage1_bgm.mp3')
+        stage1_bgm.set_volume(setting_bgm_sound)
+
+    if stage2_bgm is None:
+        stage2_bgm = load_music('./sound/bgm/stage2_bgm.mp3')
+        stage2_bgm.set_volume(setting_bgm_sound)
+
+    if stage3_bgm is None:
+        stage3_bgm = load_music('./sound/bgm/stage3_bgm.mp3')
+        stage3_bgm.set_volume(setting_bgm_sound)
+
+def init_effect_sounds():
+    global normal_click_sound, warning_sound
+
+    if normal_click_sound is None:
+        normal_click_sound = load_wav('./sound/click/normal_click.wav')
+        normal_click_sound.set_volume(setting_effect_sound)
+
+    if warning_sound is None:
+        warning_sound = load_wav('./sound/click/warning.wav')
+        warning_sound.set_volume(setting_effect_sound)

@@ -6,6 +6,7 @@ import game_world
 import game_framework
 import stage3_1_mode, stage3_3_mode
 import common
+import settings
 from stage3_0 import Stage3_0
 from stage3_1 import Stage3_1
 from stage3_2 import Stage3_2
@@ -122,6 +123,8 @@ def init(player_start_pos=None):
 
     ui = Ui()
     game_world.add_object(ui, 4)
+
+    settings.stage3_bgm.repeat_play()
 
 def update():
     game_world.update()

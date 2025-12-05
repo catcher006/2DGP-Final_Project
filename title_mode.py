@@ -9,7 +9,8 @@ def init():
     global image
     image = load_image('./image/background/main_title.png')
 
-    settings.init_sounds()
+    settings.init_bgm_sounds()
+    settings.init_effect_sounds()
 
 def finish():
     global image
