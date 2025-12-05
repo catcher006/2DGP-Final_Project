@@ -1,4 +1,4 @@
-from pico2d import load_image
+from pico2d import load_image, load_font
 
 class Village:
     def __init__(self):
@@ -23,7 +23,16 @@ class Village:
         self.image = load_image('./image/background/village.png')
         self.black_screen = load_image('./image/background/black_screen.png')
         self.button_start = load_image('./image/ui/button/start_button.png')
+        self.button_enhance = load_image('./image/ui/button/enhance_button.png')
+        self.button_weapon = load_image('./image/ui/button/weapon_button.png')
         self.info_coin = load_image('./image/ui/information/dont_enough_coin.png')
+        self.info_weapon = load_image('./image/ui/information/dont_have_weapon.png')
+        self.info_already_selected = load_image('./image/ui/information/already_selected.png')
+        self.icon_sword = load_image('./image/ui/item/sword.png')
+        self.icon_arrow = load_image('./image/ui/item/bow.png')
+        self.icon_shield = load_image('./image/ui/item/shield.png')
+
+        self.font = load_font('./font/PixelPurl.TTF', 25)
     def enter(self, e): pass
     def exit(self, e): pass
     def do(self): pass

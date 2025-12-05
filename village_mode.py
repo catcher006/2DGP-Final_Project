@@ -12,7 +12,7 @@ from player import Player
 from ui import Ui
 
 enhance_active = False # 강화 모드 활성화 플래그
-font = None
+weapon_select = False # 무기 선택 모드 활성화 플래그
 
 # 강화 시스템 설정
 TIER_LIST = ['normal', 'silver', 'gold']
@@ -25,6 +25,11 @@ BUTTONS = {
     'shield': (750, 150, 150, 50)
 }
 
+MENU_BUTTONS = {
+    'enhance': (20, 450, 64, 64),  # 상단: 강화 버튼
+    'weapon': (20, 380, 64, 64)    # 하단: 무기 선택 버튼
+}
+
 # 버튼 애니메이션 상태
 button_animations = {
     'sword': {'frame': 0, 'animating': False, 'time': 0, 'sequence_index': 0},
@@ -33,6 +38,20 @@ button_animations = {
 }
 
 coin_warning = {
+    'active': False,
+    'frame': 0,
+    'sequence_index': 0,
+    'time': 0
+}
+
+weapon_warning = {
+    'active': False,
+    'frame': 0,
+    'sequence_index': 0,
+    'time': 0
+}
+
+already_selected_warning = {
     'active': False,
     'frame': 0,
     'sequence_index': 0,
@@ -50,13 +69,9 @@ def point_in_rect(x, y, rect):
 
 
 def get_current_tier(item_name):
-    """현재 아이템 등급 반환 (속성 안전 조회)"""
-    p = getattr(common, 'player', None)
-    if not p:
-        return 'none'
-
+    """현재 아이템 등급 반환"""
     if item_name == 'sword':
-        sword_id = common.player.player_sword_id
+        sword_id = Player.player_sword_id
         if 'gold' in sword_id:
             return 'gold'
         elif 'silver' in sword_id:
@@ -65,7 +80,7 @@ def get_current_tier(item_name):
             return 'normal'
         return 'none'
     elif item_name == 'arrow':
-        bow_id = common.player.player_bow_id
+        bow_id = Player.player_bow_id
         if 'gold' in bow_id:
             return 'gold'
         elif 'silver' in bow_id:
@@ -74,7 +89,7 @@ def get_current_tier(item_name):
             return 'normal'
         return 'none'
     elif item_name == 'shield':
-        plate_id = common.player.player_plate_id
+        plate_id = Player.player_plate_id
         if 'gold' in plate_id:
             return 'gold'
         elif 'silver' in plate_id:
@@ -139,6 +154,55 @@ def update_coin_warning():
             else:
                 coin_warning['frame'] = COIN_WARNING_SEQUENCE[coin_warning['sequence_index']]
 
+def start_weapon_warning():
+    """무기 없음 경고 애니메이션 시작"""
+    weapon_warning['active'] = True
+    weapon_warning['time'] = 0
+    weapon_warning['sequence_index'] = 0
+    weapon_warning['frame'] = 0
+
+
+def update_weapon_warning():
+    """무기 없음 경고 애니메이션 업데이트"""
+    if weapon_warning['active']:
+        weapon_warning['time'] += game_framework.frame_time
+
+        if weapon_warning['time'] >= COIN_WARNING_FRAME_TIME:
+            weapon_warning['time'] = 0
+            weapon_warning['sequence_index'] += 1
+
+            if weapon_warning['sequence_index'] >= len(COIN_WARNING_SEQUENCE):
+                weapon_warning['active'] = False
+                weapon_warning['sequence_index'] = 0
+                weapon_warning['frame'] = 0
+            else:
+                weapon_warning['frame'] = COIN_WARNING_SEQUENCE[weapon_warning['sequence_index']]
+
+
+def start_already_selected_warning():
+    """이미 선택된 무기 경고 애니메이션 시작"""
+    already_selected_warning['active'] = True
+    already_selected_warning['time'] = 0
+    already_selected_warning['sequence_index'] = 0
+    already_selected_warning['frame'] = 0
+
+
+def update_already_selected_warning():
+    """이미 선택된 무기 경고 애니메이션 업데이트"""
+    if already_selected_warning['active']:
+        already_selected_warning['time'] += game_framework.frame_time
+
+        if already_selected_warning['time'] >= COIN_WARNING_FRAME_TIME:
+            already_selected_warning['time'] = 0
+            already_selected_warning['sequence_index'] += 1
+
+            if already_selected_warning['sequence_index'] >= len(COIN_WARNING_SEQUENCE):
+                already_selected_warning['active'] = False
+                already_selected_warning['sequence_index'] = 0
+                already_selected_warning['frame'] = 0
+            else:
+                already_selected_warning['frame'] = COIN_WARNING_SEQUENCE[already_selected_warning['sequence_index']]
+
 
 def enhance_item(item_type):
     """아이템 강화 시도"""
@@ -159,15 +223,7 @@ def enhance_item(item_type):
         if current_tier == 'none':
             next_tier = 'normal'
         else:
-            try:
-                next_tier = TIER_LIST[TIER_LIST.index(current_tier) + 1]
-            except (ValueError, IndexError):
-                print("Tier calculation error")
-                return False
-
-        if not getattr(common, 'player', None):
-            print("No player to enhance")
-            return False
+            next_tier = TIER_LIST[TIER_LIST.index(current_tier) + 1]
 
         # 등급 적용
         if item_type == 'sword':
@@ -197,11 +253,6 @@ def enhance_item(item_type):
 
 
 def reload_player_images():
-    """플레이어 이미지를 새로 로드"""
-    if not getattr(common, 'player', None):
-        print("reload_player_images: common.player is None")
-        return
-
     # 이미지 재로드
     common.player.load_walk_images()
     common.player.load_idle_images()
@@ -215,6 +266,59 @@ def reload_player_images():
         common.player.load_bow_images()
 
     print(f"Player images reloaded: plate={Player.player_plate_id}, weapon={Player.current_weapon_id}")
+
+
+def handle_weapon_select_click(mx, my):
+    # 무기 선택 클릭 처리
+    enhance_rect = MENU_BUTTONS.get('enhance')
+    weapon_rect = MENU_BUTTONS.get('weapon')
+
+    if enhance_rect and point_in_rect(mx, my, enhance_rect):
+        return
+    if weapon_rect and point_in_rect(mx, my, weapon_rect):
+        return
+
+    for name in ['sword', 'arrow']:
+        rect = BUTTONS.get(name)
+        if rect:
+            x, y, w, h = rect
+            cx = x + w // 2
+            icon_y = 300
+            icon_size = 100
+
+            icon_cx = cx + 150
+            icon_left = icon_cx - icon_size // 2
+            icon_right = icon_cx + icon_size // 2
+            icon_bottom = icon_y - icon_size // 2
+            icon_top = icon_y + icon_size // 2
+
+            if icon_left <= mx <= icon_right and icon_bottom <= my <= icon_top:
+                tier = get_current_tier(name)
+
+                # tier가 none이면 경고 애니메이션 시작
+                if tier == 'none':
+                    start_weapon_warning()
+                    print(f"{name} is not available!")
+                    return
+
+                # 이미 선택된 무기인지 확인
+                if name == 'sword':
+                    if 'sword' in Player.current_weapon_id:
+                        start_already_selected_warning()
+                        print(f"Sword is already selected!")
+                        return
+                    Player.current_weapon_id = Player.player_sword_id
+                    print(f"Sword selected: {Player.current_weapon_id}")
+                elif name == 'arrow':
+                    if 'bow' in Player.current_weapon_id:
+                        start_already_selected_warning()
+                        print(f"Bow is already selected!")
+                        return
+                    Player.current_weapon_id = Player.player_bow_id
+                    print(f"Bow selected: {Player.current_weapon_id}")
+
+                reload_player_images()
+                return
 
 
 def handle_enhance_click(mx, my):
@@ -251,71 +355,174 @@ def handle_enhance_click(mx, my):
             else:
                 print(f"{name} is already at max tier!")
             return
+
+    for menu_name, menu_rect in MENU_BUTTONS.items():
+        if point_in_rect(mx, my, menu_rect):
+            print(f"  -> Clicked menu button: {menu_name}")
+            if menu_name == 'enhance':
+                enhance_active = True
+                weapon_select = False
+                print("Enhance menu activated.")
+            elif menu_name == 'weapon':
+                weapon_select = True
+                enhance_active = False
+                print("Weapon selection menu activated.")
+            return
     print("  -> No button clicked")
 
+def draw_menu_button(name, rect):
+    for name, rect in MENU_BUTTONS.items():
+        x, y, w, h = rect
+        cx = x + w // 2
+        cy = y + h // 2
 
-def draw_button(name, rect):
+        # enhance 활성화 시 enhance 버튼 강조, weapon_select 활성화 시 weapon 버튼 강조
+        if name == 'enhance':
+            frame = 0 if enhance_active else 1
+            village.button_enhance.clip_draw(frame * 192, 0, 192, 192, cx, cy, w, h)
+        elif name == 'weapon':
+            frame = 0 if weapon_select else 1
+            village.button_weapon.clip_draw(frame * 192, 0, 192, 192, cx, cy, w, h)
+
+
+def draw_button(name, rect, mode='enhance'):
+    """버튼 그리기 (모드에 따라 다른 스타일)"""
     x, y, w, h = rect
     cx = x + w // 2
     cy = y + h // 2
 
-    frame = button_animations.get(name, {}).get('frame', 0)
-    print(f"Drawing {name} button with frame {frame}")
+    # 강화 모드
+    if mode == 'enhance':
+        frame = button_animations.get(name, {}).get('frame', 0)
 
-    # village가 없으면 그리기 시도하지 않음
-    if 'village' in globals() and getattr(village, 'button_start', None):
+        # 아이템 아이콘 표시
+        tier = get_current_tier(name)
+        icon_y = y + h + 150
+
+        if tier == 'none':
+            # 아이콘 대신 [None] 텍스트로 표시
+            village.font.draw(cx - 25, icon_y, '[None]', (255, 255, 255))
+        else:
+            tier_frame = 0
+            if tier == 'silver':
+                tier_frame = 1
+            elif tier == 'gold':
+                tier_frame = 2
+
+            if name == 'sword' and village.icon_sword:
+                village.icon_sword.clip_draw(tier_frame * 64, 0, 64, 64, cx, icon_y, 100, 100)
+            elif name == 'arrow' and village.icon_arrow:
+                village.icon_arrow.clip_draw(tier_frame * 64, 0, 64, 64, cx, icon_y, 100, 100)
+            elif name == 'shield' and village.icon_shield:
+                village.icon_shield.clip_draw(tier_frame * 64, 0, 64, 64, cx, icon_y, 100, 100)
+
+        # 버튼 그리기
         village.button_start.clip_draw(320 * frame, 0, 320, 115, cx, cy, w, h)
 
-    if font:
-        tier = get_current_tier(name)
-        cost = COSTS.get(tier, 'MAX')
-
-        item_name = ''
-        p = getattr(common, 'player', None)
-        if p:
-            if name == 'sword':
-                item_name = getattr(p, 'player_sword_id', 'NONE').replace('_', ' ').upper()
-            elif name == 'arrow':
-                item_name = getattr(p, 'player_bow_id', 'NONE').replace('_', ' ').upper()
-            elif name == 'shield':
-                item_name = getattr(p, 'player_plate_id', 'NONE').replace('_', ' ').upper()
+        # 아이템 이름 표시
+        if name == 'sword':
+            item_name = Player.player_sword_id.replace('_', ' ').upper()
+        elif name == 'arrow':
+            item_name = Player.player_bow_id.replace('_', ' ').upper()
+        elif name == 'shield':
+            item_name = Player.player_plate_id.replace('_', ' ').upper()
         else:
             item_name = 'NONE'
 
-        font.draw(x, y + h + 80, f'{name.upper()} [{tier.upper()}]', (255, 255, 255))
-
         if item_name != 'NONE':
-            font.draw(cx - 50, cy, item_name, (255, 200, 0))
-        else:
-            font.draw(cx - 30, cy, 'EMPTY', (150, 150, 150))
+            text_width = len(item_name) * 10
+            village.font.draw(cx - text_width // 2, cy + 45, item_name, (255, 200, 0))
 
+        tier = get_current_tier(name)
+        cost = COSTS.get(tier, 'MAX')
         if cost != 'MAX':
             success_rates = {'none': '60%', 'normal': '30%', 'silver': '10%'}
             rate = success_rates.get(tier, '0%')
-            font.draw(x + 10, y + h + 15, f'Cost: {cost} | Rate: {rate}', (255, 255, 0))
+            cost_text = f'Coin: {cost} | Rate: {rate}'
+            text_width = len(cost_text) * 10
+            village.font.draw(cx - text_width // 2 + 20, y + h + 60, cost_text, (255, 255, 0))
+        elif cost == 'MAX':
+            village.font.draw(cx - 15, y + h + 60, 'MAX', (0, 255, 0))
+
+    # 무기 선택 모드
+    elif mode == 'weapon_select':
+        tier = get_current_tier(name)
+        icon_y = 300
+        icon_size = 100
+
+        if tier != 'none':
+            is_selected = False
+            if name == 'sword' and 'sword' in Player.current_weapon_id:
+                is_selected = True
+            elif name == 'arrow' and 'bow' in Player.current_weapon_id:
+                is_selected = True
+
+            tier_frame = 0
+            if tier == 'silver':
+                tier_frame = 1
+            elif tier == 'gold':
+                tier_frame = 2
+
+            if name == 'sword' and village.icon_sword:
+                village.icon_sword.clip_draw(tier_frame * 64, 0, 64, 64, cx + 150, icon_y, icon_size, icon_size)
+            elif name == 'arrow' and village.icon_arrow:
+                village.icon_arrow.clip_draw(tier_frame * 64, 0, 64, 64, cx + 150, icon_y, icon_size, icon_size)
+
+            if is_selected:
+                left = cx + 150 - icon_size // 2
+                right = cx + 150 + icon_size // 2
+                bottom = icon_y - icon_size // 2
+                top = icon_y + icon_size // 2
+
+                for i in range(3):
+                    draw_rectangle(left - i, bottom - i, right + i, top + i)
+
+            if name == 'sword':
+                item_name = Player.player_sword_id.replace('_', ' ').upper()
+            elif name == 'arrow':
+                item_name = Player.player_bow_id.replace('_', ' ').upper()
+            else:
+                item_name = 'NONE'
+
+            color = (0, 255, 0) if is_selected else (255, 255, 255)
+            text_width = len(item_name) * 10
+            village.font.draw(cx + 150 - text_width // 2, y + h + 20, item_name, color)
         else:
-            font.draw(cx - 20, y + h + 15, 'MAX', (0, 255, 0))
+            # tier가 none인 경우 [None] 텍스트 표시
+            village.font.draw(cx + 80, icon_y, '[None]', (150, 150, 150))
 
 def handle_events():
-    global running, enhance_active
+    global running, enhance_active, weapon_select
 
     event_list = get_events()
     for event in event_list:
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            if enhance_active:
+            if enhance_active or weapon_select:
                 enhance_active = False # 강화 모드 비활성화
+                weapon_select = False # 무기 선택 모드 비활성화
             else:
                 game_framework.change_mode(title_mode)
-        elif enhance_active:
-            # 강화 UI가 활성화되어 있으면 마우스 클릭만 처리
+        elif enhance_active or weapon_select:
             if event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
-                # 마우스 y 좌표를 화면 좌표계로 변환
                 mx = event.x
                 my = get_canvas_height() - event.y
-                print(f"Mouse clicked at: ({mx}, {my})")  # 디버그용
-                handle_enhance_click(mx, my)
+
+                # 메뉴 버튼 클릭 확인
+                enhance_rect = MENU_BUTTONS.get('enhance')
+                weapon_rect = MENU_BUTTONS.get('weapon')
+
+                if enhance_rect and point_in_rect(mx, my, enhance_rect):
+                    enhance_active = True
+                    weapon_select = False
+                elif weapon_rect and point_in_rect(mx, my, weapon_rect):
+                    weapon_select = True
+                    enhance_active = False
+                elif enhance_active:
+                    handle_enhance_click(mx, my)
+                elif weapon_select:
+                    handle_weapon_select_click(mx, my)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             if 480 <= common.player.x <= 590 and 370 <= common.player.y <= 380: # 던전 입구 좌표 범위
                 game_framework.push_mode(dungeonmain_mode,(535, 60))
@@ -325,23 +532,48 @@ def handle_events():
             common.player.handle_event(event)
 
 def draw_enhance_ui():
-    # 반투명 배경 (선택사항)
     village.black_screen.clip_draw(5 * 768, 0, 768, 144, 512, 288, 1024, 576)
 
-    if font:
-        font.draw(400, 500, '=== Enhance Menu ===', (255, 255, 255))
+    # 메뉴 버튼 항상 표시
+    for name, rect in MENU_BUTTONS.items():
+        x, y, w, h = rect
+        cx = x + w // 2
+        cy = y + h // 2
 
+        if name == 'enhance':
+            frame = 0 if enhance_active else 1
+            village.button_enhance.clip_draw(frame * 192, 0, 192, 192, cx, cy, w, h)
+        elif name == 'weapon':
+            frame = 0 if weapon_select else 1
+            village.button_weapon.clip_draw(frame * 192, 0, 192, 192, cx, cy, w, h)
+
+    # 강화 모드
+    if enhance_active:
+        village.font.draw(320, 50, 'Click the Start Button or Go to Game with ESC key', (200, 200, 200))
         for name, rect in BUTTONS.items():
             draw_button(name, rect)
 
-        coins_text = f'Your coins: {Ui.coin}'
-        font.draw(120, 120, coins_text, (255, 255, 255))
-        font.draw(120, 80, 'ESC to close  -  Click to enhance', (180, 180, 180))
+        if coin_warning['active'] and village.info_coin:
+            frame = coin_warning['frame']
+            village.info_coin.clip_draw(0, frame * 78, 490, 78, 512, 288)
 
-    # 코인 부족 경고 표시
-    if coin_warning['active']:
-        frame = coin_warning['frame']
-        village.info_coin.clip_draw(0, frame * 78, 490, 78, 512, 288)
+    # 무기 선택 모드
+    elif weapon_select:
+        village.font.draw(320, 50, 'Click the Item Image or Go to Game with ESC key', (200, 200, 200))
+        for name in ['sword', 'arrow']:
+            rect = BUTTONS.get(name)
+            if rect:
+                draw_button(name, rect, mode='weapon_select')
+
+        # 무기 경고 표시
+        if weapon_warning['active'] and village.info_weapon:
+            frame = weapon_warning['frame']
+            village.info_weapon.clip_draw(0, frame * 78, 490, 78, 512, 288)
+
+        # 이미 선택된 무기 경고 표시
+        if already_selected_warning['active'] and village.info_already_selected:
+            frame = already_selected_warning['frame']
+            village.info_already_selected.clip_draw(0, frame * 78, 490, 78, 512, 288)
 
 def init(player_start_pos=None):
     global world
@@ -350,9 +582,11 @@ def init(player_start_pos=None):
     global back_object
     global front_object
     global enhance_active
+    global weapon_select
     global font
 
     enhance_active = False
+    weapon_select = False
     font = load_font('ENCR10B.TTF', 20)
 
     village = Village()
@@ -381,6 +615,9 @@ def update():
     if enhance_active:
         update_button_animations()
         update_coin_warning()
+    elif weapon_select:
+        update_weapon_warning()
+        update_already_selected_warning()
     else:
         game_world.update()
 
@@ -389,7 +626,7 @@ def draw():
     game_world.render()
 
     # 강화 UI 오버레이
-    if enhance_active:
+    if enhance_active or weapon_select:
         draw_enhance_ui()
 
     update_canvas()
