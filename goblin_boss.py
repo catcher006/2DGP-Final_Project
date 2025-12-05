@@ -7,7 +7,7 @@ import common
 from goblin_boss_sword import Goblin_Boss_Sword
 from stage3_7 import Stage3_7
 from state_machine import StateMachine
-from pico2d import load_image, load_font, get_time, draw_rectangle
+from pico2d import load_image, load_font, get_time, draw_rectangle, load_wav
 
 # mob Run Speed
 PIXEL_PER_METER = (10.0 / 0.3) # 10 pixel 30 cm
@@ -273,6 +273,10 @@ class Move:
         self.mob.move_image.clip_draw(int(self.mob.frame) * 64, 64 * self.mob.face_dir, 64, 64, self.mob.x, self.mob.y, 200, 200)
 
 class Goblin_Boss:
+
+    hurt_sound = None
+    dead_sound = None
+
     def __init__(self):
         self.move_image = load_image("./image/mobs/goblin_boss/walk.png")
         self.idle_image = load_image("./image/mobs/goblin_boss/idle.png")
@@ -282,6 +286,14 @@ class Goblin_Boss:
         self.hp_image = load_image("./image/ui/mobs/goblin/goblin_hp.png")
 
         self.font = load_font('ENCR10B.TTF', 10)
+
+        if Goblin_Boss.hurt_sound is None:
+            Goblin_Boss.hurt_sound = load_wav('./sound/mob/goblin_hurt.wav')
+            Goblin_Boss.hurt_sound.set_volume(64)
+
+        if Goblin_Boss.dead_sound is None:
+            Goblin_Boss.dead_sound = load_wav('./sound/mob/goblin_dead.wav')
+            Goblin_Boss.dead_sound.set_volume(64)
 
         self.x = random.randint(155,890)
         self.y = random.randint(135,490)
@@ -424,13 +436,16 @@ class Goblin_Boss:
 
                 if self.hp <= 0:
                     self.hp = 0
+                    Goblin_Boss.dead_sound.play()
                     self.is_alive = False
                     Stage3_7.boss_cleared = True
                     self.state_machine.handle_state_event(('DIE', None))
                     print("zombie_mob is dead!")
 
-                # 디버그 출력 (선택사항)
-                print(f"slime_mob damaged! HP: {self.hp}")
+                else:
+                    Goblin_Boss.hurt_sound.play()
+                    # 디버그 출력 (선택사항)
+                    print(f"slime_mob damaged! HP: {self.hp}")
 
         elif group == 'player:goblin_boss' and self.is_alive:
             # 넉백 방향 계산

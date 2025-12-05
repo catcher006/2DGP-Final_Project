@@ -6,7 +6,7 @@ import common
 from goblin_arrow import Goblin_Arrow
 from goblin_mace import Goblin_Mace
 from state_machine import StateMachine
-from pico2d import load_image, load_font, get_time, draw_rectangle
+from pico2d import load_image, load_font, get_time, draw_rectangle, load_wav
 
 
 # mob Run Speed
@@ -341,6 +341,10 @@ class Move:
         else: self.mob.move_image.clip_draw(int(self.mob.frame) * 64, 64 * self.mob.face_dir, 64, 64, self.mob.x, self.mob.y, 100, 100)
 
 class Goblin_Mob:
+
+    hurt_sound = None
+    dead_sound = None
+
     def __init__(self):
         self.mob_type = random.choice(["mace", "bow"])
 
@@ -352,6 +356,14 @@ class Goblin_Mob:
         self.hp_image = load_image("./image/ui/mobs/goblin/goblin_hp.png")
 
         self.font = load_font('ENCR10B.TTF', 10)
+
+        if Goblin_Mob.hurt_sound is None:
+            Goblin_Mob.hurt_sound = load_wav('./sound/mob/goblin_hurt.wav')
+            Goblin_Mob.hurt_sound.set_volume(64)
+
+        if Goblin_Mob.dead_sound is None:
+            Goblin_Mob.dead_sound = load_wav('./sound/mob/goblin_dead.wav')
+            Goblin_Mob.dead_sound.set_volume(64)
 
         self.x = random.randint(105,940)
         self.y = random.randint(85,540)
@@ -496,10 +508,12 @@ class Goblin_Mob:
 
         if self.hp <= 0:
             self.hp = 0
+            Goblin_Mob.dead_sound.play()
             self.is_alive = False
             self.state_machine.handle_state_event(('DIE', None))
             print("zombie_mob is dead!")
         else:
+            Goblin_Mob.hurt_sound.play()
             print(f"zombie_mob damaged! HP: {self.hp}")
 
     def apply_knockback(self, other, distance, multiplier):
