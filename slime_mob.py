@@ -97,7 +97,7 @@ class Dead:
 
                 game_world.add_object(coin, 2)
                 game_world.add_collision_pair('player:coin', None, coin)
-                print(f"Coin created at ({coin.x}, {coin.y})")
+                # print(f"Coin created at ({coin.x}, {coin.y})")
 
                 game_world.remove_object(self.mob)
 
@@ -286,7 +286,7 @@ class Slime_Mob:
                 self.hp_yellow_image.clip_draw(0, int(self.hp) * 54, 400, 54, self.x - 5, self.y + 35, 60, 11)
                 self.font.draw(self.x - 13, self.y + 35, f'{self.hp:02d}', (0, 0, 0))
 
-            draw_rectangle(*self.get_bb())
+            # draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         frame = int(self.frame)  # frame을 정수로 변환
@@ -369,9 +369,10 @@ class Slime_Mob:
             self.hp = 0
             self.is_alive = False
             self.state_machine.handle_state_event(('DIE', None))
-            print("slime_mob is dead!")
+            # print("slime_mob is dead!")
         else:
-            print(f"slime_mob damaged! HP: {self.hp}")
+            pass
+            # print(f"slime_mob damaged! HP: {self.hp}")
 
     def apply_knockback(self, other, distance, multiplier):
         dx = self.x - other.x

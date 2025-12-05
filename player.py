@@ -90,7 +90,7 @@ class Dead:
 
     def enter(self, e):
         self.player.frame = 0
-        print("Entered Dead state!")  # 디버그용
+        # print("Entered Dead state!")  # 디버그용
 
     def exit(self, e):
         pass
@@ -443,7 +443,7 @@ class Player:
 
     def draw(self):
         self.state_machine.draw()
-        draw_rectangle(*self.get_bb())
+        # draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         if not Player.is_alive:
@@ -621,13 +621,13 @@ class Player:
             sounds.player_dead_sound.play()
             Player.is_alive = False
             self.state_machine.handle_state_event(('DIE', None))
-            print("Player is dead!")
+            # print("Player is dead!")
         else:
             if actual_damage <= 15:
                 sounds.player_hurt_low_sound.play()
             else:
                 sounds.player_hurt_high_sound.play()
-            print(f"Player damaged! HP: {player_hp} (took {actual_damage} damage)")
+            # print(f"Player damaged! HP: {player_hp} (took {actual_damage} damage)")
 
     def apply_knockback(self, other, distance, konck_dist):
         dx = self.x - other.x

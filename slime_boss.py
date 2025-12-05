@@ -81,7 +81,7 @@ class Dead:
                     game_world.add_object(coin, 2)
                     game_world.add_collision_pair('player:coin', None, coin)
 
-                print(f"8 coins created around boss at ({self.boss_mob.x}, {self.boss_mob.y})")
+                # print(f"8 coins created around boss at ({self.boss_mob.x}, {self.boss_mob.y})")
 
                 game_world.remove_object(self.boss_mob)
 
@@ -249,7 +249,7 @@ class Slime_Boss:
             else:
                 self.font.draw(self.x - 21, self.y + 65, f'{self.hp:02d}', (255, 0, 0))
 
-            draw_rectangle(*self.get_bb())
+            # draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         frame = int(self.frame)  # frame을 정수로 변환
@@ -336,10 +336,10 @@ class Slime_Boss:
                     self.is_alive = False
                     Stage1_4.boss_cleared = True
                     self.state_machine.handle_state_event(('DIE', None))
-                    print("slime_mob is dead!")
+                    # print("slime_mob is dead!")
 
                 # 디버그 출력 (선택사항)
-                print(f"slime_mob damaged! HP: {self.hp}")
+                # print(f"slime_mob damaged! HP: {self.hp}")
 
         elif group == 'player:slime_boss' and self.is_alive:
             # 넉백 방향 계산

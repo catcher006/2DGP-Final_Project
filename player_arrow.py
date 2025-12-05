@@ -98,8 +98,8 @@ class Player_Arrow:
         # 충돌 박스 그리기
         if self.is_fired:
             bb = self.get_bb()
-            if bb:
-                draw_rectangle(*bb)
+        #    if bb:
+        #        draw_rectangle(*bb)
 
     def get_bb(self):
         # 발사되기 전에는 충돌 박스 없음
