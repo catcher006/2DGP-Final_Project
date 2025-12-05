@@ -20,8 +20,7 @@ from stage2_10 import Stage2_10
 from stage2_11 import Stage2_11
 from zombie_mace import Zombie_Mace
 from state_machine import StateMachine
-from pico2d import load_image, load_font, get_time, draw_rectangle
-
+from pico2d import load_image, load_font, get_time, draw_rectangle, load_wav
 
 # mob Run Speed
 PIXEL_PER_METER = (10.0 / 0.3) # 10 pixel 30 cm
@@ -304,6 +303,10 @@ class Move:
         self.mob.move_image.clip_draw(int(self.mob.frame) * 64, 64 * self.mob.face_dir, 64, 64, self.mob.x, self.mob.y, 100, 100)
 
 class Zombie_Mob:
+
+    hurt_sound = None
+    dead_sound = None
+
     def __init__(self):
         self.mob_type = random.choice(["none", "mace"])
 
@@ -316,6 +319,14 @@ class Zombie_Mob:
         self.hp_image = load_image("./image/ui/mobs/zombie/zombie_hp.png")
 
         self.font = load_font('ENCR10B.TTF', 10)
+
+        if not Zombie_Mob.hurt_sound:
+            Zombie_Mob.hurt_sound = load_wav('./sound/mob/zombie_hurt.wav')
+            Zombie_Mob.hurt_sound.set_volume(64)
+
+        if not Zombie_Mob.dead_sound:
+            Zombie_Mob.dead_sound = load_wav('./sound/mob/zombie_dead.wav')
+            Zombie_Mob.dead_sound.set_volume(64)
 
         self.x = random.randint(105,940)
         self.y = random.randint(85,540)
@@ -469,9 +480,13 @@ class Zombie_Mob:
         if self.hp <= 0:
             self.hp = 0
             self.is_alive = False
+            if Zombie_Mob.dead_sound:
+                Zombie_Mob.dead_sound.play()
             self.state_machine.handle_state_event(('DIE', None))
             print("zombie_mob is dead!")
         else:
+            if Zombie_Mob.hurt_sound:
+                Zombie_Mob.hurt_sound.play()
             print(f"zombie_mob damaged! HP: {self.hp}")
 
     def apply_knockback(self, other, distance, multiplier):
