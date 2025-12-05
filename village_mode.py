@@ -6,6 +6,7 @@ import game_framework
 import title_mode
 import random
 import common
+import settings
 from village import Village
 from village_front_object import Village_Front_Object
 from player import Player
@@ -137,6 +138,8 @@ def start_coin_warning():
     coin_warning['sequence_index'] = 0
     coin_warning['frame'] = 0
 
+    settings.warning_sound.play()
+
 
 def update_coin_warning():
     """코인 부족 경고 애니메이션 업데이트"""
@@ -160,6 +163,8 @@ def start_weapon_warning():
     weapon_warning['time'] = 0
     weapon_warning['sequence_index'] = 0
     weapon_warning['frame'] = 0
+
+    settings.warning_sound.play()
 
 
 def update_weapon_warning():
@@ -185,6 +190,8 @@ def start_already_selected_warning():
     already_selected_warning['time'] = 0
     already_selected_warning['sequence_index'] = 0
     already_selected_warning['frame'] = 0
+
+    settings.warning_sound.play()
 
 
 def update_already_selected_warning():
@@ -506,6 +513,9 @@ def handle_events():
                 game_framework.change_mode(title_mode)
         elif enhance_active or weapon_select:
             if event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
+
+                settings.normal_click_sound.play()
+
                 mx = event.x
                 my = get_canvas_height() - event.y
 
@@ -523,6 +533,8 @@ def handle_events():
                     handle_enhance_click(mx, my)
                 elif weapon_select:
                     handle_weapon_select_click(mx, my)
+        elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
+                settings.normal_click_sound.play()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             if 480 <= common.player.x <= 590 and 370 <= common.player.y <= 380: # 던전 입구 좌표 범위
                 game_framework.push_mode(dungeonmain_mode,(535, 60))
