@@ -47,10 +47,19 @@ class Ui:
 
         # 게임 정보 설정
         self.game_info_image = load_image('./image/ui/information/game_info_page.png')
+        self.resource_info_images = []
+        for i in range(1, 4):
+            img = load_image(f'./image/ui/information/resource_info_{i}.png')
+            self.resource_info_images.append(img)
+
         self.scroll_offset = 0
         self.max_scroll = 0  # 이미지 높이에 따라 계산
         self.info_view_height = 350  # 보이는 영역 높이
         self.info_view_y = 288  # 중심 y 좌표
+
+        # 마우스 위치 추적
+        self.mouse_x = 0
+        self.mouse_y = 0
     def draw(self):
         self.ui_coin_image.draw(60, 560)
         self.pixel_font_25.draw(70, 560, f'{Ui.coin:d}', (255, 255, 0))
@@ -108,7 +117,54 @@ class Ui:
                 elif self.current_tutorial_page == 3:
                     self.info_tuturial_page3_image.draw(512, 288)
             elif Ui.information_button:
-                    self.game_info_image.draw(512, 288)
+                self.game_info_image.draw(512, 288)
+
+                if len(self.resource_info_images) > 0:
+                    view_x = 562
+                    view_y = 228
+                    view_width = 550
+                    view_height = 180
+
+                    # 전체 콘텐츠 높이
+                    total_height = sum(img.h for img in self.resource_info_images)
+
+                    # 스크롤 가능한 최대 범위
+                    self.max_scroll = 20938
+
+                    self.scroll_offset = max(0, min(self.scroll_offset, self.max_scroll))
+
+                    # 보이는 영역의 상단/하단
+                    view_top = view_y + view_height // 2
+                    view_bottom = view_y - view_height // 2
+
+                    # 콘텐츠 시작 위치: view_top에서 시작, scroll_offset만큼 위로 이동
+                    content_y = view_top + self.scroll_offset
+
+                    for img in self.resource_info_images:
+                        img_height = img.h
+                        img_top = content_y
+                        img_bottom = content_y - img_height
+
+                        # 화면과 겹치는지 확인
+                        if img_bottom < view_top and img_top > view_bottom:
+                            visible_top = min(img_top, view_top)
+                            visible_bottom = max(img_bottom, view_bottom)
+                            visible_height = visible_top - visible_bottom
+
+                            clip_from_top = max(0, img_top - view_top)
+                            clip_from_bottom = max(0, view_bottom - img_bottom)
+                            clip_height = img_height - clip_from_top - clip_from_bottom
+
+                            draw_y = (visible_top + visible_bottom) // 2
+
+                            img.clip_draw(
+                                0, clip_from_bottom,
+                                view_width, clip_height,
+                                view_x, draw_y,
+                                view_width, visible_height
+                            )
+
+                        content_y -= img_height
             else:
                 self.pause_button_image.draw(990, 550, 40, 40)
 
@@ -123,17 +179,16 @@ class Ui:
             return False
 
         if event.type == SDL_MOUSEMOTION:
-            mx = event.x
-            my = get_canvas_height() - event.y
-            self.handle_mouse_motion(mx, my)
+            self.mouse_x = event.x
+            self.mouse_y = get_canvas_height() - event.y
+            self.handle_mouse_motion(self.mouse_x, self.mouse_y)
             return True
 
+
         elif event.type == SDL_MOUSEWHEEL:
-            mx = event.x
-            my = get_canvas_height() - event.y
             # 게임 정보 영역에서만 스크롤 처리
-            if Ui.information_button and 180 <= mx <= 844 and 113 <= my <= 463:
-                self.scroll_offset -= event.y * 20  # 스크롤 속도 조절
+            if Ui.information_button and 180 <= self.mouse_x <= 844 and 113 <= self.mouse_y <= 463:
+                self.scroll_offset -= event.y * 20
                 self.scroll_offset = max(0, min(self.scroll_offset, self.max_scroll))
                 return True
 
