@@ -8,39 +8,43 @@ stage1_bgm = None
 stage2_bgm = None
 stage3_bgm = None
 
-setting_bgm_sound = 128
-setting_effect_sound = 128
+setting_bgm_sound = 4
+setting_effect_sound = 4
 
 def init_bgm_sounds():
     global village_bgm, dungeon_bgm, stage1_bgm, stage2_bgm, stage3_bgm
 
+    sound = 0 if setting_bgm_sound == 0 else 2 ** setting_bgm_sound
+
     if village_bgm is None:
         village_bgm = load_music('./sound/bgm/village_bgm.mp3')
-        village_bgm.set_volume(setting_bgm_sound)
+        village_bgm.set_volume(sound)
 
     if dungeon_bgm is None:
         dungeon_bgm = load_music('./sound/bgm/dungeon_bgm.mp3')
-        dungeon_bgm.set_volume(setting_bgm_sound)
+        dungeon_bgm.set_volume(sound)
 
     if stage1_bgm is None:
         stage1_bgm = load_music('./sound/bgm/stage1_bgm.mp3')
-        stage1_bgm.set_volume(setting_bgm_sound)
+        stage1_bgm.set_volume(sound)
 
     if stage2_bgm is None:
         stage2_bgm = load_music('./sound/bgm/stage2_bgm.mp3')
-        stage2_bgm.set_volume(setting_bgm_sound)
+        stage2_bgm.set_volume(sound)
 
     if stage3_bgm is None:
         stage3_bgm = load_music('./sound/bgm/stage3_bgm.mp3')
-        stage3_bgm.set_volume(setting_bgm_sound)
+        stage3_bgm.set_volume(sound)
 
 def init_effect_sounds():
     global normal_click_sound, warning_sound
 
+    sound = 0 if setting_effect_sound == 0 else 2 ** setting_effect_sound
+
     if normal_click_sound is None:
         normal_click_sound = load_wav('./sound/click/normal_click.wav')
-        normal_click_sound.set_volume(setting_effect_sound)
+        normal_click_sound.set_volume(sound)
 
     if warning_sound is None:
         warning_sound = load_wav('./sound/click/warning.wav')
-        warning_sound.set_volume(setting_effect_sound)
+        warning_sound.set_volume(sound)

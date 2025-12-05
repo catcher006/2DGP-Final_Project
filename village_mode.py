@@ -511,6 +511,47 @@ def handle_events():
                 weapon_select = False # 무기 선택 모드 비활성화
             else:
                 game_framework.change_mode(title_mode)
+        elif Ui.paused:
+            # 일시정지 상태에서 설정 버튼 클릭 처리
+            if event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
+                settings.normal_click_sound.play()
+                mx = event.x
+                my = get_canvas_height() - event.y
+
+                # 일시정지 버튼 클릭 (990, 550 중심, 40x40 크기)
+                if 970 <= mx <= 1010 and 530 <= my <= 570:
+                    Ui.paused = not Ui.paused
+                    continue
+
+                # 사운드 버튼 (220, 488 중심, 80x30 크기)
+                if 180 <= mx <= 260 and 473 <= my <= 503:
+                    Ui.sound_button = True
+                    Ui.tutorial_button = False
+                    Ui.information_button = False
+                    continue
+
+                # 튜토리얼 버튼 (300, 488 중심, 80x30 크기)
+                if 260 <= mx <= 340 and 473 <= my <= 503:
+                    Ui.tutorial_button = True
+                    Ui.sound_button = False
+                    Ui.information_button = False
+                    continue
+
+                # 게임 정보 버튼 (380, 488 중심, 80x30 크기)
+                if 340 <= mx <= 420 and 473 <= my <= 503:
+                    Ui.information_button = True
+                    Ui.sound_button = False
+                    Ui.tutorial_button = False
+                    continue
+
+                if Ui.tutorial_button:
+                    if 595 <= mx <= 617 and 122 <= my <= 160:
+                        if ui.current_tutorial_page < 3:
+                            ui.current_tutorial_page += 1
+                    elif 407 <= mx <= 429 and 122 <= my <= 160:
+                        if ui.current_tutorial_page > 1:
+                            ui.current_tutorial_page -= 1
+            continue
         elif enhance_active or weapon_select:
             if event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
 
@@ -535,6 +576,12 @@ def handle_events():
                     handle_weapon_select_click(mx, my)
         elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
                 settings.normal_click_sound.play()
+                mx = event.x
+                my = get_canvas_height() - event.y
+
+                if 970 <= mx <= 1010 and 530 <= my <= 570:
+                    Ui.paused = True if not Ui.paused else False
+                    continue
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             if 480 <= common.player.x <= 590 and 370 <= common.player.y <= 380: # 던전 입구 좌표 범위
                 game_framework.push_mode(dungeonmain_mode,(535, 60))
@@ -596,6 +643,7 @@ def init(player_start_pos=None):
     global enhance_active
     global weapon_select
     global font
+    global ui
 
     enhance_active = False
     weapon_select = False
@@ -626,6 +674,9 @@ def init(player_start_pos=None):
     settings.village_bgm.repeat_play()
 
 def update():
+    if Ui.paused:
+        return
+
     if enhance_active:
         update_button_animations()
         update_coin_warning()
