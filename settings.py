@@ -48,3 +48,27 @@ def init_effect_sounds():
     if warning_sound is None:
         warning_sound = load_wav('./sound/click/warning.wav')
         warning_sound.set_volume(sound)
+
+
+def apply_bgm_volume():
+    volume = 0 if setting_bgm_sound == 0 else 2 ** setting_bgm_sound
+
+    if village_bgm is not None:
+        village_bgm.set_volume(volume)
+    if dungeon_bgm is not None:
+        dungeon_bgm.set_volume(volume)
+    if stage1_bgm is not None:
+        stage1_bgm.set_volume(volume)
+    if stage2_bgm is not None:
+        stage2_bgm.set_volume(volume)
+    if stage3_bgm is not None:
+        stage3_bgm.set_volume(volume)
+
+
+def apply_effect_volume():
+    volume = 0 if setting_effect_sound == 0 else 2 ** setting_effect_sound
+
+    if normal_click_sound is not None:
+        normal_click_sound.set_volume(volume)
+    if warning_sound is not None:
+        warning_sound.set_volume(volume)

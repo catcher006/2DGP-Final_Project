@@ -195,19 +195,21 @@ class Ui:
             return False
 
         # 배경음 사운드 바 클릭
-        for i in range(6):
+        for i in range(8):
             bar_x = 315 + 70 * i
             if bar_x - 35 <= mx <= bar_x + 35 and 325 <= my <= 365:
                 settings.setting_bgm_sound = i
                 settings.init_bgm_sounds()
+                settings.apply_bgm_volume()
                 return True
 
         # 효과음 사운드 바 클릭
-        for i in range(6):
+        for i in range(8):
             bar_x = 315 + 70 * i
             if bar_x - 35 <= mx <= bar_x + 35 and 175 <= my <= 215:
                 settings.setting_effect_sound = i
                 settings.init_effect_sounds()
+                settings.apply_effect_volume()
                 return True
 
         return False
