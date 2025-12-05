@@ -6,7 +6,6 @@ import game_world
 import game_framework
 import stage3_1_mode, stage3_3_mode
 import common
-import sounds
 from stage3_0 import Stage3_0
 from stage3_1 import Stage3_1
 from stage3_2 import Stage3_2
@@ -26,14 +25,25 @@ from ui import Ui
 
 def handle_events():
     global running
+    global ui
+    global sounds
 
     event_list = get_events()
     for event in event_list:
         if event.type == SDL_QUIT:
             game_framework.quit()
-        # 마우스 이벤트는 무시
-        elif event.type in (SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP):
-            continue
+        elif Ui.paused:
+            if ui.handle_events(event):
+                continue
+        elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
+            import sounds
+            sounds.normal_click_sound.play()
+            mx = event.x
+            my = get_canvas_height() - event.y
+
+            if 970 <= mx <= 1010 and 530 <= my <= 570:
+                Ui.paused = not Ui.paused
+                continue
         elif event.type == SDL_KEYDOWN and event.key == SDLK_f:
             if 500 <= common.player.x <=  550 and 580 <= common.player.y <= 600: # 상단 문 (메인 던전으로 가는 문)
                 if Stage3_7.boss_cleared:
@@ -51,8 +61,10 @@ def handle_events():
                     Stage3_10.stage3_10_create = False
                     Stage3_11.stage3_11_create = False
                     Stage3_7.boss_cleared = False
-                    game_framework.clear_stage3_modes((545, 400))
+                    game_framework.clear_stage3_modes((830, 400))
 
+                import sounds
+                sounds.stage3_bgm.stop()
                 game_framework.pop_mode(dungeonmain_mode,(830, 400))
             elif 990 <= common.player.x <=  1010 and 270 <= common.player.y <= 370: # 우측 문
                 if not Stage3_1.stage3_1_create:
@@ -71,6 +83,7 @@ def init(player_start_pos=None):
     global world, goblin_mobs, coins
     global stage3_0
     global player
+    global ui
 
     # 기존 충돌 페어 초기화
     game_world.collision_pairs.clear()
@@ -124,9 +137,10 @@ def init(player_start_pos=None):
     ui = Ui()
     game_world.add_object(ui, 4)
 
-    sounds.stage3_bgm.repeat_play()
-
 def update():
+    if Ui.paused:
+        return
+
     game_world.update()
     game_world.handle_collsions()
 
