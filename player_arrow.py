@@ -14,10 +14,15 @@ ARROW_SPEED_PPS = (ARROW_SPEED_MPS * PIXEL_PER_METER)
 
 class Player_Arrow:
     image = None
+    arrow_sound = None
 
     def __init__(self):
         if Player_Arrow.image is None:
             Player_Arrow.image = load_image('./image/item/arrow.png')
+
+        if Player_Arrow.arrow_sound is None:
+            Player_Arrow.arrow_sound = load_wav('./sound/player/arrow_sound.wav')
+            Player_Arrow.arrow_sound.set_volume(64)
 
         self.x = common.player.x
         self.y = common.player.y
@@ -57,6 +62,7 @@ class Player_Arrow:
 
             # 프레임 7에서 발사
             if self.frame >= 9:
+                Player_Arrow.arrow_sound.play()
                 self.is_fired = True
 
         # 발사 후: 날아감
