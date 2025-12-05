@@ -3,11 +3,12 @@ import game_world
 import game_framework
 import random
 import common
+import sounds
 import stage1_4_mode
 from stage1_4 import Stage1_4
 from state_machine import StateMachine
 from coin import Coin
-from pico2d import load_image, load_font, get_time, draw_rectangle, load_wav
+from pico2d import load_image, load_font, get_time, draw_rectangle
 
 # mob Run Speed
 PIXEL_PER_METER = (10.0 / 0.3) # 10 pixel 30 cm
@@ -181,9 +182,6 @@ class Move:
         self.boss_mob.move_image.clip_draw(int(self.boss_mob.frame) * 48, 0, 48, 31, self.boss_mob.x, self.boss_mob.y, 192, 124)
 
 class Slime_Boss:
-
-    hurt_sound = None
-
     def __init__(self):
         self.move_image = load_image("./image/mobs/slime_boss/slime_boss_jump.png")
         self.idle_image = load_image("./image/mobs/slime_boss/slime_boss_jump.png")
@@ -192,10 +190,6 @@ class Slime_Boss:
         self.hp_image = load_image("./image/ui/mobs/slime_boss/boss_slime_hp.png")
 
         self.font = load_font('ENCR10B.TTF', 10)
-
-        if not Slime_Boss.hurt_sound:
-            Slime_Boss.hurt_sound = load_wav('./sound/mob/slime_hurt.wav')
-            Slime_Boss.hurt_sound.set_volume(64)
 
         self.x = random.randint(155,890)
         self.y = random.randint(135,490)
@@ -320,7 +314,7 @@ class Slime_Boss:
                     self.hp -= 50
                 elif common.player.current_weapon_id == 'gold_sword' or common.player.current_weapon_id == 'gold_bow':
                     self.hp -= 100
-                Slime_Boss.hurt_sound.play()
+                sounds.slime_hurt_sound.play()
                 self.last_damage_time = current_time
 
                 # 칼에 맞았을 때 넉백 (플레이어 반대 방향)

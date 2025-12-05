@@ -1,6 +1,7 @@
 import time
 import game_framework
 import game_world
+import sounds
 from player_sword import Player_Sword
 from player_arrow import Player_Arrow
 from stage1_0 import Stage1_0
@@ -342,11 +343,6 @@ class Player:
     is_attacking = False
     is_alive = True
 
-    # 사운드 변수
-    hurt_low_sound = None
-    hurt_high_sound = None
-    dead_sound = None
-
     def load_walk_images(self):
         plate = Player.player_plate_id
         weapon = Player.current_weapon_id
@@ -426,18 +422,6 @@ class Player:
             self.load_sword_images()
         elif self.check_weapon() == 'bow':
             self.load_bow_images()
-
-        if Player.hurt_low_sound is None:
-            Player.hurt_low_sound = load_wav('./sound/player/player_hurt_low.wav')
-            Player.hurt_low_sound.set_volume(64)
-
-        if Player.hurt_high_sound is None:
-            Player.hurt_high_sound = load_wav('./sound/player/player_hurt_high.wav')
-            Player.hurt_high_sound.set_volume(64)
-
-        if Player.dead_sound is None:
-            Player.dead_sound = load_wav('./sound/player/player_dead.wav')
-            Player.dead_sound.set_volume(64)
 
         # 상태들 생성
         self.IDLE = Idle(self)
@@ -634,15 +618,15 @@ class Player:
         # HP가 0 이하로 떨어지면 사망 처리
         if player_hp <= 0:
             player_hp = 0
-            Player.dead_sound.play()
+            sounds.player_dead_sound.play()
             Player.is_alive = False
             self.state_machine.handle_state_event(('DIE', None))
             print("Player is dead!")
         else:
             if actual_damage <= 15:
-                Player.hurt_low_sound.play()
+                sounds.player_hurt_low_sound.play()
             else:
-                Player.hurt_high_sound.play()
+                sounds.player_hurt_high_sound.play()
             print(f"Player damaged! HP: {player_hp} (took {actual_damage} damage)")
 
     def apply_knockback(self, other, distance, konck_dist):

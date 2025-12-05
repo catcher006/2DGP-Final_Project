@@ -3,6 +3,7 @@ import game_world
 import game_framework
 import random
 import common
+import sounds
 import stage1_0_mode, stage1_1_mode, stage1_2_mode, stage1_3_mode
 import stage1_4_mode, stage1_5_mode, stage1_6_mode, stage1_7_mode
 from stage1_0 import Stage1_0
@@ -15,8 +16,7 @@ from stage1_6 import Stage1_6
 from stage1_7 import Stage1_7
 from state_machine import StateMachine
 from coin import Coin
-from pico2d import load_image, load_font, get_time, draw_rectangle, load_wav
-from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f
+from pico2d import load_image, load_font, get_time, draw_rectangle
 
 
 # mob Run Speed
@@ -198,8 +198,6 @@ class Move:
         self.mob.move_image.clip_draw(int(self.mob.frame) * 48, 0, 48, 31, self.mob.x, self.mob.y, 96, 62)
 
 class Slime_Mob:
-    hurt_sound = None
-
     def __init__(self):
         self.mob_type = random.choice(["Green", 'Blue', 'Yellow'])
 
@@ -212,10 +210,6 @@ class Slime_Mob:
         self.hp_yellow_image = load_image("./image/ui/mobs/slime/yellow_slime_hp.png")
 
         self.font = load_font('ENCR10B.TTF', 10)
-
-        if not Slime_Mob.hurt_sound:
-            Slime_Mob.hurt_sound = load_wav('./sound/mob/slime_hurt.wav')
-            Slime_Mob.hurt_sound.set_volume(64)
 
         self.x = random.randint(105,940)
         self.y = random.randint(85,540)
@@ -369,7 +363,7 @@ class Slime_Mob:
         elif common.player.current_weapon_id in ['gold_sword', 'gold_bow']:
             self.hp -= 100
 
-        Slime_Mob.hurt_sound.play()
+        sounds.slime_hurt_sound.play()
 
         if self.hp <= 0:
             self.hp = 0

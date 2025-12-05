@@ -1,6 +1,7 @@
-from pico2d import load_image, draw_rectangle, load_wav
+from pico2d import load_image, draw_rectangle
 import game_framework
 import game_world
+import sounds
 import stage1_0_mode, stage1_1_mode, stage1_2_mode, stage1_3_mode
 import stage1_4_mode, stage1_5_mode, stage1_6_mode, stage1_7_mode
 import stage2_0_mode, stage2_1_mode, stage2_2_mode, stage2_3_mode
@@ -49,13 +50,8 @@ ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 8
 
 class Coin:
-    coin_sound = None
-
     def __init__(self):
         self.image = load_image("./image/item/coin.png")
-        if not Coin.coin_sound:
-            Coin.coin_sound = load_wav('./sound/item/coin.wav')
-            Coin.coin_sound.set_volume(32)
         self.frame = 0
         self.x, self.y = 512, 288
     def enter(self, e): pass
@@ -100,8 +96,7 @@ class Coin:
             elif Ui.coin > 99999999 - 50:
                 Ui.coin = 99999999
 
-            if Coin.coin_sound:
-                Coin.coin_sound.play()
+            sounds.coin_sound.play()
 
             try:
                 game_world.remove_object(self)

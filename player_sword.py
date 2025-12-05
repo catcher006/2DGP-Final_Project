@@ -1,12 +1,10 @@
 import player
 import game_world
 import common
+import sounds
 from pico2d import *
 
 class Player_Sword():
-
-    sword_sound = None
-
     def __init__(self):
         self.x = common.player.x
         self.y = common.player.y
@@ -14,12 +12,8 @@ class Player_Sword():
         self.face_dir = common.player.face_dir
         self.sound_played = False
 
-        if Player_Sword.sword_sound is None:
-            Player_Sword.sword_sound = load_wav('./sound/player/sword_attack.wav')
-            Player_Sword.sword_sound.set_volume(32)
-
-        if Player_Sword.sword_sound and not self.sound_played:
-            Player_Sword.sword_sound.play()
+        if sounds.sword_attack_sound and not self.sound_played:
+            sounds.sword_attack_sound.play()
             self.sound_played = True
 
     def draw(self):
