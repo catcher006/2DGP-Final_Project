@@ -17,14 +17,24 @@ from ui import Ui
 
 def handle_events():
     global running
+    global ui
 
     event_list = get_events()
     for event in event_list:
         if event.type == SDL_QUIT:
             game_framework.quit()
-        # 마우스 이벤트는 무시
-        elif event.type in (SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP):
-            continue
+        elif Ui.paused:
+            if ui.handle_events(event):
+                continue
+        elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
+            import sounds
+            sounds.normal_click_sound.play()
+            mx = event.x
+            my = get_canvas_height() - event.y
+
+            if 970 <= mx <= 1010 and 530 <= my <= 570:
+                Ui.paused = not Ui.paused
+                continue
         elif event.type == SDL_KEYDOWN and event.key == SDLK_f:
             if 500 <= common.player.x <=  550 and 580 <= common.player.y <= 600: # 상단 문
                 if not Stage1_4.stage1_4_create:
@@ -43,6 +53,7 @@ def init(player_start_pos=None):
     global world, slime_mobs, coins
     global stage1_7
     global player
+    global ui
 
     # 기존 충돌 페어 초기화
     game_world.collision_pairs.clear()
@@ -98,6 +109,9 @@ def init(player_start_pos=None):
     game_world.add_object(ui, 4)
 
 def update():
+    if Ui.paused:
+        return
+
     game_world.update()
     game_world.handle_collsions()
 
