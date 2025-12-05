@@ -126,7 +126,7 @@ class Dead:
                     game_world.add_object(coin, 2)
                     game_world.add_collision_pair('player:coin', None, coin)
 
-                print(f"8 coins created around boss at ({self.mob.x}, {self.mob.y})")
+                # print(f"8 coins created around boss at ({self.mob.x}, {self.mob.y})")
 
                 game_world.remove_object(self.mob)
 
@@ -348,7 +348,7 @@ class Goblin_Boss:
                 self.font.draw(self.x + 2, self.y + 60, f'{self.hp % 10:d}', (60, 180, 50))
             else:
                 self.font.draw(self.x - 5, self.y + 60, f'{self.hp:02d}', (60, 180, 50))
-            draw_rectangle(*self.get_bb())
+            # draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         if not self.is_alive or self.hp <= 0:
@@ -429,12 +429,12 @@ class Goblin_Boss:
                     self.is_alive = False
                     Stage3_7.boss_cleared = True
                     self.state_machine.handle_state_event(('DIE', None))
-                    print("zombie_mob is dead!")
+                    # print("zombie_mob is dead!")
 
                 else:
                     sounds.goblin_hurt_sound.play()
                     # 디버그 출력 (선택사항)
-                    print(f"slime_mob damaged! HP: {self.hp}")
+                    # print(f"slime_mob damaged! HP: {self.hp}")
 
         elif group == 'player:goblin_boss' and self.is_alive:
             # 넉백 방향 계산

@@ -153,7 +153,7 @@ class Dead:
 
                 game_world.add_object(coin, 2)
                 game_world.add_collision_pair('player:coin', None, coin)
-                print(f"Coin created at ({coin.x}, {coin.y})")
+                # print(f"Coin created at ({coin.x}, {coin.y})")
 
                 game_world.remove_collision_object(self.mob)
                 game_world.remove_object(self.mob)
@@ -414,7 +414,7 @@ class Goblin_Mob:
                 self.font.draw(self.x, self.y + 35, f'{self.hp % 10:d}', (60, 180, 50))
             else:
                 self.font.draw(self.x - 6, self.y + 35, f'{self.hp:02d}', (60, 180, 50))
-            draw_rectangle(*self.get_bb())
+            # draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         if not self.is_alive or self.hp <= 0:
@@ -500,10 +500,10 @@ class Goblin_Mob:
             sounds.goblin_dead_sound.play()
             self.is_alive = False
             self.state_machine.handle_state_event(('DIE', None))
-            print("zombie_mob is dead!")
+            # print("zombie_mob is dead!")
         else:
             sounds.goblin_hurt_sound.play()
-            print(f"zombie_mob damaged! HP: {self.hp}")
+            # print(f"zombie_mob damaged! HP: {self.hp}")
 
     def apply_knockback(self, other, distance, multiplier):
         dx = self.x - other.x
