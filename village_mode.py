@@ -6,7 +6,7 @@ import game_framework
 import title_mode
 import random
 import common
-import settings
+import sounds
 from village import Village
 from village_front_object import Village_Front_Object
 from player import Player
@@ -138,7 +138,7 @@ def start_coin_warning():
     coin_warning['sequence_index'] = 0
     coin_warning['frame'] = 0
 
-    settings.warning_sound.play()
+    sounds.warning_sound.play()
 
 
 def update_coin_warning():
@@ -164,7 +164,7 @@ def start_weapon_warning():
     weapon_warning['sequence_index'] = 0
     weapon_warning['frame'] = 0
 
-    settings.warning_sound.play()
+    sounds.warning_sound.play()
 
 
 def update_weapon_warning():
@@ -191,7 +191,7 @@ def start_already_selected_warning():
     already_selected_warning['sequence_index'] = 0
     already_selected_warning['frame'] = 0
 
-    settings.warning_sound.play()
+    sounds.warning_sound.play()
 
 
 def update_already_selected_warning():
@@ -517,7 +517,7 @@ def handle_events():
         elif enhance_active or weapon_select:
             if event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
 
-                settings.normal_click_sound.play()
+                sounds.normal_click_sound.play()
 
                 mx = event.x
                 my = get_canvas_height() - event.y
@@ -537,7 +537,7 @@ def handle_events():
                 elif weapon_select:
                     handle_weapon_select_click(mx, my)
         elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
-                settings.normal_click_sound.play()
+                sounds.normal_click_sound.play()
                 mx = event.x
                 my = get_canvas_height() - event.y
 
@@ -633,7 +633,7 @@ def init(player_start_pos=None):
     ui = Ui()
     game_world.add_object(ui, 4)
 
-    settings.village_bgm.repeat_play()
+    sounds.village_bgm.repeat_play()
 
 def update():
     if Ui.paused:
@@ -660,14 +660,14 @@ def draw():
 
 def finish():
     game_world.clear()
-    settings.village_bgm.stop()
+    sounds.village_bgm.stop()
 
 def pause():
     # 현재 모드의 모든 객체를 게임 월드에서 제거
     game_world.clear()
     # 충돌 페어도 정리
     game_world.collision_pairs.clear()
-    settings.village_bgm.stop()
+    sounds.village_bgm.stop()
 
 def resume(player_start_pos=None):
     # 필요시 village 객체들을 다시 초기화
@@ -684,4 +684,4 @@ def resume(player_start_pos=None):
     ui = Ui()
     game_world.add_object(ui, 4)
 
-    settings.village_bgm.repeat_play()
+    sounds.village_bgm.repeat_play()

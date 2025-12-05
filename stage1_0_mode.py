@@ -5,7 +5,7 @@ import dungeonmain_mode
 import game_world
 import game_framework
 import common
-import settings
+import sounds
 import stage1_1_mode
 import stage1_3_mode
 from stage1_0 import Stage1_0
@@ -47,7 +47,7 @@ def handle_events():
                     Stage1_4.boss_cleared = False
                     game_framework.clear_stage1_modes((240, 400))
 
-                settings.stage1_bgm.stop()
+                sounds.stage1_bgm.stop()
                 game_framework.pop_mode(dungeonmain_mode,(240, 400))
             elif 990 <= common.player.x <=  1010 and 270 <= common.player.y <= 370: # 우측 문
                 if not Stage1_1.stage1_1_create:

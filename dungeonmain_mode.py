@@ -5,7 +5,7 @@ import stage1_0_mode, stage2_0_mode, stage3_0_mode
 import game_world
 import game_framework
 import common
-import settings
+import sounds
 from dungeonmain import Dungeonmain
 from player import Player
 from stage1_0 import Stage1_0
@@ -31,19 +31,19 @@ def handle_events():
                     game_framework.push_mode(stage1_0_mode, (525, 600))
                 else:
                     game_framework.pop_mode(stage1_0_mode, (525, 600))
-                settings.stage1_bgm.repeat_play()
+                sounds.stage1_bgm.repeat_play()
             elif 505 <= common.player.x <= 585 and 380 <= common.player.y <= 400:  # 2번 스테이지 입구 좌표 범위
                 if not Stage2_0.stage2_0_create:
                     game_framework.push_mode(stage2_0_mode, (525, 600))
                 else:
                     game_framework.pop_mode(stage2_0_mode, (525, 600))
-                settings.stage2_bgm.repeat_play()
+                sounds.stage2_bgm.repeat_play()
             elif 780 <= common.player.x <= 880 and 380 <= common.player.y <= 400:  # 3번 스테이지 입구 좌표 범위
                 if not Stage3_0.stage3_0_create:
                     game_framework.push_mode(stage3_0_mode, (525, 600))
                 else:
                     game_framework.pop_mode(stage3_0_mode, (525, 600))
-                settings.stage3_bgm.repeat_play()
+                sounds.stage3_bgm.repeat_play()
             elif 500 <= common.player.x <= 600 and 60 <= common.player.y <= 80:  # 마을 입구 좌표 범위
                 game_framework.pop_mode(village_mode,(535, 380))
         else:
@@ -78,7 +78,7 @@ def init(player_start_pos=None):
     ui = Ui()
     game_world.add_object(ui, 4)
 
-    settings.dungeon_bgm.repeat_play()
+    sounds.dungeon_bgm.repeat_play()
 
 def update():
     game_world.update()
@@ -90,12 +90,12 @@ def draw():
 
 def finish():
     game_world.clear()
-    settings.dungeon_bgm.stop()
+    sounds.dungeon_bgm.stop()
 
 def pause():
     # 현재 모드의 모든 객체를 게임 월드에서 제거
     game_world.clear()
-    settings.dungeon_bgm.stop()
+    sounds.dungeon_bgm.stop()
 
 def resume(player_start_pos=None):
     # 필요시 dungeonmain 객체들을 다시 초기화
@@ -111,4 +111,4 @@ def resume(player_start_pos=None):
     ui = Ui()
     game_world.add_object(ui, 4)
 
-    settings.dungeon_bgm.repeat_play()
+    sounds.dungeon_bgm.repeat_play()

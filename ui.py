@@ -1,6 +1,6 @@
 from pico2d import *
 import player
-import settings
+import sounds
 
 
 class Ui:
@@ -70,12 +70,12 @@ class Ui:
                 self.sound_bar_image.draw(560, 350)
                 self.name_bgm_image.draw(230, 390)
 
-                self.current_bgm_sound.draw(315 + 70 * settings.setting_bgm_sound, 340, 20, 20)
+                self.current_bgm_sound.draw(315 + 70 * sounds.setting_bgm_sound, 340, 20, 20)
 
-                if self.hovered_bgm >= 0 and self.hovered_bgm != settings.setting_bgm_sound:
+                if self.hovered_bgm >= 0 and self.hovered_bgm != sounds.setting_bgm_sound:
                     self.want_bgm_sound.draw(315 + 70 * self.hovered_bgm, 340, 20, 20)
 
-                if settings.setting_bgm_sound != 0:
+                if sounds.setting_bgm_sound != 0:
                     self.sound_track_on_image.draw(230, 340)
                 else:
                     self.sound_track_off_image.draw(230, 340)
@@ -84,12 +84,12 @@ class Ui:
                 self.sound_bar_image.draw(560, 200)
                 self.name_effect_image.draw(230, 245)
 
-                self.current_effect_sound.draw(315 + 70 * settings.setting_effect_sound, 190, 20, 20)
+                self.current_effect_sound.draw(315 + 70 * sounds.setting_effect_sound, 190, 20, 20)
 
-                if self.hovered_effect >= 0 and self.hovered_effect != settings.setting_effect_sound:
+                if self.hovered_effect >= 0 and self.hovered_effect != sounds.setting_effect_sound:
                     self.want_effect_sound.draw(315 + 70 * self.hovered_effect, 190, 20, 20)
 
-                if settings.setting_effect_sound != 0:
+                if sounds.setting_effect_sound != 0:
                     self.sound_track_on_image.draw(230, 195)
                 else:
                     self.sound_track_off_image.draw(230, 195)
@@ -118,13 +118,14 @@ class Ui:
             return True
 
         elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
-            settings.normal_click_sound.play()
+            sounds.normal_click_sound.play()
             mx = event.x
             my = get_canvas_height() - event.y
 
             # 일시정지 버튼
             if 970 <= mx <= 1010 and 530 <= my <= 570:
                 Ui.paused = False
+                self.reset_ui_state()
                 return True
 
             # 사운드 버튼
@@ -195,24 +196,33 @@ class Ui:
             return False
 
         # 배경음 사운드 바 클릭
-        for i in range(8):
+        for i in range(6):
             bar_x = 315 + 70 * i
             if bar_x - 35 <= mx <= bar_x + 35 and 325 <= my <= 365:
-                settings.setting_bgm_sound = i
-                settings.init_bgm_sounds()
-                settings.apply_bgm_volume()
+                sounds.setting_bgm_sound = i
+                sounds.init_bgm_sounds()
+                sounds.apply_bgm_volume()
                 return True
 
         # 효과음 사운드 바 클릭
-        for i in range(8):
+        for i in range(6):
             bar_x = 315 + 70 * i
             if bar_x - 35 <= mx <= bar_x + 35 and 175 <= my <= 215:
-                settings.setting_effect_sound = i
-                settings.init_effect_sounds()
-                settings.apply_effect_volume()
+                sounds.setting_effect_sound = i
+                sounds.init_effect_sounds()
+                sounds.apply_effect_volume()
                 return True
 
         return False
+
+    def reset_ui_state(self):
+        self.current_tutorial_page = 1
+        self.hovered_bgm = -1
+        self.hovered_effect = -1
+        Ui.sound_button = True
+        Ui.tutorial_button = False
+        Ui.information_button = False
+
     def enter(self, e): pass
     def exit(self, e): pass
     def do(self): pass

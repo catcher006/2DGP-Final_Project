@@ -8,6 +8,18 @@ stage1_bgm = None
 stage2_bgm = None
 stage3_bgm = None
 
+coin_sound = None
+goblin_dead_sound = None
+goblin_hurt_sound = None
+slime_hurt_sound = None
+zombie_hurt_sound = None
+zombie_dead_sound = None
+arrow_sound = None
+player_dead_sound = None
+player_hurt_high_sound = None
+player_hurt_low_sound = None
+sword_attack_sound = None
+
 setting_bgm_sound = 4
 setting_effect_sound = 4
 

@@ -1,7 +1,7 @@
 import game_framework
 from pico2d import *
 import village_mode
-import settings
+import sounds
 
 image = None
 
@@ -9,8 +9,8 @@ def init():
     global image
     image = load_image('./image/background/main_title.png')
 
-    settings.init_bgm_sounds()
-    settings.init_effect_sounds()
+    sounds.init_bgm_sounds()
+    sounds.init_effect_sounds()
 
 def finish():
     global image
@@ -34,7 +34,7 @@ def handle_events():
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
             game_framework.change_mode(village_mode)
         elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
-            settings.normal_click_sound.play()
+            sounds.normal_click_sound.play()
             game_framework.change_mode(village_mode)
 
 def pause():
