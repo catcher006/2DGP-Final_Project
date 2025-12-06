@@ -112,67 +112,67 @@ class Coin:
                     ]
             if Stage1_0.current_mode:
                 remove_from_mode(Stage1_0, stage1_0_mode)
-            elif Stage1_1.current_mode:
+            if Stage1_1.current_mode:
                 remove_from_mode(Stage1_1, stage1_1_mode)
-            elif Stage1_2.current_mode:
+            if Stage1_2.current_mode:
                 remove_from_mode(Stage1_2, stage1_2_mode)
-            elif Stage1_3.current_mode:
+            if Stage1_3.current_mode:
                 remove_from_mode(Stage1_3, stage1_3_mode)
-            elif Stage1_4.current_mode:
+            if Stage1_4.current_mode:
                 remove_from_mode(Stage1_4, stage1_4_mode)
-            elif Stage1_5.current_mode:
+            if Stage1_5.current_mode:
                 remove_from_mode(Stage1_5, stage1_5_mode)
-            elif Stage1_6.current_mode:
+            if Stage1_6.current_mode:
                 remove_from_mode(Stage1_6, stage1_6_mode)
-            elif Stage1_7.current_mode:
+            if Stage1_7.current_mode:
                 remove_from_mode(Stage1_7, stage1_7_mode)
-            elif Stage2_0.current_mode:
+            if Stage2_0.current_mode:
                 remove_from_mode(Stage2_0, stage2_0_mode)
-            elif Stage2_1.current_mode:
+            if Stage2_1.current_mode:
                 remove_from_mode(Stage2_1, stage2_1_mode)
-            elif Stage2_2.current_mode:
+            if Stage2_2.current_mode:
                 remove_from_mode(Stage2_2, stage2_2_mode)
-            elif Stage2_3.current_mode:
+            if Stage2_3.current_mode:
                 remove_from_mode(Stage2_3, stage2_3_mode)
-            elif Stage2_4.current_mode:
+            if Stage2_4.current_mode:
                 remove_from_mode(Stage2_4, stage2_4_mode)
-            elif Stage2_5.current_mode:
+            if Stage2_5.current_mode:
                 remove_from_mode(Stage2_5, stage2_5_mode)
-            elif Stage2_6.current_mode:
+            if Stage2_6.current_mode:
                 remove_from_mode(Stage2_6, stage2_6_mode)
-            elif Stage2_7.current_mode:
+            if Stage2_7.current_mode:
                 remove_from_mode(Stage2_7, stage2_7_mode)
-            elif Stage2_8.current_mode:
+            if Stage2_8.current_mode:
                 remove_from_mode(Stage2_8, stage2_8_mode)
-            elif Stage2_9.current_mode:
+            if Stage2_9.current_mode:
                 remove_from_mode(Stage2_9, stage2_9_mode)
-            elif Stage2_10.current_mode:
+            if Stage2_10.current_mode:
                 remove_from_mode(Stage2_10, stage2_10_mode)
-            elif Stage2_11.current_mode:
+            if Stage2_11.current_mode:
                 remove_from_mode(Stage2_11, stage2_11_mode)
-            elif Stage3_0.current_mode:
+            if Stage3_0.current_mode:
                 remove_from_mode(Stage3_0, stage3_0_mode)
-            elif Stage3_1.current_mode:
+            if Stage3_1.current_mode:
                 remove_from_mode(Stage3_1, stage3_1_mode)
-            elif Stage3_2.current_mode:
+            if Stage3_2.current_mode:
                 remove_from_mode(Stage3_2, stage3_2_mode)
-            elif Stage3_3.current_mode:
+            if Stage3_3.current_mode:
                 remove_from_mode(Stage3_3, stage3_3_mode)
-            elif Stage3_4.current_mode:
+            if Stage3_4.current_mode:
                 remove_from_mode(Stage3_4, stage3_4_mode)
-            elif Stage3_5.current_mode:
+            if Stage3_5.current_mode:
                 remove_from_mode(Stage3_5, stage3_5_mode)
-            elif Stage3_6.current_mode:
+            if Stage3_6.current_mode:
                 remove_from_mode(Stage3_6, stage3_6_mode)
-            elif Stage3_7.current_mode:
+            if Stage3_7.current_mode:
                 remove_from_mode(Stage3_7, stage3_7_mode)
-            elif Stage3_8.current_mode:
+            if Stage3_8.current_mode:
                 remove_from_mode(Stage3_8, stage3_8_mode)
-            elif Stage3_9.current_mode:
+            if Stage3_9.current_mode:
                 remove_from_mode(Stage3_9, stage3_9_mode)
-            elif Stage3_10.current_mode:
+            if Stage3_10.current_mode:
                 remove_from_mode(Stage3_10, stage3_10_mode)
-            elif Stage3_11.current_mode:
+            if Stage3_11.current_mode:
                 remove_from_mode(Stage3_11, stage3_11_mode)
 
             # print(f"After collection: {Ui.coin}")  # 디버그 출력
