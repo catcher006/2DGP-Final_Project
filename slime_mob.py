@@ -209,7 +209,7 @@ class Slime_Mob:
         self.hp_blue_image = load_image("./image/ui/mobs/slime/blue_slime_hp.png")
         self.hp_yellow_image = load_image("./image/ui/mobs/slime/yellow_slime_hp.png")
 
-        self.font = load_font('ENCR10B.TTF', 10)
+        self.font = load_font('./font/ENCR10B.TTF', 10)
 
         self.x = random.randint(105,940)
         self.y = random.randint(85,540)

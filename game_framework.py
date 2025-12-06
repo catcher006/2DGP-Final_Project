@@ -54,7 +54,7 @@ def pop_mode(target_mode=None, *args):
             break
 
     if found_idx == -1:
-        print(f"Warning: Target mode {target_name} not found in stack")
+        # print(f"Warning: Target mode {target_name} not found in stack")
         return
 
     # 이미 최상단이면 아무것도 안 함
@@ -73,7 +73,7 @@ def pop_mode(target_mode=None, *args):
     # 타겟 모드 resume
     stack[-1]['mode'].resume(*args)
 
-    print(f"Moved target mode {target_name} to top, stack depth: {len(stack)}")
+    # print(f"Moved target mode {target_name} to top, stack depth: {len(stack)}")
 
 def quit():
     global running
@@ -113,26 +113,28 @@ def clear_stage1_modes(*args):
         'stage1_4_mode', 'stage1_5_mode', 'stage1_6_mode', 'stage1_7_mode'
     }
 
-    print(f"Before clear: stack depth = {len(stack)}")
+    # print(f"Before clear: stack depth = {len(stack)}")
     for entry in stack:
-        print(f"  - {entry['name']}")
+        pass
+        # print(f"  - {entry['name']}")
 
     # 제거할 모드들의 finish() 먼저 호출
     for entry in stack:
         if entry['name'] in stage_mode_names:
-            print(f"Finishing {entry['name']}")
+            # print(f"Finishing {entry['name']}")
             entry['mode'].finish()
 
     # 스테이지 모드가 아닌 것만 남기기
     stack = [entry for entry in stack if entry['name'] not in stage_mode_names]
 
-    print(f"After clear: stack depth = {len(stack)}")
+    # print(f"After clear: stack depth = {len(stack)}")
     for entry in stack:
-        print(f"  - {entry['name']}")
+        pass
+        # print(f"  - {entry['name']}")
 
     # 던전 메인이 남아있으면 resume 호출 (인자 전달)
     if stack and stack[-1]['name'] == 'dungeonmain_mode':
-        print("Resuming dungeonmain_mode with args")
+        # print("Resuming dungeonmain_mode with args")
         if args:
             stack[-1]['mode'].resume(*args)
         else:
@@ -146,22 +148,24 @@ def clear_stage2_modes(*args):
         'stage2_8_mode', 'stage2_9_mode', 'stage2_10_mode', 'stage2_11_mode'
     }
 
-    print(f"Before clear: stack depth = {len(stack)}")
+    # print(f"Before clear: stack depth = {len(stack)}")
     for entry in stack:
-        print(f"  - {entry['name']}")
+        pass
+        # print(f"  - {entry['name']}")
 
     # 제거할 모드들의 finish() 먼저 호출
     for entry in stack:
         if entry['name'] in stage_mode_names:
-            print(f"Finishing {entry['name']}")
+            # print(f"Finishing {entry['name']}")
             entry['mode'].finish()
 
     # 스테이지 모드가 아닌 것만 남기기
     stack = [entry for entry in stack if entry['name'] not in stage_mode_names]
 
-    print(f"After clear: stack depth = {len(stack)}")
+    # print(f"After clear: stack depth = {len(stack)}")
     for entry in stack:
-        print(f"  - {entry['name']}")
+        pass
+        # print(f"  - {entry['name']}")
 
     # 던전 메인이 남아있으면 resume 호출 (인자 전달)
     if stack and stack[-1]['name'] == 'dungeonmain_mode':

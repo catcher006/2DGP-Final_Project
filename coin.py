@@ -86,10 +86,10 @@ class Coin:
         return None
 
     def handle_collision(self, group, other):
-        print(f"Collision detected! Group: {group}")  # 디버그 출력
+        # print(f"Collision detected! Group: {group}")  # 디버그 출력
 
         if group == 'player:coin':
-            print(f"Coin collected! Current coins: {Ui.coin}")  # 디버그 출력
+            # print(f"Coin collected! Current coins: {Ui.coin}")  # 디버그 출력
 
             if Ui.coin + 50 <= 99999999:
                 Ui.coin += 50
@@ -98,10 +98,8 @@ class Coin:
 
             sounds.coin_sound.play()
 
-            try:
-                game_world.remove_object(self)
-            except Exception as e:
-                print(f"game_world.remove_object error: {e}")
+            game_world.remove_object(self)
+
             # 현재 활성화된 모드의 coins와 saved_coins에서 제거
             def remove_from_mode(mode, mode_module):
                 if self in mode_module.coins:
@@ -177,4 +175,4 @@ class Coin:
             elif Stage3_11.current_mode:
                 remove_from_mode(Stage3_11, stage3_11_mode)
 
-            print(f"After collection: {Ui.coin}")  # 디버그 출력
+            # print(f"After collection: {Ui.coin}")  # 디버그 출력

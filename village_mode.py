@@ -777,7 +777,7 @@ def init(player_start_pos=None):
 
     enhance_active = False
     weapon_select = False
-    font = load_font('ENCR10B.TTF', 20)
+    font = load_font('./font/ENCR10B.TTF', 20)
 
     village = Village()
     game_world.add_object((village), 0)

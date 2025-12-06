@@ -315,7 +315,7 @@ class Zombie_Mob:
 
         self.hp_image = load_image("./image/ui/mobs/zombie/zombie_hp.png")
 
-        self.font = load_font('ENCR10B.TTF', 10)
+        self.font = load_font('./font/ENCR10B.TTF', 10)
 
         self.x = random.randint(105,940)
         self.y = random.randint(85,540)
