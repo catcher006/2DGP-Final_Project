@@ -396,8 +396,37 @@ class Ui:
         import game_world
         import title_mode
         from stage1_0 import Stage1_0
+        from stage1_1 import Stage1_1
+        from stage1_2 import Stage1_2
+        from stage1_3 import Stage1_3
+        from stage1_4 import Stage1_4
+        from stage1_5 import Stage1_5
+        from stage1_6 import Stage1_6
+        from stage1_7 import Stage1_7
         from stage2_0 import Stage2_0
+        from stage2_1 import Stage2_1
+        from stage2_2 import Stage2_2
+        from stage2_3 import Stage2_3
+        from stage2_4 import Stage2_4
+        from stage2_5 import Stage2_5
+        from stage2_6 import Stage2_6
+        from stage2_7 import Stage2_7
+        from stage2_8 import Stage2_8
+        from stage2_9 import Stage2_9
+        from stage2_10 import Stage2_10
+        from stage2_11 import Stage2_11
         from stage3_0 import Stage3_0
+        from stage3_1 import Stage3_1
+        from stage3_2 import Stage3_2
+        from stage3_3 import Stage3_3
+        from stage3_4 import Stage3_4
+        from stage3_5 import Stage3_5
+        from stage3_6 import Stage3_6
+        from stage3_7 import Stage3_7
+        from stage3_8 import Stage3_8
+        from stage3_9 import Stage3_9
+        from stage3_10 import Stage3_10
+        from stage3_11 import Stage3_11
 
         # 게임 월드 완전 초기화
         game_world.clear()
@@ -414,10 +443,46 @@ class Ui:
         player.player_hp = 100
         player.Player.is_alive = True
 
-        # 스테이지 플래그 초기화
+        # Stage1 플래그 초기화
         Stage1_0.stage1_0_create = False
+        Stage1_1.stage1_1_create = False
+        Stage1_2.stage1_2_create = False
+        Stage1_3.stage1_3_create = False
+        Stage1_4.stage1_4_create = False
+        Stage1_4.boss_cleared = False
+        Stage1_5.stage1_5_create = False
+        Stage1_6.stage1_6_create = False
+        Stage1_7.stage1_7_create = False
+
+        # Stage2 플래그 초기화
         Stage2_0.stage2_0_create = False
+        Stage2_1.stage2_1_create = False
+        Stage2_2.stage2_2_create = False
+        Stage2_3.stage2_3_create = False
+        Stage2_4.stage2_4_create = False
+        Stage2_5.stage2_5_create = False
+        Stage2_6.stage2_6_create = False
+        Stage2_7.stage2_7_create = False
+        Stage2_7.boss_cleared = False
+        Stage2_8.stage2_8_create = False
+        Stage2_9.stage2_9_create = False
+        Stage2_10.stage2_10_create = False
+        Stage2_11.stage2_11_create = False
+
+        # Stage3 플래그 초기화
         Stage3_0.stage3_0_create = False
+        Stage3_1.stage3_1_create = False
+        Stage3_2.stage3_2_create = False
+        Stage3_3.stage3_3_create = False
+        Stage3_4.stage3_4_create = False
+        Stage3_5.stage3_5_create = False
+        Stage3_6.stage3_6_create = False
+        Stage3_7.stage3_7_create = False
+        Stage3_7.boss_cleared = False
+        Stage3_8.stage3_8_create = False
+        Stage3_9.stage3_9_create = False
+        Stage3_10.stage3_10_create = False
+        Stage3_11.stage3_11_create = False
 
         # 모든 모드 스택 제거하고 타이틀 모드로 변경
         game_framework.change_mode(title_mode)
