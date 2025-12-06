@@ -38,9 +38,12 @@ class Ui:
         self.want_effect_sound = load_image('./image/ui/button/want_effect_sound.png')
 
         # 튜토리얼 설정
-        self.info_tuturial_page1_image = load_image('./image/ui/information/tutorial_page1.png')
-        self.info_tuturial_page2_image = load_image('./image/ui/information/tutorial_page2.png')
-        self.info_tuturial_page3_image = load_image('./image/ui/information/tutorial_page3.png')
+        self.info_tutorial_page1_image = load_image('./image/ui/information/tutorial_page1.png')
+        self.info_tutorial_page2_image = load_image('./image/ui/information/tutorial_page2.png')
+        self.info_tutorial_page3_image = load_image('./image/ui/information/tutorial_page3.png')
+        self.info_tutorial_page4_image = load_image('./image/ui/information/tutorial_page4.png')
+        self.info_tutorial_page5_image = load_image('./image/ui/information/tutorial_page5.png')
+        self.info_tutorial_page6_image = load_image('./image/ui/information/tutorial_page6.png')
 
         self.current_tutorial_page = 1
         self.hovered_bgm = -1
@@ -142,11 +145,17 @@ class Ui:
                     self.sound_track_off_image.draw(230, 195)
             elif Ui.tutorial_button:
                 if self.current_tutorial_page == 1:
-                    self.info_tuturial_page1_image.draw(512, 288)
+                    self.info_tutorial_page1_image.draw(512, 288)
                 elif self.current_tutorial_page == 2:
-                    self.info_tuturial_page2_image.draw(512, 288)
+                    self.info_tutorial_page2_image.draw(512, 288)
                 elif self.current_tutorial_page == 3:
-                    self.info_tuturial_page3_image.draw(512, 288)
+                    self.info_tutorial_page3_image.draw(512, 288)
+                elif self.current_tutorial_page == 4:
+                    self.info_tutorial_page4_image.draw(512, 288)
+                elif self.current_tutorial_page == 5:
+                    self.info_tutorial_page5_image.draw(512, 288)
+                elif self.current_tutorial_page == 6:
+                    self.info_tutorial_page6_image.draw(512, 288)
             elif Ui.information_button:
                 self.game_info_image.draw(512, 288)
 
@@ -298,7 +307,7 @@ class Ui:
             # 튜토리얼 페이지 전환
             if Ui.tutorial_button:
                 if 595 <= mx <= 617 and 122 <= my <= 160:
-                    if self.current_tutorial_page < 3:
+                    if self.current_tutorial_page < 6:
                         self.current_tutorial_page += 1
                     return True
                 elif 407 <= mx <= 429 and 122 <= my <= 160:
