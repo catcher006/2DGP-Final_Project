@@ -128,6 +128,7 @@ def finish():
 
 def pause():
     global goblin_mobs, stage3_3, coins
+    global ui
 
     stage3_3.current_mode = False
 
@@ -158,10 +159,12 @@ def pause():
 
     game_world.clear()
     game_world.collision_pairs.clear()
+    ui = None
 
 
 def resume(player_start_pos=None):
     global goblin_mobs, stage3_3, player, coins
+    global ui
 
     Stage3_3.current_mode = True
 

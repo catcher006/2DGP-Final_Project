@@ -148,6 +148,7 @@ def finish():
 
 def pause():
     global slime_mobs, stage1_0, coins
+    global ui
 
     Stage1_0.current_mode = False
 
@@ -176,10 +177,12 @@ def pause():
 
     game_world.clear()
     game_world.collision_pairs.clear()
+    ui = None
 
 
 def resume(player_start_pos=None):
     global slime_mobs, stage1_0, player, coins
+    global ui
 
     Stage1_0.current_mode = True
 

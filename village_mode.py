@@ -663,15 +663,19 @@ def finish():
     sounds.village_bgm.stop()
 
 def pause():
+    global ui
+
     # 현재 모드의 모든 객체를 게임 월드에서 제거
     game_world.clear()
     # 충돌 페어도 정리
     game_world.collision_pairs.clear()
     sounds.village_bgm.stop()
+    ui = None
 
 def resume(player_start_pos=None):
     # 필요시 village 객체들을 다시 초기화
     global village, back_object, front_object, player
+    global ui
 
     common.player.move_validator = village.is_walkable
     if player_start_pos:

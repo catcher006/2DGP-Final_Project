@@ -17,14 +17,23 @@ from ui import Ui
 def handle_events():
     global running
     global stage1_0
+    global ui
 
     event_list = get_events()
     for event in event_list:
         if event.type == SDL_QUIT:
             game_framework.quit()
-        # 마우스 이벤트는 무시
-        elif event.type in (SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP):
-            continue
+        elif Ui.paused:
+            if ui.handle_events(event):
+                continue
+        elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
+            sounds.normal_click_sound.play()
+            mx = event.x
+            my = get_canvas_height() - event.y
+
+            if 970 <= mx <= 1010 and 530 <= my <= 570:
+                Ui.paused = True if not Ui.paused else False
+                continue
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
             if 195 <= common.player.x <= 290 and 380 <= common.player.y <= 400:  # 1번 스테이지 입구 좌표 범위
                 if not Stage1_0.stage1_0_create:
@@ -55,6 +64,7 @@ def init(player_start_pos=None):
     global player
     global back_object
     global front_object
+    global ui
 
     dungeonmain = Dungeonmain()
     game_world.add_object((dungeonmain), 0)
@@ -81,6 +91,9 @@ def init(player_start_pos=None):
     sounds.dungeon_bgm.repeat_play()
 
 def update():
+    if Ui.paused:
+        return
+
     game_world.update()
 
 def draw():
@@ -93,13 +106,16 @@ def finish():
     sounds.dungeon_bgm.stop()
 
 def pause():
+    global ui
     # 현재 모드의 모든 객체를 게임 월드에서 제거
     game_world.clear()
     sounds.dungeon_bgm.stop()
+    ui = None
 
 def resume(player_start_pos=None):
     # 필요시 dungeonmain 객체들을 다시 초기화
     global dungeonmain, player
+    global ui
 
     common.player.move_validator = dungeonmain.is_walkable
     if player_start_pos:

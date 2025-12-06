@@ -122,6 +122,7 @@ def finish():
 
 def pause():
     global zombie_mobs, stage2_3, coins
+    global ui
 
     Stage2_3.current_mode = False
 
@@ -152,10 +153,12 @@ def pause():
 
     game_world.clear()
     game_world.collision_pairs.clear()
+    ui = None
 
 
 def resume(player_start_pos=None):
     global zombie_mobs, stage2_3, player, coins
+    global ui
 
     Stage2_3.current_mode = True
 
