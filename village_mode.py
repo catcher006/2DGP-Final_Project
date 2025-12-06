@@ -14,11 +14,19 @@ from ui import Ui
 
 enhance_active = False # 강화 모드 활성화 플래그
 weapon_select = False # 무기 선택 모드 활성화 플래그
+sale_active = False # 상점 모드 활성화 플래그
 
 # 강화 시스템 설정
 TIER_LIST = ['normal', 'silver', 'gold']
 COSTS = {'none': 500, 'normal': 800, 'silver': 1000 }
 ODDS = {'none': 0.6, 'normal': 0.3, 'silver': 0.1 }
+
+# 상점 시스템 설정
+SHOP_ITEMS = {
+    'blue_potion': {'name': 'Blue Potion', 'price': 300, 'heal': 10},
+    'red_potion': {'name': 'Red Potion', 'price': 800, 'heal': 50},
+    'yellow_potion': {'name': 'Yellow Potion', 'price': 500, 'heal': {'high': 50, 'low': 10}}
+}
 
 BUTTONS = {
     'sword': (150, 150, 150, 50),
@@ -29,6 +37,12 @@ BUTTONS = {
 MENU_BUTTONS = {
     'enhance': (20, 450, 64, 64),  # 상단: 강화 버튼
     'weapon': (20, 380, 64, 64)    # 하단: 무기 선택 버튼
+}
+
+SHOP_ITEM_POSITIONS = {
+    'blue_potion': (300, 300),
+    'red_potion': (512, 300),
+    'yellow_potion': (724, 300)
 }
 
 # 버튼 애니메이션 상태
@@ -53,6 +67,13 @@ weapon_warning = {
 }
 
 already_selected_warning = {
+    'active': False,
+    'frame': 0,
+    'sequence_index': 0,
+    'time': 0
+}
+
+hp_full_warning = {
     'active': False,
     'frame': 0,
     'sequence_index': 0,
@@ -209,6 +230,33 @@ def update_already_selected_warning():
                 already_selected_warning['frame'] = 0
             else:
                 already_selected_warning['frame'] = COIN_WARNING_SEQUENCE[already_selected_warning['sequence_index']]
+
+
+def start_hp_full_warning():
+    """HP 최대치 경고 애니메이션 시작"""
+    hp_full_warning['active'] = True
+    hp_full_warning['time'] = 0
+    hp_full_warning['sequence_index'] = 0
+    hp_full_warning['frame'] = 0
+
+    sounds.warning_sound.play()
+
+
+def update_hp_full_warning():
+    """HP 최대치 경고 애니메이션 업데이트"""
+    if hp_full_warning['active']:
+        hp_full_warning['time'] += game_framework.frame_time
+
+        if hp_full_warning['time'] >= COIN_WARNING_FRAME_TIME:
+            hp_full_warning['time'] = 0
+            hp_full_warning['sequence_index'] += 1
+
+            if hp_full_warning['sequence_index'] >= len(COIN_WARNING_SEQUENCE):
+                hp_full_warning['active'] = False
+                hp_full_warning['sequence_index'] = 0
+                hp_full_warning['frame'] = 0
+            else:
+                hp_full_warning['frame'] = COIN_WARNING_SEQUENCE[hp_full_warning['sequence_index']]
 
 
 def enhance_item(item_type):
@@ -500,7 +548,7 @@ def draw_button(name, rect, mode='enhance'):
             village.font.draw(cx + 80, icon_y, '[None]', (150, 150, 150))
 
 def handle_events():
-    global running, enhance_active, weapon_select
+    global running, enhance_active, weapon_select, sale_active
 
     event_list = get_events()
     for event in event_list:
@@ -510,7 +558,9 @@ def handle_events():
             if enhance_active or weapon_select:
                 enhance_active = False # 강화 모드 비활성화
                 weapon_select = False # 무기 선택 모드 비활성화
-            else:
+            elif sale_active:
+                sale_active = False # 상점 모드 비활성화
+            elif not Ui.paused:
                 game_framework.change_mode(title_mode)
         elif Ui.paused:
             if ui.handle_events(event):
@@ -537,6 +587,27 @@ def handle_events():
                     handle_enhance_click(mx, my)
                 elif weapon_select:
                     handle_weapon_select_click(mx, my)
+        elif sale_active:
+            if event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
+                sounds.normal_click_sound.play()
+                mx = event.x
+                my = get_canvas_height() - event.y
+
+                # 상점 아이템 클릭 처리
+                for item_name, pos in SHOP_ITEM_POSITIONS.items():
+                    icon_x, icon_y = pos
+                    icon_size = 100
+
+                    left = icon_x - icon_size // 2
+                    right = icon_x + icon_size // 2
+                    bottom = icon_y - icon_size // 2
+                    top = icon_y + icon_size // 2
+
+                    if left <= mx <= right and bottom <= my <= top:
+                        purchase_potion(item_name)
+                        break
+            elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
+                sale_active = False
         elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
                 sounds.normal_click_sound.play()
                 mx = event.x
@@ -550,6 +621,8 @@ def handle_events():
                 game_framework.push_mode(dungeonmain_mode,(535, 60))
             elif 210 <= common.player.x <= 260 and 190 <= common.player.y <= 210:  # 짐 좌표 범위 - 아이템 강화
                 enhance_active = True # 강화 모드 활성화
+            elif 730 <= common.player.x <= 810 and 200 <= common.player.y <= 230:  # 짐 좌표 범위 - 상점
+                sale_active = True # 상점 모드 활성화
         else:
             common.player.handle_event(event)
 
@@ -596,6 +669,100 @@ def draw_enhance_ui():
         if already_selected_warning['active'] and village.info_already_selected:
             frame = already_selected_warning['frame']
             village.info_already_selected.clip_draw(0, frame * 78, 490, 78, 512, 288)
+
+
+def purchase_potion(item_name):
+    """포션 구매 및 HP 회복 처리"""
+    import player
+
+    item_info = SHOP_ITEMS.get(item_name)
+    if not item_info:
+        return False
+
+    # 1. HP가 이미 최대치인지 확인
+    if player.player_hp >= 100:
+        start_hp_full_warning()
+        return False
+
+    # 2. 코인이 충분한지 확인
+    if Ui.coin < item_info['price']:
+        start_coin_warning()
+        return False
+
+    # 3. 코인 차감
+    Ui.coin -= item_info['price']
+
+    # 4. 회복량 결정 (노란 포션은 확률 적용)
+    if item_name == 'yellow_potion':
+        if random.random() < 0.2:  # 20% 확률로 +50
+            heal_amount = item_info['heal']['high']
+        else:  # 80% 확률로 +10
+            heal_amount = item_info['heal']['low']
+    else:
+        heal_amount = item_info['heal']
+
+    # 5. HP 회복 (최대 100으로 제한)
+    player.player_hp = min(100, player.player_hp + heal_amount)
+    Ui.hp = player.player_hp
+
+    # 6. 구매 효과음 재생
+    sounds.coin_sound.play()
+
+    return True
+
+
+def draw_shop_ui():
+    """상점 UI 그리기"""
+    import player
+
+    # 어두운 배경
+    village.black_screen.clip_draw(5 * 768, 0, 768, 144, 512, 288, 1024, 576)
+
+    # ESC 안내
+    village.font.draw(280, 50, 'Click the Potion Image or Go Back to game with ESC key', (200, 200, 200))
+
+    # 각 포션 표시
+    for item_id, (cx, cy) in SHOP_ITEM_POSITIONS.items():
+        item_info = SHOP_ITEMS[item_id]
+        icon_size = 100
+
+        # 포션 이미지 표시
+        if item_id == 'blue_potion' and village.blue_potion:
+            village.blue_potion.draw(cx, cy, icon_size, icon_size)
+        elif item_id == 'red_potion' and village.red_potion:
+            village.red_potion.draw(cx, cy, icon_size, icon_size)
+        elif item_id == 'yellow_potion' and village.yellow_potion:
+            village.yellow_potion.draw(cx, cy, icon_size, icon_size)
+
+        # 포션 정보 텍스트
+        name_color = (100, 100, 255) if item_id == 'blue_potion' else \
+            (255, 100, 100) if item_id == 'red_potion' else \
+                (255, 255, 100)
+
+        text_width = len(item_info['name']) * 10
+        village.font.draw(cx - text_width // 2, cy - 70, item_info['name'], name_color)
+
+        # 회복량 표시 (노란 포션은 확률 표시)
+        if item_id == 'yellow_potion':
+            heal_text = '+10HP (80%), +50HP (20%)'
+            village.font.draw(cx - 120, cy - 90, heal_text, (255, 255, 255))
+        else:
+            heal_text = f'+{item_info["heal"]} HP'
+            village.font.draw(cx - 40, cy - 90, heal_text, (255, 255, 255))
+
+        price_text = f'{item_info["price"]} coins'
+        village.font.draw(cx - 50, cy - 110, price_text, (255, 215, 0))
+
+    # 코인 부족 경고 표시
+    if coin_warning['active'] and village.info_coin:
+        frame = coin_warning['frame']
+        village.info_coin.clip_draw(0, frame * 78, 490, 78, 512, 288)
+
+    # HP 최대치 경고 표시
+    if hp_full_warning['active'] and village.info_hp_full:
+        frame = hp_full_warning['frame']
+        village.info_hp_full.clip_draw(0, frame * 78, 490, 78, 512, 288)
+
 
 def init(player_start_pos=None):
     global world
@@ -646,6 +813,9 @@ def update():
     elif weapon_select:
         update_weapon_warning()
         update_already_selected_warning()
+    elif sale_active:
+        update_coin_warning()
+        update_hp_full_warning()
     else:
         game_world.update()
 
@@ -656,6 +826,8 @@ def draw():
     # 강화 UI 오버레이
     if enhance_active or weapon_select:
         draw_enhance_ui()
+    elif sale_active:
+        draw_shop_ui()
 
     update_canvas()
 

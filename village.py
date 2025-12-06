@@ -28,9 +28,13 @@ class Village:
         self.info_coin = load_image('./image/ui/information/dont_enough_coin.png')
         self.info_weapon = load_image('./image/ui/information/dont_have_weapon.png')
         self.info_already_selected = load_image('./image/ui/information/already_selected.png')
+        self.info_hp_full = load_image('./image/ui/information/enough_hp.png')
         self.icon_sword = load_image('./image/ui/item/sword.png')
         self.icon_arrow = load_image('./image/ui/item/bow.png')
         self.icon_shield = load_image('./image/ui/item/shield.png')
+        self.blue_potion = load_image('./image/ui/item/blue_potion.png')
+        self.red_potion = load_image('./image/ui/item/red_potion.png')
+        self.yellow_potion = load_image('./image/ui/item/yellow_potion.png')
 
         self.font = load_font('./font/PixelPurl.TTF', 25)
     def enter(self, e): pass
