@@ -16,8 +16,13 @@ def init():
     sounds.init_bgm_sounds()
     sounds.init_effect_sounds()
 
+    sounds.title_sound.repeat_play()
+
 def finish():
     global image, title_image, font
+
+    sounds.title_sound.stop()
+
     if image:
         del image
     if title_image:
