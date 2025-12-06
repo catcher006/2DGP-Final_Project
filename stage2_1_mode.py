@@ -22,7 +22,7 @@ def handle_events():
     for event in event_list:
         if event.type == SDL_QUIT:
             game_framework.quit()
-        elif Ui.paused:
+        elif Ui.paused or Ui.game_over:
             if ui.handle_events(event):
                 continue
         elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:

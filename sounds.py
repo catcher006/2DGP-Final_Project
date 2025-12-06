@@ -9,6 +9,7 @@ stage2_bgm = None
 stage3_bgm = None
 
 coin_sound = None
+game_over_sound = None
 
 slime_hurt_sound = None
 zombie_hurt_sound = None
@@ -54,7 +55,7 @@ def init_bgm_sounds():
         stage3_bgm.set_volume(sound)
 
 def init_effect_sounds():
-    global normal_click_sound, warning_sound, coin_sound
+    global normal_click_sound, warning_sound, coin_sound, game_over_sound
     global slime_hurt_sound
     global zombie_hurt_sound, zombie_dead_sound
     global goblin_hurt_sound, goblin_dead_sound
@@ -74,6 +75,10 @@ def init_effect_sounds():
     if coin_sound is None:
         coin_sound = load_wav('./sound/item/coin.wav')
         coin_sound.set_volume(sound)
+
+    if game_over_sound is None:
+        game_over_sound = load_music('./sound/effect/game_over.mp3')
+        game_over_sound.set_volume(sound)
 
     if slime_hurt_sound is None:
         slime_hurt_sound = load_wav('./sound/mob/slime_hurt.wav')
@@ -152,6 +157,8 @@ def apply_effect_volume():
         warning_sound.set_volume(volume)
     if coin_sound is not None:
         coin_sound.set_volume(volume)
+    if game_over_sound is not None:
+        game_over_sound.set_volume(volume)
     if slime_hurt_sound is not None:
         slime_hurt_sound.set_volume(volume)
     if zombie_hurt_sound is not None:

@@ -4,9 +4,10 @@ import sounds
 
 
 class Ui:
-    coin = 1000000 # 최대값 9999999
+    coin = 100 # 최대값 9999999
     hp = 100
     paused = False
+    game_over = False
 
     sound_button = True
     tutorial_button = False
@@ -52,6 +53,15 @@ class Ui:
             img = load_image(f'./image/ui/information/resource_info_{i}.png')
             self.resource_info_images.append(img)
 
+        # 게임 오버 화면 추가
+        self.game_over_screen = load_image('./image/ui/information/game_over.png')
+        self.restart_button_image = load_image('./image/ui/button/restart_game_button.png')
+        self.quit_button_image = load_image('./image/ui/button/quit_game_button.png')
+
+        self.game_over_sound_played = False  # 게임 오버 사운드 재생 플래그
+        self.hovered_restart = False
+        self.hovered_quit = False
+
         self.scroll_offset = 0
         self.max_scroll = 0  # 이미지 높이에 따라 계산
         self.info_view_height = 350  # 보이는 영역 높이
@@ -67,6 +77,27 @@ class Ui:
         self.pixel_font_20.draw(140, 560, 'Player HP:', (255, 255, 255))
         self.pixel_font_25.draw(215, 560, f'{Ui.hp:d}', (255, 255, 255))
 
+        # 게임 오버 화면
+        if Ui.game_over:
+            self.black_screen.clip_draw(5 * 768, 0, 768, 144, 512, 288, 1024, 576)
+            self.game_over_screen.draw(512, 338)
+
+            # 게임 오버 사운드를 한 번만 재생
+            if not self.game_over_sound_played:
+                sounds.game_over_sound.play(1)
+                self.game_over_sound_played = True
+
+            # 재시작 버튼 (호버 시 0번 인덱스)
+            restart_idx = 0 if self.hovered_restart else 1
+            self.restart_button_image.clip_draw(0, restart_idx * 60, 160, 60, 412, 150)
+
+            # 종료 버튼 (호버 시 0번 인덱스)
+            quit_idx = 0 if self.hovered_quit else 1
+            self.quit_button_image.clip_draw(0, quit_idx * 60, 160, 60, 612, 150)
+
+            return
+
+        # 일시정지 화면
         if Ui.paused:
             self.black_screen.clip_draw(5 * 768, 0, 768, 144, 512, 288, 1024, 576)
 
@@ -175,6 +206,42 @@ class Ui:
         Ui.hp = player.player_hp
 
     def handle_events(self, event):
+        if Ui.game_over:
+
+            if event.type == SDL_MOUSEMOTION:
+                mx = event.x
+                my = get_canvas_height() - event.y
+
+                # 재시작 버튼
+                if 332 <= mx <= 492 and 120 <= my <= 180:
+                    self.hovered_restart = True
+                    self.hovered_quit = False
+                # 종료 버튼
+                elif 532 <= mx <= 692 and 120 <= my <= 180:
+                    self.hovered_quit = True
+                    self.hovered_restart = False
+                else:
+                    self.hovered_restart = False
+                    self.hovered_quit = False
+                return True
+
+            elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
+                sounds.normal_click_sound.play()
+                mx = event.x
+                my = get_canvas_height() - event.y
+
+                # 재시작 버튼 클릭
+                if 332 <= mx <= 492 and 120 <= my <= 180:
+                    self.restart_game()
+                    return True
+
+                # 종료 버튼 클릭
+                if 532 <= mx <= 692 and 120 <= my <= 180:
+                    self.quit_game()
+                    return True
+
+            return True
+
         if not Ui.paused:
             return False
 
@@ -295,6 +362,7 @@ class Ui:
         self.hovered_bgm = -1
         self.hovered_effect = -1
         self.scroll_offset = 0
+        self.game_over_sound_played = False
         Ui.sound_button = True
         Ui.tutorial_button = False
         Ui.information_button = False
@@ -302,3 +370,40 @@ class Ui:
     def enter(self, e): pass
     def exit(self, e): pass
     def do(self): pass
+
+    def restart_game(self):
+        """게임 재시작 - 모든 상태 초기화 후 타이틀로 이동"""
+        import game_framework
+        import game_world
+        import title_mode
+        from stage1_0 import Stage1_0
+        from stage2_0 import Stage2_0
+        from stage3_0 import Stage3_0
+
+        # 게임 월드 완전 초기화
+        game_world.clear()
+
+        # UI 상태 초기화
+        Ui.game_over = False
+        Ui.paused = False
+        Ui.hp = 100
+        Ui.coin = 100
+        self.game_over_sound_played = False
+        self.reset_ui_state()
+
+        # 플레이어 상태 초기화
+        player.player_hp = 100
+        player.Player.is_alive = True
+
+        # 스테이지 플래그 초기화
+        Stage1_0.stage1_0_create = False
+        Stage2_0.stage2_0_create = False
+        Stage3_0.stage3_0_create = False
+
+        # 모든 모드 스택 제거하고 타이틀 모드로 변경
+        game_framework.change_mode(title_mode)
+
+    def quit_game(self):
+        """게임 종료"""
+        import game_framework
+        game_framework.quit()

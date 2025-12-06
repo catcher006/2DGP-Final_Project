@@ -37,6 +37,7 @@ from stage3_9 import Stage3_9
 from stage3_10 import Stage3_10
 from stage3_11 import Stage3_11
 from state_machine import StateMachine
+from ui import Ui
 from pico2d import *
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f, SDLK_SPACE
 
@@ -98,6 +99,9 @@ class Dead:
     def do(self):
         if self.player.frame < 5:
             self.player.frame += FRAMES_PER_DEAD_ACTION * ACTION_PER_TIME * game_framework.frame_time
+        else:
+            if not Ui.game_over:
+                Ui.game_over = True
 
 
     def draw(self):
@@ -483,10 +487,6 @@ class Player:
         self.state_machine.update()
 
     def handle_event(self, event):
-        # 죽었으면 입력 무시
-        if not Player.is_alive:
-            return
-
         if event.key in (SDLK_a, SDLK_d, SDLK_w, SDLK_s):
             cur_xdir, cur_ydir = self.xdir, self.ydir
             if event.type == SDL_KEYDOWN:
