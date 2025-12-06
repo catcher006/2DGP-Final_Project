@@ -141,7 +141,7 @@ def pause():
             'frame': coin.frame
         })
 
-    print(f"Pause: Saved {len(stage3_7.saved_mobs)} zombie mobs, {len(stage3_7.saved_coins)} coins")
+    # print(f"Pause: Saved {len(stage3_7.saved_mobs)} zombie mobs, {len(stage3_7.saved_coins)} coins")
 
     game_world.clear()
     game_world.collision_pairs.clear()
@@ -176,7 +176,7 @@ def resume(player_start_pos=None):
         game_world.add_collision_pair('player:goblin_boss', None, goblin_boss)
     else:
         goblin_boss = None
-        print("Resume: No saved mobs to restore")
+        # print("Resume: No saved mobs to restore")
 
     # 코인 복원
     if stage3_7.saved_coins:
@@ -194,7 +194,7 @@ def resume(player_start_pos=None):
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
 
-        print(f"Resume: Restored {len(coins)} coins")
+        # print(f"Resume: Restored {len(coins)} coins")
 
     ui = Ui()
     game_world.add_object(ui, 4)

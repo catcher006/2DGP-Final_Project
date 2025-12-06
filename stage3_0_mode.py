@@ -170,7 +170,7 @@ def pause():
                 'type': goblin_mob.mob_type
             }
             stage3_0.saved_mobs.append(mob_data)
-            print(f"Pause: Saved mob at ({mob_data['x']}, {mob_data['y']}) with type '{mob_data['type']}', HP: {mob_data['hp']}")
+            # print(f"Pause: Saved mob at ({mob_data['x']}, {mob_data['y']}) with type '{mob_data['type']}', HP: {mob_data['hp']}")
 
     # 코인 저장
     stage3_0.saved_coins = []
@@ -181,7 +181,7 @@ def pause():
             'frame': coin.frame
         })
 
-    print(f"Pause: Saved {len(stage3_0.saved_mobs)} zombie mobs, {len(stage3_0.saved_coins)} coins")
+    # print(f"Pause: Saved {len(stage3_0.saved_mobs)} zombie mobs, {len(stage3_0.saved_coins)} coins")
 
     game_world.clear()
     game_world.collision_pairs.clear()
@@ -205,13 +205,13 @@ def resume(player_start_pos=None):
     if stage3_0.saved_mobs:
         goblin_mobs = []
         for mob_data in stage3_0.saved_mobs:
-            print(f"Resume: Restoring mob with type '{mob_data['type']}' at ({mob_data['x']}, {mob_data['y']})")
+            # print(f"Resume: Restoring mob with type '{mob_data['type']}' at ({mob_data['x']}, {mob_data['y']})")
 
             goblin_mob = Goblin_Mob()
 
             # 저장된 타입으로 설정
             goblin_mob.mob_type = mob_data['type']
-            print(f"Resume: Set mob_type to '{goblin_mob.mob_type}'")
+            # print(f"Resume: Set mob_type to '{goblin_mob.mob_type}'")
 
             # 타입에 맞는 이미지 재로드
             goblin_mob.move_image = load_image("./image/mobs/goblin/" + goblin_mob.mob_type + "/walk.png")
@@ -239,9 +239,10 @@ def resume(player_start_pos=None):
                 if goblin_mob != other_mob:
                     game_world.add_collision_pair('goblin_mob:goblin_mob', None, other_mob)
 
-        print(f"Resume: Total restored {len(goblin_mobs)} goblin mobs")
+        # print(f"Resume: Total restored {len(goblin_mobs)} goblin mobs")
     else:
-        print("Resume: No saved mobs to restore")
+        pass
+        # print("Resume: No saved mobs to restore")
 
     # 코인 복원
     if stage3_0.saved_coins:
@@ -259,7 +260,7 @@ def resume(player_start_pos=None):
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
 
-        print(f"Resume: Restored {len(coins)} coins")
+        # print(f"Resume: Restored {len(coins)} coins")
 
     ui = Ui()
     game_world.add_object(ui, 4)

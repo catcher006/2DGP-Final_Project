@@ -138,7 +138,7 @@ def pause():
                 'type': zombie_mob.mob_type
             }
             stage2_11.saved_mobs.append(mob_data)
-            print(f"Pause: Saved mob at ({mob_data['x']}, {mob_data['y']}) with type '{mob_data['type']}', HP: {mob_data['hp']}")
+            # print(f"Pause: Saved mob at ({mob_data['x']}, {mob_data['y']}) with type '{mob_data['type']}', HP: {mob_data['hp']}")
 
     # 코인 저장
     stage2_11.saved_coins = []
@@ -149,7 +149,7 @@ def pause():
             'frame': coin.frame
         })
 
-    print(f"Pause: Saved {len(stage2_11.saved_mobs)} zombie mobs, {len(stage2_11.saved_coins)} coins")
+    # print(f"Pause: Saved {len(stage2_11.saved_mobs)} zombie mobs, {len(stage2_11.saved_coins)} coins")
 
     game_world.clear()
     game_world.collision_pairs.clear()
@@ -173,13 +173,13 @@ def resume(player_start_pos=None):
     if stage2_11.saved_mobs:
         zombie_mobs = []
         for mob_data in stage2_11.saved_mobs:
-            print(f"Resume: Restoring mob with type '{mob_data['type']}' at ({mob_data['x']}, {mob_data['y']})")
+            # print(f"Resume: Restoring mob with type '{mob_data['type']}' at ({mob_data['x']}, {mob_data['y']})")
 
             zombie_mob = Zombie_Mob()
 
             # 저장된 타입으로 설정
             zombie_mob.mob_type = mob_data['type']
-            print(f"Resume: Set mob_type to '{zombie_mob.mob_type}'")
+            # print(f"Resume: Set mob_type to '{zombie_mob.mob_type}'")
 
             # 타입에 맞는 이미지 재로드
             zombie_mob.move_image = load_image("./image/mobs/zombie/" + zombie_mob.mob_type + "/walk.png")
@@ -214,7 +214,7 @@ def resume(player_start_pos=None):
                         zombie_mob.DEAD: {}
                     }
                 )
-                print(f"Resume: Created state_machine with ATTACK state for mace type")
+                # print(f"Resume: Created state_machine with ATTACK state for mace type")
             else:
                 zombie_mob.state_machine = StateMachine(
                     zombie_mob.IDLE,
@@ -224,13 +224,13 @@ def resume(player_start_pos=None):
                         zombie_mob.DEAD: {}
                     }
                 )
-                print(f"Resume: Created state_machine without ATTACK state for none type")
+                # print(f"Resume: Created state_machine without ATTACK state for none type")
 
             # IDLE 상태로 명시적 전환
             zombie_mob.state_machine.cur_state = zombie_mob.IDLE
             zombie_mob.IDLE.enter(None)
 
-            print(f"Resume: Mob restored - Type: '{zombie_mob.mob_type}', Position: ({zombie_mob.x}, {zombie_mob.y}), HP: {zombie_mob.hp}")
+            # print(f"Resume: Mob restored - Type: '{zombie_mob.mob_type}', Position: ({zombie_mob.x}, {zombie_mob.y}), HP: {zombie_mob.hp}")
             zombie_mobs.append(zombie_mob)
 
         game_world.add_objects(zombie_mobs, 2)
@@ -244,9 +244,10 @@ def resume(player_start_pos=None):
                 if zombie_mob != other_mob:
                     game_world.add_collision_pair('zombie_mob:zombie_mob', None, other_mob)
 
-        print(f"Resume: Total restored {len(zombie_mobs)} zombie mobs")
+        # print(f"Resume: Total restored {len(zombie_mobs)} zombie mobs")
     else:
-        print("Resume: No saved mobs to restore")
+        pass
+        # print("Resume: No saved mobs to restore")
 
     # 코인 복원
     if stage2_11.saved_coins:
@@ -264,7 +265,7 @@ def resume(player_start_pos=None):
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
 
-        print(f"Resume: Restored {len(coins)} coins")
+        # print(f"Resume: Restored {len(coins)} coins")
 
     ui = Ui()
     game_world.add_object(ui, 4)

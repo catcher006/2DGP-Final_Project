@@ -150,7 +150,7 @@ def pause():
             'frame': coin.frame
         })
 
-    print(f"Pause: Saved {len(stage1_2.saved_mobs)} slime mobs, {len(stage1_2.saved_coins)} coins")
+    # print(f"Pause: Saved {len(stage1_2.saved_mobs)} slime mobs, {len(stage1_2.saved_coins)} coins")
 
     game_world.clear()
     game_world.collision_pairs.clear()
@@ -199,9 +199,10 @@ def resume(player_start_pos=None):
                 if slime_mob != other_mob:
                     game_world.add_collision_pair('slime_mob:slime_mob', None, other_mob)
 
-        print(f"Resume: Restored {len(slime_mobs)} slime mobs")
+        # print(f"Resume: Restored {len(slime_mobs)} slime mobs")
     else:
-        print("Resume: No saved mobs to restore")
+        pass
+        # print("Resume: No saved mobs to restore")
 
     # 코인 복원
     if stage1_2.saved_coins:
@@ -219,9 +220,10 @@ def resume(player_start_pos=None):
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
 
-        print(f"Resume: Restored {len(slime_mobs)} slime mobs, {len(coins)} coins")
+        # print(f"Resume: Restored {len(slime_mobs)} slime mobs, {len(coins)} coins")
     else:
-        print(f"Resume: Restored {len(slime_mobs)} slime mobs, 0 coins")
+        pass
+        # print(f"Resume: Restored {len(slime_mobs)} slime mobs, 0 coins")
 
     ui = Ui()
     game_world.add_object(ui, 4)

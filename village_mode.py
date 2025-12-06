@@ -216,7 +216,7 @@ def enhance_item(item_type):
     current_tier = get_current_tier(item_type)
 
     if current_tier == 'gold':
-        print(f"{item_type} is already max tier!")
+        # print(f"{item_type} is already max tier!")
         return False
 
     success_rates = {
@@ -237,25 +237,25 @@ def enhance_item(item_type):
             new_sword_id = f'{next_tier}_sword'
             Player.player_sword_id = new_sword_id
             Player.current_weapon_id = new_sword_id
-            print(f"[DEBUG] Sword enhanced:")
-            print(f"  - player_sword_id: {Player.player_sword_id}")
-            print(f"  - current_weapon_id: {Player.current_weapon_id}")
+            # print(f"[DEBUG] Sword enhanced:")
+            # print(f"  - player_sword_id: {Player.player_sword_id}")
+            # print(f"  - current_weapon_id: {Player.current_weapon_id}")
         elif item_type == 'arrow':
             new_bow_id = f'{next_tier}_bow'
             Player.player_bow_id = new_bow_id
             Player.current_weapon_id = new_bow_id
-            print(f"[DEBUG] Bow enhanced:")
-            print(f"  - player_bow_id: {Player.player_bow_id}")
-            print(f"  - current_weapon_id: {Player.current_weapon_id}")
+            # print(f"[DEBUG] Bow enhanced:")
+            # print(f"  - player_bow_id: {Player.player_bow_id}")
+            # print(f"  - current_weapon_id: {Player.current_weapon_id}")
         elif item_type == 'shield':
             Player.player_plate_id = f'{next_tier}_plate'
 
         reload_player_images()
 
-        print(f"Enhancement SUCCESS! {item_type} -> {next_tier}")
+        # print(f"Enhancement SUCCESS! {item_type} -> {next_tier}")
         return True
     else:
-        print(f"Enhancement FAILED for {item_type}")
+        # print(f"Enhancement FAILED for {item_type}")
         return False
 
 
@@ -272,7 +272,7 @@ def reload_player_images():
     elif weapon_type == 'bow':
         common.player.load_bow_images()
 
-    print(f"Player images reloaded: plate={Player.player_plate_id}, weapon={Player.current_weapon_id}")
+    # print(f"Player images reloaded: plate={Player.player_plate_id}, weapon={Player.current_weapon_id}")
 
 
 def handle_weapon_select_click(mx, my):
@@ -305,24 +305,24 @@ def handle_weapon_select_click(mx, my):
                 # tier가 none이면 경고 애니메이션 시작
                 if tier == 'none':
                     start_weapon_warning()
-                    print(f"{name} is not available!")
+                    # print(f"{name} is not available!")
                     return
 
                 # 이미 선택된 무기인지 확인
                 if name == 'sword':
                     if 'sword' in Player.current_weapon_id:
                         start_already_selected_warning()
-                        print(f"Sword is already selected!")
+                        # print(f"Sword is already selected!")
                         return
                     Player.current_weapon_id = Player.player_sword_id
-                    print(f"Sword selected: {Player.current_weapon_id}")
+                    # print(f"Sword selected: {Player.current_weapon_id}")
                 elif name == 'arrow':
                     if 'bow' in Player.current_weapon_id:
                         start_already_selected_warning()
-                        print(f"Bow is already selected!")
+                        # print(f"Bow is already selected!")
                         return
                     Player.current_weapon_id = Player.player_bow_id
-                    print(f"Bow selected: {Player.current_weapon_id}")
+                    # print(f"Bow selected: {Player.current_weapon_id}")
 
                 reload_player_images()
                 return
@@ -330,11 +330,11 @@ def handle_weapon_select_click(mx, my):
 
 def handle_enhance_click(mx, my):
     """버튼 클릭 처리"""
-    print(f"Checking click at ({mx}, {my})")
+    # print(f"Checking click at ({mx}, {my})")
     for name, rect in BUTTONS.items():
-        print(f"  Button '{name}': {rect}")
+        # print(f"  Button '{name}': {rect}")
         if point_in_rect(mx, my, rect):
-            print(f"  -> Clicked {name} button!")
+            # print(f"  -> Clicked {name} button!")
 
             # 현재 등급 확인
             tier = get_current_tier(name)
@@ -350,32 +350,33 @@ def handle_enhance_click(mx, my):
                     if enhance_item(name):
                         # 성공: 돈 차감
                         Ui.coin -= cost
-                        print(f"Enhancement successful! Remaining coins: {Ui.coin}")
+                        # print(f"Enhancement successful! Remaining coins: {Ui.coin}")
                     else:
                         # 실패: 돈만 차감
                         Ui.coin -= cost
-                        print(f"Enhancement failed! Remaining coins: {Ui.coin}")
+                        # print(f"Enhancement failed! Remaining coins: {Ui.coin}")
                 else:
                     # 돈이 부족하면 경고 애니메이션 시작
-                    print("Not enough coins!")
+                    # print("Not enough coins!")
                     start_coin_warning()
             else:
-                print(f"{name} is already at max tier!")
+                pass
+                # print(f"{name} is already at max tier!")
             return
 
     for menu_name, menu_rect in MENU_BUTTONS.items():
         if point_in_rect(mx, my, menu_rect):
-            print(f"  -> Clicked menu button: {menu_name}")
+            # print(f"  -> Clicked menu button: {menu_name}")
             if menu_name == 'enhance':
                 enhance_active = True
                 weapon_select = False
-                print("Enhance menu activated.")
+                # print("Enhance menu activated.")
             elif menu_name == 'weapon':
                 weapon_select = True
                 enhance_active = False
-                print("Weapon selection menu activated.")
+                # print("Weapon selection menu activated.")
             return
-    print("  -> No button clicked")
+    # print("  -> No button clicked")
 
 def draw_menu_button(name, rect):
     for name, rect in MENU_BUTTONS.items():

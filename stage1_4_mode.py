@@ -128,9 +128,10 @@ def pause():
             'hp': slime_boss.hp,
             'frame': slime_boss.frame
         })
-        print(f"Pause: Saved boss (hp: {slime_boss.hp})")
+        # print(f"Pause: Saved boss (hp: {slime_boss.hp})")
     else:
-        print("Pause: No boss to save")
+        pass
+        # print("Pause: No boss to save")
 
     # 코인 저장
     stage1_4.saved_coins = []
@@ -141,7 +142,7 @@ def pause():
             'frame': coin.frame
         })
 
-    print(f"Pause: Saved boss (alive: {slime_boss.is_alive if slime_boss else False}), {len(stage1_4.saved_coins)} coins")
+    # print(f"Pause: Saved boss (alive: {slime_boss.is_alive if slime_boss else False}), {len(stage1_4.saved_coins)} coins")
 
     game_world.clear()
     game_world.collision_pairs.clear()
@@ -175,10 +176,10 @@ def resume(player_start_pos=None):
         game_world.add_collision_pair('player:slime_boss', common.player, None)
         game_world.add_collision_pair('player:slime_boss', None, slime_boss)
 
-        print(f"Resume: Restored boss")
+        # print(f"Resume: Restored boss")
     else:
         slime_boss = None
-        print("Resume: No saved boss to restore")
+        # print("Resume: No saved boss to restore")
 
     # 코인 복원
     if stage1_4.saved_coins:
@@ -196,9 +197,10 @@ def resume(player_start_pos=None):
         for coin in coins:
             game_world.add_collision_pair('player:coin', None, coin)
 
-        print(f"Resume: Restored {len(coins)} coins")
+        # print(f"Resume: Restored {len(coins)} coins")
     else:
-        print(f"Resume: 0 coins")
+        pass
+        # print(f"Resume: 0 coins")
 
     ui = Ui()
     game_world.add_object(ui, 4)
