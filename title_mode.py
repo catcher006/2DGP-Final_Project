@@ -4,17 +4,29 @@ import village_mode
 import sounds
 
 image = None
+title_image = None
+font = None
 
 def init():
-    global image
+    global image, title_image, font
     image = load_image('./image/background/main_title.png')
+    title_image = load_image('./image/background/title.png')
+    font = load_font('./font/PixelPurl.TTF', 40)
 
     sounds.init_bgm_sounds()
     sounds.init_effect_sounds()
 
 def finish():
-    global image
-    del image
+    global image, title_image, font
+    if image:
+        del image
+    if title_image:
+        del title_image
+    if font:
+        del font
+    image = None
+    title_image = None
+    font = None
 
 def update():
     pass
@@ -22,6 +34,8 @@ def update():
 def draw():
     clear_canvas()
     image.draw_to_origin(0, 0, 1024, 576)
+    title_image.draw(512, 288)
+    font.draw(80, 50, 'ESC key to end the game, click to start the game or space bar', (200, 200, 200))
     update_canvas()
 
 def handle_events():
