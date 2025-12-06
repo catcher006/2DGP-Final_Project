@@ -276,6 +276,16 @@ class Ui:
             # 일시정지 버튼
             if 970 <= mx <= 1010 and 530 <= my <= 570:
                 Ui.paused = False
+
+                # 플레이어를 idle 상태로 강제 전환
+                import game_world
+                for layer in game_world.world:
+                    for obj in layer:
+                        if isinstance(obj, player.Player):
+                            obj.xdir = 0
+                            obj.ydir = 0
+                            obj.state_machine.handle_state_event(('STOP', None))
+
                 self.reset_ui_state()
                 return True
 
