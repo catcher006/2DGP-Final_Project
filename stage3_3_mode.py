@@ -68,7 +68,7 @@ def init(player_start_pos=None):
         Stage3_3.stage3_3_create = True
         Stage3_3.current_mode = True
 
-        goblin_mobs = [Goblin_Mob() for _ in range(random.randint(2, 5))]
+        goblin_mobs = [Goblin_Mob() for _ in range(random.randint(4 ,8))]
         for goblin_mob in goblin_mobs:
             goblin_mob.move_validator = stage3_3.is_mob_walkable
 

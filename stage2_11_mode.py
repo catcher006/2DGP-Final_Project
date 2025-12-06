@@ -62,7 +62,7 @@ def init(player_start_pos=None):
         Stage2_11.stage2_11_create = True
         Stage2_11.current_mode = True
 
-        zombie_mobs = [Zombie_Mob() for _ in range(random.randint(2, 5))]
+        zombie_mobs = [Zombie_Mob() for _ in range(random.randint(4, 7))]
         for zombie_mob in zombie_mobs:
             zombie_mob.move_validator = stage2_11.is_mob_walkable
 

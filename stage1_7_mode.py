@@ -64,7 +64,7 @@ def init(player_start_pos=None):
         Stage1_7.stage1_7_create = True
         Stage1_7.current_mode = True
 
-        slime_mobs = [Slime_Mob() for _ in range(random.randint(0, 2))]
+        slime_mobs = [Slime_Mob() for _ in range(random.randint(3, 5))]
         for slime_mob in slime_mobs:
             slime_mob.move_validator = stage1_7.is_mob_walkable
 
