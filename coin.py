@@ -59,9 +59,9 @@ class Coin:
     def do(self): pass
     def draw(self):
         self.image.clip_draw(int(self.frame) * 17,0, 17, 16, self.x, self.y, 32, 32)
-        bb = self.get_bb()
-        if bb:
-            draw_rectangle(*bb)
+        # bb = self.get_bb()
+        # if bb:
+        #     draw_rectangle(*bb)
     def update(self):
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
     def get_bb(self):
