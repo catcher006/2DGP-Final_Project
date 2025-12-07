@@ -6,6 +6,7 @@ import game_world
 import game_framework
 import stage2_1_mode
 import common
+import player
 from stage2_0 import Stage2_0
 from stage2_1 import Stage2_1
 from stage2_2 import Stage2_2
@@ -63,6 +64,10 @@ def handle_events():
                     Stage2_7.boss_cleared = False
                     game_framework.clear_stage1_modes((545, 400))
 
+                from game_data import GameData
+                GameData.player_data['coins'] = Ui.coin
+                GameData.player_data['hp'] = player.player_hp
+                GameData.save_player()
                 import sounds
                 sounds.stage2_bgm.stop()
                 game_framework.pop_mode(dungeonmain_mode,(545, 400))

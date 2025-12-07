@@ -1,6 +1,5 @@
 import game_framework
 from pico2d import *
-
 import title_mode
 
 image = None
@@ -15,6 +14,14 @@ def init():
     logo_start_time = get_time()
     bgm.set_volume(64)
     bgm.play()
+
+    from game_data import GameData
+    from ui import Ui
+    GameData.initialize()
+    GameData.apply_weapon()
+    GameData.apply_player()
+    Ui.coin = GameData.player_data['coins']
+    Ui.hp = GameData.player_data['hp']
 
 def finish():
     global image

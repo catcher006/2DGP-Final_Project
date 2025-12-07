@@ -11,6 +11,7 @@ from village import Village
 from village_front_object import Village_Front_Object
 from player import Player
 from ui import Ui
+from game_data import GameData
 
 enhance_active = False # 강화 모드 활성화 플래그
 weapon_select = False # 무기 선택 모드 활성화 플래그
@@ -325,6 +326,8 @@ def reload_player_images():
 
 def handle_weapon_select_click(mx, my):
     # 무기 선택 클릭 처리
+    from game_data import GameData
+
     enhance_rect = MENU_BUTTONS.get('enhance')
     weapon_rect = MENU_BUTTONS.get('weapon')
 
@@ -373,11 +376,14 @@ def handle_weapon_select_click(mx, my):
                     # print(f"Bow selected: {Player.current_weapon_id}")
 
                 reload_player_images()
+                GameData.update_weapon()  # 무기 변경 저장
                 return
 
 
 def handle_enhance_click(mx, my):
     """버튼 클릭 처리"""
+    from game_data import GameData
+
     # print(f"Checking click at ({mx}, {my})")
     for name, rect in BUTTONS.items():
         # print(f"  Button '{name}': {rect}")
@@ -398,10 +404,15 @@ def handle_enhance_click(mx, my):
                     if enhance_item(name):
                         # 성공: 돈 차감
                         Ui.coin -= cost
+                        GameData.update_weapon()  # 무기 데이터 저장
+                        GameData.player_data['coins'] = Ui.coin
+                        GameData.save_player()  # 코인 저장
                         # print(f"Enhancement successful! Remaining coins: {Ui.coin}")
                     else:
                         # 실패: 돈만 차감
                         Ui.coin -= cost
+                        GameData.player_data['coins'] = Ui.coin
+                        GameData.save_player()  # 코인만 저장
                         # print(f"Enhancement failed! Remaining coins: {Ui.coin}")
                 else:
                     # 돈이 부족하면 경고 애니메이션 시작
@@ -674,6 +685,7 @@ def draw_enhance_ui():
 def purchase_potion(item_name):
     """포션 구매 및 HP 회복 처리"""
     import player
+    from game_data import GameData
 
     item_info = SHOP_ITEMS.get(item_name)
     if not item_info:
@@ -704,6 +716,11 @@ def purchase_potion(item_name):
     # 5. HP 회복 (최대 100으로 제한)
     player.player_hp = min(100, player.player_hp + heal_amount)
     Ui.hp = player.player_hp
+
+    # HP와 코인 저장
+    GameData.player_data['hp'] = player.player_hp
+    GameData.player_data['coins'] = Ui.coin
+    GameData.save_player()
 
     # 6. 구매 효과음 재생
     sounds.coin_sound.play()

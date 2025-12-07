@@ -79,6 +79,10 @@ def quit():
     global running
     running = False
 
+    from game_data import GameData
+    GameData.save_weapon()
+    GameData.save_player()
+
 def run(start_mode):
     global running, stack, frame_time
     running = True

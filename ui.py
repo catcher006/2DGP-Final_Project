@@ -1,10 +1,11 @@
 from pico2d import *
+from game_data import GameData
 import player
 import sounds
 
 
 class Ui:
-    coin = 100000 # 최대값 9999999
+    coin = 500 # 최대값 9999999
     hp = 100
     paused = False
     game_over = False
@@ -431,11 +432,17 @@ class Ui:
         # 게임 월드 완전 초기화
         game_world.clear()
 
+        # 저장된 데이터 다시 로드
+        GameData.load_player()
+        GameData.load_weapon()
+        GameData.apply_weapon()
+        GameData.apply_player()
+
         # UI 상태 초기화
         Ui.game_over = False
         Ui.paused = False
         Ui.hp = 100
-        Ui.coin = 100
+        Ui.coin = GameData.player_data['coins']
         self.game_over_sound_played = False
         self.reset_ui_state()
 
