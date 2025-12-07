@@ -439,7 +439,7 @@ class Player:
             {
                 self.IDLE: { event_run: self.WALK, space_down: self.ATTACK, event_die: self.DEAD },
                 self.WALK: { event_stop: self.IDLE, space_down: self.ATTACK, event_die: self.DEAD },
-                self.ATTACK: { event_stop: self.IDLE, event_die: self.DEAD },
+                self.ATTACK: { event_stop: self.IDLE, event_run: self.WALK, event_die: self.DEAD },
                 self.DEAD: {}
             }
 
