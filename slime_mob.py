@@ -15,7 +15,6 @@ from stage1_5 import Stage1_5
 from stage1_6 import Stage1_6
 from stage1_7 import Stage1_7
 from state_machine import StateMachine
-from coin import Coin
 from pico2d import load_image, load_font, get_time, draw_rectangle
 
 
@@ -73,11 +72,16 @@ class Dead:
         if self.played:
             # 애니메이션이 끝났고 아직 코인 생성/삭제가 되지 않았으면 처리
             if not self.spawned:
+                from coin import Coin
                 # 몹이 죽을 때 코인 생성
                 coin = Coin()
                 coin.x = self.mob.x
                 coin.y = self.mob.y
 
+                # 1. 먼저 게임 월드에 추가
+                game_world.add_object(coin, 2)
+
+                # 2. 스테이지별 리스트에 추가
                 if Stage1_0.current_mode:
                     stage1_0_mode.coins.append(coin)
                 elif Stage1_1.current_mode:
@@ -95,10 +99,10 @@ class Dead:
                 elif Stage1_7.current_mode:
                     stage1_7_mode.coins.append(coin)
 
-                game_world.add_object(coin, 2)
-                game_world.add_collision_pair('player:coin', None, coin)
+                game_world.add_collision_pair('player:coin', common.player, coin)
                 # print(f"Coin created at ({coin.x}, {coin.y})")
 
+                game_world.remove_collision_object(self.mob)
                 game_world.remove_object(self.mob)
 
                 self.spawned = True

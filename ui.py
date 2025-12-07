@@ -4,7 +4,7 @@ import sounds
 
 
 class Ui:
-    coin = 100 # 최대값 9999999
+    coin = 100000 # 최대값 9999999
     hp = 100
     paused = False
     game_over = False

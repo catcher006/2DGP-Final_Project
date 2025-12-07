@@ -131,11 +131,14 @@ class Dead:
                     coin.x, coin.y = pos
                     coin.frame = random.randint(0, 7)
 
+                    # 1. 먼저 게임 월드에 추가
+                    game_world.add_object(coin, 2)
+
+                    # 2. 스테이지별 리스트에 추가
                     if Stage2_7.current_mode:
                         stage2_7_mode.coins.append(coin)
 
-                    game_world.add_object(coin, 2)
-                    game_world.add_collision_pair('player:coin', None, coin)
+                    game_world.add_collision_pair('player:coin', common.player, coin)
 
                 # print(f"8 coins created around boss at ({self.mob.x}, {self.mob.y})")
 

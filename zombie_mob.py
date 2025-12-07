@@ -125,6 +125,10 @@ class Dead:
                 coin.x = self.mob.x
                 coin.y = self.mob.y
 
+                # 1. 먼저 게임 월드에 추가
+                game_world.add_object(coin, 2)
+
+                # 2. 스테이지별 리스트에 추가
                 if Stage2_0.current_mode:
                     stage2_0_mode.coins.append(coin)
                 elif Stage2_1.current_mode:
@@ -150,8 +154,7 @@ class Dead:
                 elif Stage2_11.current_mode:
                     stage2_11_mode.coins.append(coin)
 
-                game_world.add_object(coin, 2)
-                game_world.add_collision_pair('player:coin', None, coin)
+                game_world.add_collision_pair('player:coin', common.player, coin)
                 # print(f"Coin created at ({coin.x}, {coin.y})")
 
                 game_world.remove_collision_object(self.mob)
