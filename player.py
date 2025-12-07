@@ -39,7 +39,7 @@ from stage3_11 import Stage3_11
 from state_machine import StateMachine
 from ui import Ui
 from pico2d import *
-from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f, SDLK_SPACE
+from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_f, SDLK_SPACE, SDL_GetKeyboardState, SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_W, SDL_SCANCODE_S
 
 # Player Run Speed
 PIXEL_PER_METER = (10.0 / 0.3) # 10 pixel 30 cm
@@ -490,16 +490,32 @@ class Player:
         if event.key in (SDLK_a, SDLK_d, SDLK_w, SDLK_s):
             cur_xdir, cur_ydir = self.xdir, self.ydir
             if event.type == SDL_KEYDOWN:
-                if event.key == SDLK_a: self.xdir -= 1
-                elif event.key == SDLK_d: self.xdir += 1
-                elif event.key == SDLK_w: self.ydir += 1
-                elif event.key == SDLK_s: self.ydir -= 1
+                if event.key == SDLK_a:
+                    self.xdir = -1 if self.xdir != 1 else 0
+                elif event.key == SDLK_d:
+                    self.xdir = 1 if self.xdir != -1 else 0
+                elif event.key == SDLK_w:
+                    self.ydir = 1 if self.ydir != -1 else 0
+                elif event.key == SDLK_s:
+                    self.ydir = -1 if self.ydir != 1 else 0
             elif event.type == SDL_KEYUP:
-                # 키를 떼는 순간에도 방향 값을 0으로 직접 설정
-                if event.key == SDLK_a and self.xdir < 0: self.xdir = 0
-                elif event.key == SDLK_d and self.xdir > 0: self.xdir = 0
-                elif event.key == SDLK_w and self.ydir > 0: self.ydir = 0
-                elif event.key == SDLK_s and self.ydir < 0: self.ydir = 0
+                keys = SDL_GetKeyboardState(None)
+                if event.key == SDLK_a and self.xdir == 0:
+                    self.xdir = 1 if keys[SDL_SCANCODE_D] else 0
+                elif event.key == SDLK_a and self.xdir == -1:
+                    self.xdir = 1 if keys[SDL_SCANCODE_D] else 0
+                elif event.key == SDLK_d and self.xdir == 0:
+                    self.xdir = -1 if keys[SDL_SCANCODE_A] else 0
+                elif event.key == SDLK_d and self.xdir == 1:
+                    self.xdir = -1 if keys[SDL_SCANCODE_A] else 0
+                elif event.key == SDLK_w and self.ydir == 0:
+                    self.ydir = -1 if keys[SDL_SCANCODE_S] else 0
+                elif event.key == SDLK_w and self.ydir == 1:
+                    self.ydir = -1 if keys[SDL_SCANCODE_S] else 0
+                elif event.key == SDLK_s and self.ydir == 0:
+                    self.ydir = 1 if keys[SDL_SCANCODE_W] else 0
+                elif event.key == SDLK_s and self.ydir == -1:
+                    self.ydir = 1 if keys[SDL_SCANCODE_W] else 0
             if cur_xdir != self.xdir or cur_ydir != self.ydir:  # 방향키에 따른 변화가 있으면
                 if self.xdir == 0 and self.ydir == 0:  # 멈춤
                     self.state_machine.handle_state_event(('STOP', self.face_dir))  # 스탑 시 이전 방향 전달
